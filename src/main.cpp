@@ -1,5 +1,6 @@
 #include <QGuiApplication>
 #include "TriangleWindow.hpp"
+#include "RectangleWindow.hpp"
 
 int main(int argc, char** argv)
 {
@@ -10,10 +11,10 @@ int main(int argc, char** argv)
 	format.setProfile(QSurfaceFormat::CoreProfile);
 	format.setVersion(3, 3);
 
-	TriangleWindow window;
+	RectangleWindow window;
 
 	window.setFormat(format);
-	window.resize(640, 480);
+	window.resize(600, 480);
 	window.show();
 
 	return app.exec();
