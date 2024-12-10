@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="includes\MainWindow.cpp" />
+    <QtMoc Include="includes\MainWindow.hpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\OpenGLWindow.cpp" />
     <ClCompile Include="src\RectangleWindow.cpp" />
