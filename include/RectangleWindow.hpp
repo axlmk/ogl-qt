@@ -1,13 +1,14 @@
 #ifndef RECTANGLE_WINDOW_HPP
 #define RECTANGLE_WINDOW_HPP
 
+#include <iostream>
 #include <QOpenGLFunctions>
 #include <QOpenGLWindow>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
 #include <QOpenGLShaderProgram>
 
-class RectangleWindow : public QOpenGLWindow {
+class RectangleWindow : public QOpenGLWindow, protected QOpenGLFunctions {
 public:
 	~RectangleWindow() Q_DECL_OVERRIDE;
 
