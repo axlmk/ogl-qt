@@ -19,32 +19,6 @@ void RectangleWindow::initializeGL() {
 	int success = 0;
 	char infoLog[INFO_LOG_SIZE];
 
-	/* 3D Model creation */
-
-	float renderedObject[] = {
-		 0.0f,  0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-		-0.5f, -0.5f, 0.0f,
-	};
-
-	/* Vertex Array Object management */
-	glGenVertexArrays(1, &m_VAO);
-	glBindVertexArray(m_VAO);
-
-	/* VBO management */
-
-	unsigned int vertexBufferObject; // Vertex buffer object, used to manage vertex data in the GPU memory
-	glGenBuffers(1, &vertexBufferObject); // generate random buffer
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject); // make vertexBufferObject a buffer of type GL_ARRAY_BUFFER
-	// GL_STREAM_DRAW: the data is set only once and used by the GPU at most a few times.
-	// GL_STATIC_DRAW : the data is set only once and used many times.
-	// GL_DYNAMIC_DRAW : the data is changed a lot and used many times.
-	// glBufferData => copy the rendered object into the vertex buffer object thanks to the GL_ARRAY_BUFFER target
-	glBufferData(GL_ARRAY_BUFFER, sizeof(renderedObject), renderedObject, GL_STATIC_DRAW);
-	// Tells OpenGL how to interpret the raw data
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
 	/* Verter shader management */
 
 	const std::string vertexShaderContent = getFileContent("shaders/pass_through.vert"); // Get shader content from file
@@ -81,6 +55,43 @@ void RectangleWindow::initializeGL() {
 		qCritical() << "Error compiling fragment shader: " << infoLog;
 	}
 
+	/* 3D Model creation */
+
+	float renderedObject[] = {
+		 -0.5f,  0.5f,  0.0f,
+		  0.5f,  0.5f,  0.0f,
+		 -0.5f, -0.5f,  0.0f,
+		  0.5f, -0.5f,  0.0f
+	};
+
+	unsigned int indices[] = {
+		0, 1, 3,
+		0, 2, 3
+	};
+
+	/* Vertex Array Object (VAO) management */
+	
+	glGenVertexArrays(1, &m_VAO);
+	glBindVertexArray(m_VAO);
+
+	/* Element Buffer Object (EBO) management */
+	
+	unsigned int m_EBO;
+	glGenBuffers(1, &m_EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	/* Vertex Buffer Object (VBO) management */
+
+	unsigned int VBO; // Vertex buffer object, used to manage vertex data in the GPU memory
+	glGenBuffers(1, &VBO); // generate random buffer
+	glBindBuffer(GL_ARRAY_BUFFER, VBO); // make VBO a buffer of type GL_ARRAY_BUFFER
+	// glBufferData => copy the rendered object into the vertex buffer object thanks to the GL_ARRAY_BUFFER target
+	glBufferData(GL_ARRAY_BUFFER, sizeof(renderedObject), renderedObject, GL_STATIC_DRAW);
+	// Tells OpenGL how to interpret the raw data
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	
 	/* Shader linking management */
 	
 	m_shaderProgramId = glCreateProgram(); // Creation of the program
@@ -96,6 +107,8 @@ void RectangleWindow::initializeGL() {
 	glDeleteShader(fragmentShaderId);
 	// Right now we sent the input vertex data to the GPU 
 	// and instructed the GPU how it should process the vertex data within a vertex and fragment shader.
+
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // Wireframe
 }
 
 std::string RectangleWindow::getFileContent(std::filesystem::path path) {
@@ -117,10 +130,10 @@ std::string RectangleWindow::getFileContent(std::filesystem::path path) {
 }
 
 void RectangleWindow::paintGL() {
-	glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glUseProgram(m_shaderProgramId);
 	glBindVertexArray(m_VAO);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
