@@ -14,16 +14,10 @@
     <ClCompile Include="include\MainWindow.cpp" />
     <QtMoc Include="include\MainWindow.hpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\OpenGLWindow.cpp" />
     <ClCompile Include="src\RectangleWindow.cpp" />
-    <ClCompile Include="src\TriangleWindow.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <QtMoc Include="include\OpenGLWindow.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\RectangleWindow.hpp" />
-    <ClInclude Include="include\TriangleWindow.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\pass_through.vert" />

@@ -1,14 +1,17 @@
-#ifndef RECTANGLE_WINDOW_HPP
-#define RECTANGLE_WINDOW_HPP
+#pragma once
 
 #include <iostream>
-#include <QOpenGLFunctions>
-#include <QOpenGLWindow>
-#include <QOpenGLVertexArrayObject>
-#include <QOpenGLBuffer>
-#include <QOpenGLShaderProgram>
+#include <fstream>
+#include <filesystem>
+#include <string>
 
-class RectangleWindow : public QOpenGLWindow, protected QOpenGLFunctions {
+#include <QOpenGLExtraFunctions>
+#include <QOpenGLWindow>
+#include <QDebug>
+
+#define INFO_LOG_SIZE 512
+
+class RectangleWindow : public QOpenGLWindow, protected QOpenGLExtraFunctions {
 public:
 	~RectangleWindow() Q_DECL_OVERRIDE;
 
@@ -16,10 +19,7 @@ public:
 	void paintGL() Q_DECL_OVERRIDE;
 
 private:
-	QOpenGLBuffer m_indexBufferObject;
-	QOpenGLBuffer m_vertexBufferObject;
-	QOpenGLVertexArrayObject m_vao;
-	QOpenGLShaderProgram *m_program;
+	unsigned int m_shaderProgramId;
+	unsigned int m_VAO;
+	std::string getFileContent(std::filesystem::path path);
 };
-
-#endif

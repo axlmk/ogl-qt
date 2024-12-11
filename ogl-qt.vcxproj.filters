@@ -26,13 +26,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\OpenGLWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\RectangleWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TriangleWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\main.cpp">
@@ -43,18 +37,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="include\OpenGLWindow.hpp">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="include\MainWindow.hpp">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\RectangleWindow.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\TriangleWindow.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
