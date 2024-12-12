@@ -4,10 +4,12 @@
 #include <fstream>
 #include <filesystem>
 #include <string>
+#include <cmath>
 
 #include <QOpenGLExtraFunctions>
 #include <QOpenGLWindow>
 #include <QDebug>
+#include <QRandomGenerator>
 
 #define INFO_LOG_SIZE 512
 

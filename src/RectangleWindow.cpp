@@ -108,7 +108,6 @@ void RectangleWindow::initializeGL() {
 	// Right now we sent the input vertex data to the GPU 
 	// and instructed the GPU how it should process the vertex data within a vertex and fragment shader.
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // Wireframe
 }
 
 std::string RectangleWindow::getFileContent(std::filesystem::path path) {
@@ -133,7 +132,13 @@ void RectangleWindow::paintGL() {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	int vertexColorLocation = glGetUniformLocation(m_shaderProgramId, "cpuColor");
 	glUseProgram(m_shaderProgramId);
+	double red = QRandomGenerator::global()->bounded(1.0f);
+	float green = QRandomGenerator::global()->bounded(1.0f);
+	float blue = QRandomGenerator::global()->bounded(1.0f);
+	glUniform4f(vertexColorLocation, red, green, blue, 1.0f);
+	
 	glBindVertexArray(m_VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }

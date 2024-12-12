@@ -47,12 +47,5 @@ MainWindow::MainWindow() : QDialog(nullptr, Qt::WindowSystemMenuHint | Qt::Windo
 
 
 void MainWindow::onChangeColors() {
-	// randomize the colors and change them in the OpenGL window
-
-	//for (unsigned int i = 0; i < 4; ++i) {
-	//	m_rectangleWindow->m_vertexColors[i].setRgbF(rand() * 1.0 / RAND_MAX, rand() * 1.0 / RAND_MAX, rand() * 1.0 / RAND_MAX);
-	//}
-
-	//// now update the scene -> this will also request an update
-	//m_rectangleWindow->updateScene();
+	m_rectangleWindow->update();
 }
