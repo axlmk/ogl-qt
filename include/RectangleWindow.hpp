@@ -1,8 +1,6 @@
 #pragma once
 
 #include <iostream>
-#include <fstream>
-#include <filesystem>
 #include <string>
 #include <cmath>
 
@@ -11,9 +9,10 @@
 #include <QDebug>
 #include <QRandomGenerator>
 
-#define INFO_LOG_SIZE 512
+#include "Utils.hpp"
+#include "Shader.hpp"
 
-class RectangleWindow : public QOpenGLWindow, protected QOpenGLExtraFunctions {
+class RectangleWindow : public QOpenGLWindow {
 public:
 	~RectangleWindow() Q_DECL_OVERRIDE;
 
@@ -23,5 +22,6 @@ public:
 private:
 	unsigned int m_shaderProgramId;
 	unsigned int m_VAO;
+	Shader m_shd;
 	std::string getFileContent(std::filesystem::path path);
 };

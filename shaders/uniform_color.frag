@@ -1,7 +1,7 @@
 #version 330 core
 
+in vec4 cpuColor;
 out vec4 finalColor;
-uniform vec4 cpuColor;
 
 void main() {
   finalColor = cpuColor;

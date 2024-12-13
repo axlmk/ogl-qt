@@ -9,7 +9,7 @@ void RectangleWindow::initializeGL() {
 	/* Initialize OpenGL */
 
 	try {
-		initializeOpenGLFunctions();
+		g_opengl.initializeOpenGLFunctions();
 	} catch (...) {
 		qCritical() << "OpenGL could not be initialized";
 	}
@@ -17,128 +17,57 @@ void RectangleWindow::initializeGL() {
 	/* Initialization of debug variables */
 
 	int success = 0;
-	char infoLog[INFO_LOG_SIZE];
-
-	/* Verter shader management */
-
-	const std::string vertexShaderContent = getFileContent("shaders/pass_through.vert"); // Get shader content from file
-	if (vertexShaderContent.empty()) {
-		qCritical() << "Vertex shader content could not be loaded";
-		return;
-	}
-	const char *vertexShaderContentChar = vertexShaderContent.c_str();
-	unsigned int vertexShaderId;
-	vertexShaderId = glCreateShader(GL_VERTEX_SHADER); // Create new shader id
-	glShaderSource(vertexShaderId, 1, &vertexShaderContentChar, NULL); // Load the content of the shader into an actual shader
-	glCompileShader(vertexShaderId); // Compile it
-	glGetShaderiv(vertexShaderId, GL_COMPILE_STATUS, &success); // Get debug info if operation failed
-	if (!success) {
-		glGetShaderInfoLog(vertexShaderId, INFO_LOG_SIZE, NULL, infoLog);
-		qCritical() << "Error compiling vertex shader: " << infoLog;
-	}
-
-	/* Fragment shader management */
-
-	const std::string fragmentShaderContent = getFileContent("shaders/uniform_color.frag");
-	if (fragmentShaderContent.empty()) {
-		qCritical() << "Fragment shader content could not be loaded";
-		return;
-	}
-	const char * fragmentShaderContentChar = fragmentShaderContent.c_str();
-	unsigned int fragmentShaderId;
-	fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShaderId, 1, &fragmentShaderContentChar, NULL);
-	glCompileShader(fragmentShaderId);
-	glGetShaderiv(fragmentShaderId, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		glGetShaderInfoLog(vertexShaderId, INFO_LOG_SIZE, NULL, infoLog);
-		qCritical() << "Error compiling fragment shader: " << infoLog;
-	}
 
 	/* 3D Model creation */
 
 	float renderedObject[] = {
-		 -0.5f,  0.5f,  0.0f,
-		  0.5f,  0.5f,  0.0f,
-		 -0.5f, -0.5f,  0.0f,
-		  0.5f, -0.5f,  0.0f
+		 -0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 0.0f,
+		  0.5f, -0.5f,  0.0f, 0.0f, 1.0f, 0.0f,
+		  0.0f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f
 	};
 
 	unsigned int indices[] = {
-		0, 1, 3,
-		0, 2, 3
+		0, 1, 2
 	};
 
 	/* Vertex Array Object (VAO) management */
 	
-	glGenVertexArrays(1, &m_VAO);
-	glBindVertexArray(m_VAO);
+	g_opengl.glGenVertexArrays(1, &m_VAO);
+	g_opengl.glBindVertexArray(m_VAO);
 
 	/* Element Buffer Object (EBO) management */
 	
 	unsigned int m_EBO;
-	glGenBuffers(1, &m_EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	g_opengl.glGenBuffers(1, &m_EBO);
+	g_opengl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+	g_opengl.glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	/* Vertex Buffer Object (VBO) management */
 
 	unsigned int VBO; // Vertex buffer object, used to manage vertex data in the GPU memory
-	glGenBuffers(1, &VBO); // generate random buffer
-	glBindBuffer(GL_ARRAY_BUFFER, VBO); // make VBO a buffer of type GL_ARRAY_BUFFER
+	g_opengl.glGenBuffers(1, &VBO); // generate random buffer
+	g_opengl.glBindBuffer(GL_ARRAY_BUFFER, VBO); // make VBO a buffer of type GL_ARRAY_BUFFER
 	// glBufferData => copy the rendered object into the vertex buffer object thanks to the GL_ARRAY_BUFFER target
-	glBufferData(GL_ARRAY_BUFFER, sizeof(renderedObject), renderedObject, GL_STATIC_DRAW);
+	g_opengl.glBufferData(GL_ARRAY_BUFFER, sizeof(renderedObject), renderedObject, GL_STATIC_DRAW);
 	// Tells OpenGL how to interpret the raw data
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
+	g_opengl.glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	g_opengl.glEnableVertexAttribArray(0);
+	g_opengl.glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
+	g_opengl.glEnableVertexAttribArray(1);
 	
-	/* Shader linking management */
-	
-	m_shaderProgramId = glCreateProgram(); // Creation of the program
-	glAttachShader(m_shaderProgramId, vertexShaderId); // Attach both shaders to the program
-	glAttachShader(m_shaderProgramId, fragmentShaderId);
-	glLinkProgram(m_shaderProgramId); // Creation of the link
-	glGetProgramiv(m_shaderProgramId, GL_LINK_STATUS, &success); // Get info on how the link went
-	if (!success) {
-		glGetProgramInfoLog(m_shaderProgramId, INFO_LOG_SIZE, NULL, infoLog);
-		qCritical() << "Error linking the shaders to the program: " << infoLog;
-	}
-	glDeleteShader(vertexShaderId); // The shader are no more required once the linking has been done
-	glDeleteShader(fragmentShaderId);
 	// Right now we sent the input vertex data to the GPU 
 	// and instructed the GPU how it should process the vertex data within a vertex and fragment shader.
 
+	m_shd.addShaders("shaders/pass_through.vert", "shaders/uniform_color.frag");
 }
 
-std::string RectangleWindow::getFileContent(std::filesystem::path path) {
 
-	if (!std::filesystem::exists(path)) {
-		qCritical() << "Path [" << path.string() << "] doesn't not exist";
-		return "";
-	}
-
-	std::ifstream file(path);
-	if (!file) {
-		qCritical() << "Path [" << path.string() << "] could not be opened";
-		return "";
-	}
-
-	std::ostringstream buffer;
-	buffer << file.rdbuf();
-	return buffer.str();
-}
 
 void RectangleWindow::paintGL() {
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	g_opengl.glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	g_opengl.glClear(GL_COLOR_BUFFER_BIT);
 
-	int vertexColorLocation = glGetUniformLocation(m_shaderProgramId, "cpuColor");
-	glUseProgram(m_shaderProgramId);
-	double red = QRandomGenerator::global()->bounded(1.0f);
-	float green = QRandomGenerator::global()->bounded(1.0f);
-	float blue = QRandomGenerator::global()->bounded(1.0f);
-	glUniform4f(vertexColorLocation, red, green, blue, 1.0f);
-	
-	glBindVertexArray(m_VAO);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	m_shd.use();
+	g_opengl.glBindVertexArray(m_VAO);
+	g_opengl.glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 }

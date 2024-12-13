@@ -11,13 +11,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\MainWindow.cpp" />
+    <ClCompile Include="include\Utils.hpp" />
+    <ClCompile Include="src\MainWindow.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\Utils.cpp" />
     <QtMoc Include="include\MainWindow.hpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\RectangleWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\RectangleWindow.hpp" />
+    <ClInclude Include="include\Shader.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\pass_through.vert" />
