@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\Utils.hpp" />
     <ClCompile Include="src\MainWindow.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Utils.cpp" />
@@ -22,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="include\RectangleWindow.hpp" />
     <ClInclude Include="include\Shader.hpp" />
+    <ClInclude Include="include\Utils.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\pass_through.vert" />
