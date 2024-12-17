@@ -53,7 +53,7 @@ void Shader::addShaders(const std::filesystem::path& vtxShdPath, const std::file
 	g_opengl.glCompileShader(m_frgShd);
 	g_opengl.glGetShaderiv(m_frgShd, GL_COMPILE_STATUS, &success);
 	if (!success) {
-		g_opengl.glGetShaderInfoLog(m_vtxShd, INFO_LOG_SIZE, NULL, g_infoLog);
+		g_opengl.glGetShaderInfoLog(m_frgShd, INFO_LOG_SIZE, NULL, g_infoLog);
 		m_err_msg = "Error compiling fragment shader: " + std::string(g_infoLog);
 		qCritical() << m_err_msg;
 		deleteShaders();

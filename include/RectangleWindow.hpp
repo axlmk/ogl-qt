@@ -9,6 +9,8 @@
 #include <QDebug>
 #include <QRandomGenerator>
 
+#include <stb_image.h>
+
 #include "Utils.hpp"
 #include "Shader.hpp"
 
@@ -22,6 +24,7 @@ public:
 private:
 	unsigned int m_shaderProgramId;
 	unsigned int m_VAO;
+	unsigned int m_texture;
 	Shader m_shd;
 	std::string getFileContent(std::filesystem::path path);
 };
