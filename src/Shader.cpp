@@ -4,15 +4,17 @@ Shader::Shader() : m_shdPrgId{}, m_vtxShd{}, m_frgShd{} {
 }
 
 Shader::Shader(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath) {
-	addShaders(vtxShdPath, frgShdPath);
+	setShaders(vtxShdPath, frgShdPath);
 }
 
 Shader::~Shader() {
-	if(m_shdPrgId)
+	if(m_shdPrgId) {
 		g_opengl.glDeleteProgram(m_shdPrgId);
+		m_shdPrgId = 0;
+	}
 }
 
-void Shader::addShaders(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath) {
+void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath) {
 	
 	int success;
 	/* Verter shader management */
@@ -29,7 +31,7 @@ void Shader::addShaders(const std::filesystem::path& vtxShdPath, const std::file
 	g_opengl.glCompileShader(m_vtxShd); // Compile it
 	g_opengl.glGetShaderiv(m_vtxShd, GL_COMPILE_STATUS, &success); // Get debug info if operation failed
 
-	if (!success) {
+	if (success == GL_FALSE) {
 		g_opengl.glGetShaderInfoLog(m_vtxShd, INFO_LOG_SIZE, NULL, g_infoLog);
 		m_err_msg = "Error compiling vertex shader: " + std::string(g_infoLog);
 		qCritical() << m_err_msg;
@@ -52,7 +54,7 @@ void Shader::addShaders(const std::filesystem::path& vtxShdPath, const std::file
 	g_opengl.glShaderSource(m_frgShd, 1, &fragmentShaderContentChar, NULL);
 	g_opengl.glCompileShader(m_frgShd);
 	g_opengl.glGetShaderiv(m_frgShd, GL_COMPILE_STATUS, &success);
-	if (!success) {
+	if (success == GL_FALSE) {
 		g_opengl.glGetShaderInfoLog(m_frgShd, INFO_LOG_SIZE, NULL, g_infoLog);
 		m_err_msg = "Error compiling fragment shader: " + std::string(g_infoLog);
 		qCritical() << m_err_msg;
@@ -69,7 +71,7 @@ void Shader::addShaders(const std::filesystem::path& vtxShdPath, const std::file
 	g_opengl.glGetProgramiv(m_shdPrgId, GL_LINK_STATUS, &success); // Get info on how the link went
 	
 	deleteShaders();
-	if (!success) {
+	if (success == GL_FALSE) {
 		g_opengl.glGetProgramInfoLog(m_shdPrgId, INFO_LOG_SIZE, NULL, g_infoLog);
 		m_err_msg = "Error linking the shaders to the program: " + std::string(g_infoLog);
 		qCritical() << m_err_msg;
@@ -78,6 +80,13 @@ void Shader::addShaders(const std::filesystem::path& vtxShdPath, const std::file
 }
 
 void Shader::use() const {
+	GLint isValid = GL_FALSE;
+	
+	g_opengl.glValidateProgram(m_shdPrgId);
+	g_opengl.glGetProgramiv(m_shdPrgId, GL_VALIDATE_STATUS, &isValid);
+	if (isValid == GL_FALSE) {
+		qCritical() << "Program ID" << m_shdPrgId << "is unvalid";
+	}
 	g_opengl.glUseProgram(m_shdPrgId);
 }
 

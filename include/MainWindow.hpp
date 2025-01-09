@@ -2,7 +2,7 @@
 
 #include <QDialog>
 
-class RectangleWindow;
+class RenderingWindow;
 
 class MainWindow : public QDialog {
 	Q_OBJECT
@@ -13,5 +13,5 @@ private slots:
 	void onChangeColors();
 
 private:
-	RectangleWindow* m_rectangleWindow;
+	RenderingWindow *m_rectangleWindow;
 };

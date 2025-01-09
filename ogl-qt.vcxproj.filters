@@ -26,7 +26,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\RectangleWindow.cpp">
+    <ClCompile Include="src\RenderingWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\main.cpp">
@@ -44,6 +44,15 @@
     <ClCompile Include="lib\src\stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vertex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Geometry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\MainWindow.hpp">
@@ -51,7 +60,7 @@
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\RectangleWindow.hpp">
+    <ClInclude Include="include\RenderingWindow.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Shader.hpp">
@@ -63,13 +72,27 @@
     <ClInclude Include="..\..\Downloads\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Renderable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Vertex.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Geometry.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\pass_through.vert">
+    <None Include="shaders\texture.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\uniform_color.frag">
+    <None Include="shaders\uni_color_green.fs">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shaders\texture.frag" />
+    <None Include="shaders\uni_color_orange.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="shaders\uni_color.vs" />
   </ItemGroup>
 </Project>

@@ -4,7 +4,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
-#include "RectangleWindow.hpp"
+#include "RenderingWindow.hpp"
 
 MainWindow::MainWindow() : QDialog(nullptr, Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint) {
 	// *** create OpenGL window
@@ -14,7 +14,7 @@ MainWindow::MainWindow() : QDialog(nullptr, Qt::WindowSystemMenuHint | Qt::Windo
 	format.setProfile(QSurfaceFormat::CoreProfile);
 	format.setVersion(3, 3);
 
-	m_rectangleWindow = new RectangleWindow;
+	m_rectangleWindow = new RenderingWindow;
 	m_rectangleWindow->setFormat(format);
 
 	// *** create window container widget

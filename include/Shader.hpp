@@ -12,7 +12,7 @@ public:
 	Shader(const std::filesystem::path &vtxShdPath, const std::filesystem::path &frgShdPath);
 	~Shader();
 
-	void addShaders(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath);
+	void setShaders(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath);
 	void use() const;
 
 private:

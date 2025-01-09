@@ -13,18 +13,18 @@
 
 #include "Utils.hpp"
 #include "Shader.hpp"
+#include "Geometry.hpp"
+#include "Renderable.hpp"
 
-class RectangleWindow : public QOpenGLWindow {
+class RenderingWindow : public QOpenGLWindow {
 public:
-	~RectangleWindow() Q_DECL_OVERRIDE;
+	~RenderingWindow() Q_DECL_OVERRIDE;
 
 	void initializeGL() Q_DECL_OVERRIDE;
 	void paintGL() Q_DECL_OVERRIDE;
 
 private:
-	unsigned int m_shaderProgramId;
-	unsigned int m_VAO;
-	unsigned int m_texture;
-	Shader m_shd;
-	std::string getFileContent(std::filesystem::path path);
+	std::vector<std::shared_ptr<Geometry>> m_geometries;
+	std::vector<std::shared_ptr<Shader>> m_shaders;
+	std::vector<std::unique_ptr<Renderable>> m_toRender;
 };

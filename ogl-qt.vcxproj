@@ -12,22 +12,33 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\src\stb_image.cpp" />
+    <ClCompile Include="src\Geometry.cpp" />
     <ClCompile Include="src\MainWindow.cpp" />
+    <ClCompile Include="src\Renderable.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Utils.cpp" />
+    <ClCompile Include="src\Vertex.cpp" />
     <QtMoc Include="include\MainWindow.hpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\RectangleWindow.cpp" />
+    <ClCompile Include="src\RenderingWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Downloads\stb_image.h" />
-    <ClInclude Include="include\RectangleWindow.hpp" />
+    <ClInclude Include="include\Geometry.hpp" />
+    <ClInclude Include="include\RenderingWindow.hpp" />
+    <ClInclude Include="include\Renderable.hpp" />
     <ClInclude Include="include\Shader.hpp" />
     <ClInclude Include="include\Utils.hpp" />
+    <ClInclude Include="include\Vertex.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\pass_through.vert" />
-    <None Include="shaders\uniform_color.frag" />
+    <None Include="shaders\texture.frag" />
+    <None Include="shaders\texture.vert" />
+    <None Include="shaders\uni_color_green.fs" />
+    <None Include="shaders\uni_color_orange.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="shaders\uni_color.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6F8E86F3-9D4B-47C1-8897-77F952FE7C58}</ProjectGuid>
