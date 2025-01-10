@@ -1,12 +1,16 @@
 #include "Vertex.hpp"
 
-Vertex::Vertex(Location loc) {
-	m_position = loc;
+Vertex::Vertex(SpaceCoord loc) : m_spaceCoord{ loc } {
 }
 
-Vertex::operator std::vector<float>() const {
-	std::vector<float> ret = {
-		m_position.x, m_position.y, m_position.z
-	};
-	return ret;
+std::vector<float> Vertex::getSpaceCoord() const {
+	return { m_spaceCoord.x, m_spaceCoord.y, m_spaceCoord.z };
+}
+
+std::vector<float> Vertex::getTextCoord() const {
+	return { m_textCoord.x, m_textCoord.y };
+}
+
+void Vertex::setTextureCoordinates(const TextCoord &textCoord) {
+	m_textCoord = textCoord;
 }

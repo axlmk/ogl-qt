@@ -6,6 +6,7 @@
 class Renderable {
 public:
 
+	// TODO : rule of 3
 	Renderable();
 	Renderable(std::shared_ptr<Geometry> geometry, std::shared_ptr<Shader> shader);
 	~Renderable();
@@ -23,4 +24,6 @@ private:
 
 	std::shared_ptr<Geometry> m_geo;
 	std::shared_ptr<Shader> m_shd;
+
+	void setVertexAttrib();
 };

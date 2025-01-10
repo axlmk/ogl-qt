@@ -1,18 +1,25 @@
 #pragma once
 #include <vector>
 #include <glm/glm.hpp>
-#define VERTEX_FULL_SIZE 3
-#define VERTEX_LOCATION_INDEX 0
-#define VERTEX_LOCATION_SIZE 3
+#define VERTEX_NUMBER_OF_DATA 2 // Space coordinates + texture coordinates
+#define VERTEX_SPACE_COORD_INDEX 0
+#define VERTEX_SPACE_COORD_SIZE 3
+#define VERTEX_TEXT_COORD_INDEX 3
+#define VERTEX_TEXT_COORD_SIZE 2
 
-using Location = glm::vec3;
+using SpaceCoord = glm::vec3;
+using TextCoord = glm::vec2;
 
 class Vertex {
 public:
-	Vertex(Location loc);
+	Vertex(SpaceCoord loc);
 
-	explicit operator std::vector<float>() const;
+	std::vector<float> getSpaceCoord() const;
+	std::vector<float> getTextCoord() const;
+
+	void setTextureCoordinates(const TextCoord &textCoord);
 
 private:
-	Location m_position;
+	SpaceCoord m_spaceCoord;
+	TextCoord m_textCoord;
 };

@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include <vector>
 #include <QDebug>
 #include <exception>
@@ -14,17 +15,32 @@ enum class GeometryType {
 
 std::string toString(GeometryType geoType);
 
+
 class Geometry {
 public:
+	using uint = unsigned int;
 	
-	Geometry(GeometryType geoType, Location initialPos, float size);
+	// TODO : rule of 3
+	
+	Geometry();
+	Geometry(GeometryType geoType, SpaceCoord initialPos, float size);
 
-	std::vector<Vertex> getVertices() const;
-	std::vector<unsigned int> getVerticesLink() const;
-	std::vector<unsigned int> getAttributesPositions() const;
+	std::vector<Vertex>	getVertices()				const;
+	std::vector<float>	getFloatVertices()			const;
+	std::vector<uint>	getVerticesLink()			const;
+	std::vector<uint>	getAttributesPositions()	const;
+
+	bool empty() const;
+	void setTextureMapping();
+	void unsetTextureMapping();
 
 private:
+	GeometryType m_geoType;
 	std::vector<Vertex> m_vertices;
 	std::vector<unsigned int> m_verticesLink;
-	std::vector<unsigned int> m_attributesPositions;
+	std::array<unsigned int, VERTEX_NUMBER_OF_DATA> m_attributesPositions;
+	
+	bool m_hasTexture;
+	uint getStrideLength() const;
+
 };

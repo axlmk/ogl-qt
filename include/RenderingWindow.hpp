@@ -9,8 +9,6 @@
 #include <QDebug>
 #include <QRandomGenerator>
 
-#include <stb_image.h>
-
 #include "Utils.hpp"
 #include "Shader.hpp"
 #include "Geometry.hpp"

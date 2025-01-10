@@ -28,24 +28,19 @@ Renderable::~Renderable() {
 
 void Renderable::linkGeo(std::shared_ptr<Geometry> geometry) {
 	
+	// TODO : remove old geo buffers
+
 	m_geo = geometry;
 
-	if(m_geo->getVertices().empty()) {
+	if(m_geo->empty()) {
 		qCritical() << "An empty geometry can't be added to a renderable object";
 		return;
 	}
 
-	/* Geometry transformation into float's array for OpenGL to render */
-
-	std::vector<Vertex> vertices = m_geo->getVertices();
-	std::vector<float> floatVertices;
-	floatVertices.reserve(vertices.size() * VERTEX_FULL_SIZE);
-
-	for (size_t i = 0; i < vertices.size(); i++) {
-		std::vector<float> tmpFloat = static_cast<std::vector<float>>(vertices[i]);
-		std::copy(tmpFloat.begin(), tmpFloat.end(), std::back_inserter(floatVertices));
+	if(m_shd != nullptr && m_shd->getShaderType() == ShaderType::Texture) {
+		m_geo->setTextureMapping();
 	}
-
+	
 	/* Vertex Array Object (VAO) management */
 
 	g_opengl.glGenVertexArrays(1, &m_vao);
@@ -54,8 +49,6 @@ void Renderable::linkGeo(std::shared_ptr<Geometry> geometry) {
 	/* Vertex Buffer Object (VBO) management */
 
 	g_opengl.glGenBuffers(1, &m_vbo);
-	g_opengl.glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	g_opengl.glBufferData(GL_ARRAY_BUFFER, sizeof(float) * floatVertices.size(), floatVertices.data(), GL_STATIC_DRAW);
 
 	/* Element Buffer Object (EBO) management */
 
@@ -65,19 +58,33 @@ void Renderable::linkGeo(std::shared_ptr<Geometry> geometry) {
 
 	/* Specify vertex attribute format */
 
-	std::vector<unsigned int> attributesPositions = m_geo->getAttributesPositions();
-	unsigned int currentAttributePosition = 0;
-	for (size_t i = 0; i < attributesPositions.size(); i++) {
-		g_opengl.glVertexAttribPointer(i, attributesPositions[i], GL_FLOAT, GL_FALSE, attributesPositions[i] * sizeof(float), (void*) currentAttributePosition);
-		currentAttributePosition += attributesPositions[i];
-		g_opengl.glEnableVertexAttribArray(i);
-	}
+	setVertexAttrib();
 	
 	return;
 }
 
 void Renderable::linkShader(std::shared_ptr<Shader> shader) {
 	m_shd = shader;
+
+	if(m_geo == nullptr) {
+		return;
+	}
+
+	switch (m_shd->getShaderType()) {
+		case ShaderType::Texture:
+			m_geo->setTextureMapping();
+			setVertexAttrib();
+			break;
+		case ShaderType::Unicolor:
+			m_geo->unsetTextureMapping();
+			setVertexAttrib();
+			break;
+		default:
+			m_err_msg = "ShaderType unknowed";
+			qCritical() << m_err_msg;
+			throw std::invalid_argument(m_err_msg);
+	}
+
 }
 
 void Renderable::render() const {
@@ -88,4 +95,34 @@ void Renderable::render() const {
 	g_opengl.glBindVertexArray(m_vao);
 	g_opengl.glDrawElements(GL_TRIANGLES, m_geo->getVerticesLink().size(), GL_UNSIGNED_INT, 0);
 	g_opengl.glBindVertexArray(0);
+}
+
+
+void Renderable::setVertexAttrib() {
+
+	if(m_geo == nullptr) {
+		m_err_msg = "Vertices could not be interpreted if the geometry hasn't been set";
+		qCritical() << m_err_msg;
+		throw std::invalid_argument(m_err_msg);
+	}
+
+	/* Geometry transformation into float's array for OpenGL to render */
+
+	std::vector<float> floatVertices = m_geo->getFloatVertices();
+
+	/* Vertex Buffer Object (VBO) management */
+
+	g_opengl.glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	g_opengl.glBufferData(GL_ARRAY_BUFFER, sizeof(float) * floatVertices.size(), floatVertices.data(), GL_STATIC_DRAW);
+
+	/* Set data for draw call */
+
+	std::vector<unsigned int> attributesPositions = m_geo->getAttributesPositions();
+	unsigned int currentAttributePosition = 0;
+	unsigned int stride = std::accumulate(attributesPositions.begin(), attributesPositions.end(), 0);
+	for (size_t i = 0; i < attributesPositions.size(); i++) {
+		g_opengl.glVertexAttribPointer(i, attributesPositions[i], GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(currentAttributePosition * sizeof(float)));
+		currentAttributePosition += attributesPositions[i];
+		g_opengl.glEnableVertexAttribArray(i);
+	}
 }

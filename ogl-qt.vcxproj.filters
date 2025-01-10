@@ -83,16 +83,24 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\texture.vert">
+    <None Include="shaders\texture.vs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\uni_color_green.fs">
+    <None Include="shaders\texture.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\texture.frag" />
-    <None Include="shaders\uni_color_orange.fs" />
+    <None Include="shaders\unicolor.fs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="shaders\uni_color.vs" />
+    <Image Include="textures\container.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="shaders\unicolor.vs">
+      <Filter>Shaders</Filter>
+    </Text>
   </ItemGroup>
 </Project>
