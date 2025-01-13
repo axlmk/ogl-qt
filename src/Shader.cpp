@@ -66,11 +66,6 @@ void Shader::setTexture(const std::filesystem::path &texturePath) {
 		throw std::invalid_argument(m_err_msg);
 	}
 
-	if (m_txtBuff != 0) {
-		deleteTexture();
-		deleteProgram();
-	}
-
 	int width, height, nrChannels;
 	unsigned char* data = stbi_load(texturePath.string().c_str(), &width, &height, &nrChannels, 0);
 

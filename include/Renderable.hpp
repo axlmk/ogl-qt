@@ -25,5 +25,6 @@ private:
 	std::shared_ptr<Geometry> m_geo;
 	std::shared_ptr<Shader> m_shd;
 
-	void setVertexAttrib();
+	void generateRender();
+	void deleteBuffers();
 };
