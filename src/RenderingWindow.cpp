@@ -32,17 +32,15 @@ void RenderingWindow::paintGL() {
 	g_opengl.glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	g_opengl.glClear(GL_COLOR_BUFFER_BIT);
 
-	// TODO : investigate current behavior of program
 	static unsigned int i = 0;
 	for (auto &renderable : m_toRender) {
 		renderable->render();
-		i++;
-		qDebug() << i;
-		if(i > 100) {
+		if(i == 100) {
 			renderable->linkShader(m_shaders[0]);
 		}
-		if(i > 200) {
+		if(i == 150) {
 			renderable->linkShader(m_shaders[1]);
 		}
 	}
+	i++;
 }

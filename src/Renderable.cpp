@@ -64,6 +64,9 @@ void Renderable::linkGeo(std::shared_ptr<Geometry> geometry) {
 }
 
 void Renderable::linkShader(std::shared_ptr<Shader> shader) {
+	if(m_shd == shader)
+		return;
+	
 	m_shd = shader;
 
 	if(m_geo == nullptr) {
@@ -73,17 +76,17 @@ void Renderable::linkShader(std::shared_ptr<Shader> shader) {
 	switch (m_shd->getShaderType()) {
 		case ShaderType::Texture:
 			m_geo->setTextureMapping();
-			setVertexAttrib();
 			break;
 		case ShaderType::Unicolor:
 			m_geo->unsetTextureMapping();
-			setVertexAttrib();
 			break;
 		default:
 			m_err_msg = "ShaderType unknowed";
 			qCritical() << m_err_msg;
 			throw std::invalid_argument(m_err_msg);
 	}
+	linkGeo(m_geo);
+	setVertexAttrib();
 
 }
 
