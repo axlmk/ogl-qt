@@ -7,9 +7,10 @@ Renderable::Renderable() : m_geo{ nullptr }, m_shd{ nullptr } {
 	m_err_msg = "";
 }
 
-Renderable::Renderable(std::shared_ptr<Geometry> geometry, std::shared_ptr<Shader> shader) : Renderable() {
+Renderable::Renderable(std::shared_ptr<Geometry> geometry, std::shared_ptr<Shader> shader, std::shared_ptr<Camera> camera) : Renderable() {
 	linkGeo(geometry);
 	linkShader(shader);
+	linkCamera(camera);
 }
 
 
@@ -124,6 +125,11 @@ void Renderable::linkShader(std::shared_ptr<Shader> shader) {
 
 }
 
+
+void Renderable::linkCamera(std::shared_ptr<Camera> camera) {
+	m_cam = camera;
+}
+
 void Renderable::render() const {
 
 	if(m_shd == nullptr)
@@ -133,8 +139,27 @@ void Renderable::render() const {
 		return;
 
 	m_shd->use();
-	glm::mat4 transform = m_geo->getTransformation(true);
-	m_shd->setTransformation(transform);
+
+	/* Coordinates transformation */
+
+	glm::mat4 model = glm::mat4(1.f);
+	glm::mat4 view = glm::mat4(1.f);
+	glm::mat4 projection = glm::mat4(1.f);
+	glm::mat4 clip = glm::mat4(1.f);
+
+	model = glm::translate(model, m_geo->getPosition());
+	glm::vec4 modelRotation = m_geo->getRotation();
+	model = glm::rotate(model, modelRotation.x, {modelRotation.y, modelRotation.z, modelRotation.w});
+	
+	view = glm::translate(view, m_cam->getPosition());
+	glm::vec4 camRotation = m_cam->getRotation();
+	view = glm::rotate(view, camRotation.x, { camRotation.y, camRotation.z, camRotation.w });
+
+	projection = glm::perspective(glm::radians(m_cam->getFov()), 600.f / 400.f, m_cam->getNearPlan(), m_cam->getFarPlan());
+	clip = projection * view * model;
+	
+	m_shd->setTransformation(clip);
+	
 	g_opengl.glBindVertexArray(m_vao);
 	g_opengl.glDrawElements(GL_TRIANGLES, m_geo->getVerticesLink().size(), GL_UNSIGNED_INT, 0);
 }

@@ -26,7 +26,7 @@ public:
 	// TODO : rule of 3
 	
 	Geometry();
-	Geometry(GeometryType geoType, SpaceCoord initialPos, float size);
+	Geometry(GeometryType geoType, float size);
 
 	std::vector<Vertex>	getVertices()				const;
 	std::vector<float>	getFloatVertices()			const;
@@ -38,9 +38,11 @@ public:
 	void unsetTextureMapping();
 
 	void translate(float x = 0.f, float y = 0.f, float z = 0.f);
-	void scale(float s = 1.f);
+	void scale(float scale = 1.f);
 	void rotate(float angle = 0.f, float x = 0.f, float y = 0.f, float z = 0.f);
-	glm::mat4 getTransformation(bool reset);
+
+	SpaceCoord getPosition() const;
+	glm::vec4 getRotation() const;
 
 	bool empty() const;
 
@@ -50,7 +52,9 @@ private:
 	std::vector<unsigned int> m_verticesLink;
 	std::array<unsigned int, VERTEX_NUMBER_OF_DATA> m_attributesPositions;
 
-	glm::mat4 m_transformation;
+	SpaceCoord m_position;
+	glm::vec4 m_rotation;
+	float m_scale;
 	
 	bool m_hasTexture;
 	uint getStrideLength() const;

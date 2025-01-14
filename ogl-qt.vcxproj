@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="lib\src\stb_image.cpp" />
     <ClCompile Include="src\Geometry.cpp" />
     <ClCompile Include="src\MainWindow.cpp" />
@@ -24,6 +25,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Downloads\stb_image.h" />
+    <ClInclude Include="include\Camera.hpp" />
     <ClInclude Include="include\Geometry.hpp" />
     <ClInclude Include="include\RenderingWindow.hpp" />
     <ClInclude Include="include\Renderable.hpp" />

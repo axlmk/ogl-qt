@@ -19,33 +19,48 @@ Geometry::Geometry() :
 	m_hasTexture{ false },
 	m_attributesPositions{ VERTEX_SPACE_COORD_SIZE, VERTEX_TEXT_COORD_SIZE },
 	m_geoType { GeometryType::Square},
-	m_transformation { glm::mat4(1.f) } {
+	m_position { glm::vec3(0.f) },
+	m_rotation { glm::vec4(0.f, 1.f, 0.f, 0.f) } {
 
 }
 
 
 
-Geometry::Geometry(GeometryType	geoType, SpaceCoord initialPos, float size) : Geometry() {
+Geometry::Geometry(GeometryType	geoType, float size) : Geometry() {
 	m_geoType = geoType;
 	switch (m_geoType) {
 		case GeometryType::Square:
-			m_vertices.push_back(Vertex({ initialPos.x, initialPos.y, 0 }));
-			m_vertices.push_back(Vertex({ initialPos.x + size, initialPos.y, 0 }));
-			m_vertices.push_back(Vertex({ initialPos.x, initialPos.y + size, 0 }));
-			m_vertices.push_back(Vertex({ initialPos.x + size, initialPos.y + size, 0 }));
+			m_vertices.push_back(Vertex({ 0, 0, 0 }));
+			m_vertices.push_back(Vertex({ size, 0, 0 }));
+			m_vertices.push_back(Vertex({ 0, size, 0 }));
+			m_vertices.push_back(Vertex({ size, size, 0 }));
 			m_verticesLink = {	0, 1, 2,
 								1, 2, 3 };
 			break;
 		case GeometryType::Cube:
-			/*m_vertices.push_back(Vertex(initialPos));
-			m_vertices.push_back(Vertex(SpaceCoord(initialPos.x + size, initialPos.y, initialPos.z)));
-			m_vertices.push_back(Vertex(SpaceCoord(initialPos.x, initialPos.y + size, initialPos.z)));
-			m_vertices.push_back(Vertex(SpaceCoord(initialPos.x, initialPos.y, initialPos.z + size)));
-			m_vertices.push_back(Vertex(SpaceCoord(initialPos.x + size, initialPos.y + size, initialPos.z)));
-			m_vertices.push_back(Vertex(SpaceCoord(initialPos.x + size, initialPos.y, initialPos.z + size)));
-			m_vertices.push_back(Vertex(SpaceCoord(initialPos.x, initialPos.y + size, initialPos.z + size)));
-			m_vertices.push_back(Vertex(SpaceCoord(initialPos.x + size, initialPos.y + size, initialPos.z + size)));
-			break;*/
+			m_vertices.push_back(Vertex({ 0, 0, 0 }));
+			m_vertices.push_back(Vertex({ size, 0, 0 }));
+			m_vertices.push_back(Vertex({ 0, size, 0 }));
+			m_vertices.push_back(Vertex({ size, size, 0 }));
+			m_vertices.push_back(Vertex({ 0, 0, -size }));
+			m_vertices.push_back(Vertex({ size, 0, -size }));
+			m_vertices.push_back(Vertex({ 0, size, -size }));
+			m_vertices.push_back(Vertex({ size, size, -size }));
+
+			m_verticesLink = {	0, 1, 2, // 0
+								1, 2, 3,
+								2, 3, 6, // 1
+								6, 7, 3,
+								3, 1, 5, // 2
+								3, 5, 7,
+								2, 6, 4, // 3
+								2, 0, 4,
+								6, 7, 5, // 4
+								4, 5, 6,
+								0, 1, 4,
+								1, 4, 5
+			};
+			break;
 		case GeometryType::Model:
 		default:
 			std::string err_msg = "Geometry type [" + toString(geoType) + "] not implemented yet";
@@ -105,16 +120,29 @@ unsigned int Geometry::getStrideLength() const {
 
 
 void Geometry::translate(float x, float y, float z) {
-	m_transformation = glm::translate(m_transformation, glm::vec3(x, y, z));
+	m_position = glm::vec3(x, y, z);
 }
 
-void Geometry::scale(float s) {
-	m_transformation = glm::scale(m_transformation, glm::vec3(s, s, s));
+void Geometry::scale(float scale) {
+	m_scale = scale;
 }
 
 void Geometry::rotate(float angle, float x, float y, float z) {
-	m_transformation = glm::rotate(m_transformation, glm::radians(angle), glm::vec3(x, y, z));
+	m_rotation = glm::vec4(angle, x, y, z);
 }
+
+
+
+SpaceCoord Geometry::getPosition() const {
+	return m_position;
+}
+
+
+
+glm::vec4 Geometry::getRotation() const {
+	return m_rotation;
+}
+
 
 bool Geometry::empty() const {
 	return m_vertices.empty();
@@ -142,13 +170,4 @@ void Geometry::setTextureMapping() {
 
 void Geometry::unsetTextureMapping() {
 	m_hasTexture = false;
-}
-
-
-
-glm::mat4 Geometry::getTransformation(bool reset) {
-	glm::mat4 ret = m_transformation;
-	if(reset)
-		m_transformation = glm::mat4(1.f);
-	return ret;
 }

@@ -13,6 +13,7 @@
 #include "Shader.hpp"
 #include "Geometry.hpp"
 #include "Renderable.hpp"
+#include "Camera.hpp"
 
 class RenderingWindow : public QOpenGLWindow {
 public:
