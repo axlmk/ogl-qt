@@ -18,7 +18,8 @@ std::string toString(GeometryType geoType) {
 Geometry::Geometry() : 
 	m_hasTexture{ false },
 	m_attributesPositions{ VERTEX_SPACE_COORD_SIZE, VERTEX_TEXT_COORD_SIZE },
-	m_geoType { GeometryType::Square}  {
+	m_geoType { GeometryType::Square},
+	m_transformation { glm::mat4(1.f) } {
 
 }
 
@@ -103,6 +104,18 @@ unsigned int Geometry::getStrideLength() const {
 
 
 
+void Geometry::translate(float x, float y, float z) {
+	m_transformation = glm::translate(m_transformation, glm::vec3(x, y, z));
+}
+
+void Geometry::scale(float s) {
+	m_transformation = glm::scale(m_transformation, glm::vec3(s, s, s));
+}
+
+void Geometry::rotate(float angle, float x, float y, float z) {
+	m_transformation = glm::rotate(m_transformation, glm::radians(angle), glm::vec3(x, y, z));
+}
+
 bool Geometry::empty() const {
 	return m_vertices.empty();
 }
@@ -129,4 +142,13 @@ void Geometry::setTextureMapping() {
 
 void Geometry::unsetTextureMapping() {
 	m_hasTexture = false;
+}
+
+
+
+glm::mat4 Geometry::getTransformation(bool reset) {
+	glm::mat4 ret = m_transformation;
+	if(reset)
+		m_transformation = glm::mat4(1.f);
+	return ret;
 }

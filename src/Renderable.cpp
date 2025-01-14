@@ -12,6 +12,8 @@ Renderable::Renderable(std::shared_ptr<Geometry> geometry, std::shared_ptr<Shade
 	linkShader(shader);
 }
 
+
+
 Renderable::~Renderable() {
 	g_opengl.glBindBuffer(GL_ARRAY_BUFFER, 0);
 	g_opengl.glDeleteBuffers(1, &m_vbo);
@@ -25,6 +27,20 @@ Renderable::~Renderable() {
 	g_opengl.glDeleteVertexArrays(1, &m_vao);
 	m_vao = 0;
 }
+
+
+
+std::shared_ptr<Geometry> Renderable::getGeometry() const {
+	return m_geo;
+}
+
+
+
+std::shared_ptr<Shader> Renderable::getShader() const {
+	return m_shd;
+}
+
+
 
 void Renderable::linkGeo(std::shared_ptr<Geometry> geometry) {
 	
@@ -117,6 +133,8 @@ void Renderable::render() const {
 		return;
 
 	m_shd->use();
+	glm::mat4 transform = m_geo->getTransformation(true);
+	m_shd->setTransformation(transform);
 	g_opengl.glBindVertexArray(m_vao);
 	g_opengl.glDrawElements(GL_TRIANGLES, m_geo->getVerticesLink().size(), GL_UNSIGNED_INT, 0);
 }

@@ -12,6 +12,7 @@ Shader::Shader(ShaderType shaderType) : Shader() {
 
 
 Shader::~Shader() {
+	deleteShaders();
 	if(m_shdPrgId) {
 		g_opengl.glDeleteProgram(m_shdPrgId);
 		m_shdPrgId = 0;
@@ -150,13 +151,24 @@ void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::file
 	g_opengl.glLinkProgram(m_shdPrgId); // Creation of the link
 	g_opengl.glGetProgramiv(m_shdPrgId, GL_LINK_STATUS, &success); // Get info on how the link went
 	
-	deleteShaders();
 	if (success == GL_FALSE) {
 		g_opengl.glGetProgramInfoLog(m_shdPrgId, INFO_LOG_SIZE, NULL, g_infoLog);
 		m_err_msg = "Error linking the shaders to the program: " + std::string(g_infoLog);
 		qCritical() << m_err_msg;
 		throw std::invalid_argument(m_err_msg);
 	}
+}
+
+
+
+void Shader::setTransformation(glm::mat4 transform) {
+	int transformLocation = g_opengl.glGetUniformLocation(m_shdPrgId, "transformation");
+	if(transformLocation == -1) {
+		m_err_msg = "Transformation's location not found";
+		qCritical() << m_err_msg;
+		throw std::invalid_argument(m_err_msg);
+	}
+	g_opengl.glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(transform));
 }
 
 

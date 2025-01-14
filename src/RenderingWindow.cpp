@@ -35,6 +35,7 @@ void RenderingWindow::paintGL() {
 	static unsigned int i = 0;
 	for (auto &renderable : m_toRender) {
 		renderable->render();
+
 		if(i == 100) {
 			renderable->linkShader(m_shaders[0]);
 		}

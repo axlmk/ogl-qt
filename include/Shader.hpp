@@ -4,6 +4,9 @@
 #include <filesystem>
 #include <fstream>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "Utils.hpp"
 
 enum class ShaderType {
@@ -29,6 +32,7 @@ public:
 	void setColor();
 	void setTexture(const std::filesystem::path &texturePath);
 	void setCustom(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath);
+	void setTransformation(glm::mat4 transform);
 	
 	void use() const;
 

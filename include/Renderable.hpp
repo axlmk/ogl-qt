@@ -10,6 +10,10 @@ public:
 	Renderable();
 	Renderable(std::shared_ptr<Geometry> geometry, std::shared_ptr<Shader> shader);
 	~Renderable();
+
+	std::shared_ptr<Geometry> getGeometry() const;
+	std::shared_ptr<Shader> getShader() const;
+
 	void linkGeo(std::shared_ptr<Geometry> geometry);
 	void linkShader(std::shared_ptr<Shader> shader);
 	void render() const;
