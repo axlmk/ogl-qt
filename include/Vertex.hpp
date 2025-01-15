@@ -16,7 +16,7 @@ public:
 
 	std::vector<float> getSpaceCoord() const;
 	std::vector<float> getTextCoord() const;
-
+	void setSpaceCoord(SpaceCoord coord);
 	void setTextureCoordinates(const TextCoord &textCoord);
 
 private:

@@ -133,6 +133,15 @@ void Geometry::rotate(float angle, float x, float y, float z) {
 
 
 
+void Geometry::setPivot(float x, float y, float z) {
+	for(auto &vertex : m_vertices) {
+		auto coords = vertex.getSpaceCoord();
+		vertex.setSpaceCoord(SpaceCoord(coords[0] - x, coords[1] - y, coords[2] - z));
+	}
+}
+
+
+
 SpaceCoord Geometry::getPosition() const {
 	return m_position;
 }
@@ -159,6 +168,15 @@ void Geometry::setTextureMapping() {
 			m_vertices[3].setTextureCoordinates({ 1.f, 1.f });
 			break;
 		case GeometryType::Cube:
+			m_vertices[0].setTextureCoordinates({ 0.f, 0.f });
+			m_vertices[1].setTextureCoordinates({ 1.f, 0.f });
+			m_vertices[2].setTextureCoordinates({ 0.f, 1.f });
+			m_vertices[3].setTextureCoordinates({ 1.f, 1.f });
+			m_vertices[4].setTextureCoordinates({ 0.f, 1.f });
+			m_vertices[5].setTextureCoordinates({ 1.f, 1.f });
+			m_vertices[6].setTextureCoordinates({ 0.f, 0.f });
+			m_vertices[7].setTextureCoordinates({ 1.f, 0.f });
+			break;
 		case GeometryType::Model:
 		default:
 			std::string err_msg = "Geometry type [" + toString(m_geoType) + "] not implemented yet";

@@ -7,6 +7,10 @@ std::vector<float> Vertex::getSpaceCoord() const {
 	return { m_spaceCoord.x, m_spaceCoord.y, m_spaceCoord.z };
 }
 
+void Vertex::setSpaceCoord(SpaceCoord coord) {
+	m_spaceCoord = coord;
+}
+
 std::vector<float> Vertex::getTextCoord() const {
 	return { m_textCoord.x, m_textCoord.y };
 }

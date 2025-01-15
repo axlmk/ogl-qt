@@ -40,6 +40,7 @@ public:
 	void translate(float x = 0.f, float y = 0.f, float z = 0.f);
 	void scale(float scale = 1.f);
 	void rotate(float angle = 0.f, float x = 0.f, float y = 0.f, float z = 0.f);
+	void setPivot(float x = 0., float y = 0., float z = 0.);
 
 	SpaceCoord getPosition() const;
 	glm::vec4 getRotation() const;
