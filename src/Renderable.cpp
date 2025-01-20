@@ -151,9 +151,7 @@ void Renderable::render() const {
 	glm::vec4 modelRotation = m_geo->getRotation();
 	model = glm::rotate(model, modelRotation.x, {modelRotation.y, modelRotation.z, modelRotation.w});
 	
-	view = glm::translate(view, m_cam->getPosition());
-	glm::vec4 camRotation = m_cam->getRotation();
-	view = glm::rotate(view, camRotation.x, { camRotation.y, camRotation.z, camRotation.w });
+	view = m_cam->getSpaceMat();
 
 	projection = glm::perspective(glm::radians(m_cam->getFov()), 600.f / 400.f, m_cam->getNearPlan(), m_cam->getFarPlan());
 	clip = projection * view * model;
