@@ -1,6 +1,6 @@
 #include "RenderingWindow.hpp"
 
-RenderingWindow::RenderingWindow() {
+RenderingWindow::RenderingWindow() : m_KeyBeingPressed{false} {
 	m_timer = new QTimer(this);
 	connect(m_timer, &QTimer::timeout, this, QOverload<>::of(&RenderingWindow::update));
 	m_timer->start(16);
@@ -19,8 +19,6 @@ void RenderingWindow::initializeGL() {
 	glEnable(GL_DEPTH_TEST);
 
 	auto mainCam{ std::make_shared<Camera>(SpaceCoord(0., 0., 2.)) };
-	mainCam->setType(CameraType::LookAt);
-	mainCam->setTarget(SpaceCoord(0., 0., 0.));
 	m_cam = mainCam;
 
 	auto texturedCube{ std::make_shared<Geometry>(GeometryType::Cube, .5) };
@@ -46,20 +44,61 @@ void RenderingWindow::initializeGL() {
 
 void RenderingWindow::paintGL() {
 
+	m_deltaTime = QDateTime::currentMSecsSinceEpoch() - m_currentTime;
+	m_currentTime = QDateTime::currentMSecsSinceEpoch();
+
+
 	g_opengl.glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	const float radius = 3.0f;
+
+
+	float speed = 2 * m_deltaTime * 0.001;
+	auto camPos = m_cam->getPosition();
+	if(m_KeyBeingPressed[0])
+		camPos.z -= speed;
+	if (m_KeyBeingPressed[1])
+		camPos.x -= speed;
+	if (m_KeyBeingPressed[2])
+		camPos.x += speed;
+	if (m_KeyBeingPressed[3])
+		camPos.z += speed;
+	m_cam->setPosition(camPos);
+
+
 
 	static unsigned int i = 0;
 	for (auto &renderable : m_toRender) {
-		float camX = std::sin(i * 0.01) * radius;
-		float camZ = std::cos(i * 0.01) * radius;
-		
-		renderable->getGeometry()->rotate((i) * 0.02, 1.);
 		auto pos = m_cam->getPosition();
-		m_cam->setPosition(SpaceCoord(camX, pos.y, camZ));
 		renderable->render();
 		i++;
 	}
+}
+
+void RenderingWindow::keyPressEvent(QKeyEvent* event) {
+	if(event->text() == "z")
+		m_KeyBeingPressed[0] = true;
+
+	if(event->text() == "q")
+		m_KeyBeingPressed[1] = true;
+
+	if (event->text() == "d")
+		m_KeyBeingPressed[2] = true;
+
+	if (event->text() == "s")
+		m_KeyBeingPressed[3] = true;
+}
+
+	void RenderingWindow::keyReleaseEvent(QKeyEvent * event) {
+	if (event->text() == "z")
+		m_KeyBeingPressed[0] = false;
+
+	if (event->text() == "q")
+		m_KeyBeingPressed[1] = false;
+
+	if (event->text() == "d")
+		m_KeyBeingPressed[2] = false;
+
+	if (event->text() == "s")
+		m_KeyBeingPressed[3] = false;
 }

@@ -8,7 +8,9 @@
 #include <QOpenGLWindow>
 #include <QDebug>
 #include <QRandomGenerator>
+#include <QKeyEvent>
 #include <QTimer>
+#include <qdatetime>
 
 #include "Utils.hpp"
 #include "Shader.hpp"
@@ -24,11 +26,20 @@ public:
 	void initializeGL() Q_DECL_OVERRIDE;
 	void paintGL() Q_DECL_OVERRIDE;
 
+	void keyPressEvent(QKeyEvent* event) override;
+	void keyReleaseEvent(QKeyEvent* event) override;
+
 private:
 	std::vector<std::shared_ptr<Geometry>> m_geometries;
 	std::vector<std::shared_ptr<Shader>> m_shaders;
 	std::vector<std::unique_ptr<Renderable>> m_toRender;
 	std::shared_ptr<Camera> m_cam;
+
+	// 0 = z, 1 = q, 2 = d, 3 = s
+	bool m_KeyBeingPressed[4];
+
+	int m_currentTime;
+	int m_deltaTime;
 
 	QTimer *m_timer;
 };
