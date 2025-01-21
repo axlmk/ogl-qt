@@ -28,6 +28,7 @@ private:
 	std::vector<std::shared_ptr<Geometry>> m_geometries;
 	std::vector<std::shared_ptr<Shader>> m_shaders;
 	std::vector<std::unique_ptr<Renderable>> m_toRender;
+	std::shared_ptr<Camera> m_cam;
 
 	QTimer *m_timer;
 };

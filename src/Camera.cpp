@@ -42,19 +42,20 @@ void Camera::setPosition(SpaceCoord pos) {
 }
 
 glm::mat4 Camera::getSpaceMat() const {
-    glm::mat4 view;
+    glm::mat4 view = glm::mat4(1.);
 	switch(m_type) {
 		case CameraType::LookAt:
-
+			view = glm::lookAt(m_position, m_target, glm::vec3(0., 1., 0.));
 			break;
 		case CameraType::FirstPerson:
-			glm::translate(view, m_position);
+			view = glm::translate(view, -m_position);
 			view = glm::rotate(view, m_rotation.x, {m_rotation.y, m_rotation.z, m_rotation.w});
 			break;
 		default:
-			m_err_msg == "Camera's type unrecognized";
-			qCritical() << m_err_msg;
-			throw std::invalid_argument(m_err_msg);
+			std::string err_msg = "Camera's type unrecognized";
+			qCritical() << err_msg;
+			throw std::invalid_argument(err_msg);
 			break;
 	}
+	return view;
 }

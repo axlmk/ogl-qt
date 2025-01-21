@@ -76,13 +76,25 @@ void Shader::setTexture(const std::filesystem::path &texturePath) {
 		throw std::invalid_argument(m_err_msg);
 	}
 
+	GLenum format;
+	switch (nrChannels) {
+		case 3:
+			format = GL_RGB;
+			break;
+		case 4:
+			format = GL_RGBA;
+			break;
+		default:
+			break;
+	}
+
 	g_opengl.glGenTextures(1, &m_txtBuff);
 	g_opengl.glBindTexture(GL_TEXTURE_2D, m_txtBuff);
 	g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	g_opengl.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	g_opengl.glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 	g_opengl.glGenerateMipmap(GL_TEXTURE_2D);
 
 	stbi_image_free(data);
