@@ -38,7 +38,7 @@ public:
 	void addRotation(float xOffset, float yOffset);
 	void walk(bool keyPressed[]);
 
-	glm::mat4 getSpaceMat() const;
+	glm::mat4 getSpaceMat();
 
 private:
 

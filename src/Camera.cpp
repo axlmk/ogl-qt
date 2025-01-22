@@ -79,8 +79,9 @@ void Camera::addRotation(float xOffset, float yOffset) {
 
 
 
-glm::mat4 Camera::getSpaceMat() const {
+glm::mat4 Camera::getSpaceMat() {
     glm::mat4 view = glm::mat4(1.);
+	m_position.y = 0.0f;
 	switch(m_type) {
 		case CameraType::LookAt:
 			view = glm::lookAt(m_position, m_direction, { 0, 1., 0 });
