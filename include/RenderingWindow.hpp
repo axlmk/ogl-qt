@@ -28,6 +28,7 @@ public:
 
 	void keyPressEvent(QKeyEvent* event) override;
 	void keyReleaseEvent(QKeyEvent* event) override;
+	void mouseMoveEvent(QMouseEvent* event) override;
 
 private:
 	std::vector<std::shared_ptr<Geometry>> m_geometries;
@@ -39,7 +40,6 @@ private:
 	bool m_KeyBeingPressed[4];
 
 	int m_currentTime;
-	int m_deltaTime;
 
 	QTimer *m_timer;
 };

@@ -2,8 +2,9 @@
 
 #include <QApplication>
 #include <QDebug>
-#include "Utils.hpp"
+#include <QCursor>
 
+#include "Utils.hpp"
 #include "MainWindow.hpp"
 
 int main(int argc, char** argv) {

@@ -4,6 +4,7 @@ RenderingWindow::RenderingWindow() : m_KeyBeingPressed{false} {
 	m_timer = new QTimer(this);
 	connect(m_timer, &QTimer::timeout, this, QOverload<>::of(&RenderingWindow::update));
 	m_timer->start(16);
+
 }
 
 
@@ -27,6 +28,7 @@ void RenderingWindow::initializeGL() {
 
 	auto faceCube{ std::make_shared<Geometry>(GeometryType::Cube, .5) };
 	faceCube->setPivot(.25, .25, -.25);
+	faceCube->rotate(45, 1., 0.5);
 	m_geometries.push_back(faceCube);
 	
 
@@ -44,34 +46,17 @@ void RenderingWindow::initializeGL() {
 
 void RenderingWindow::paintGL() {
 
-	m_deltaTime = QDateTime::currentMSecsSinceEpoch() - m_currentTime;
+	g_deltaTime = QDateTime::currentMSecsSinceEpoch() - m_currentTime;
 	m_currentTime = QDateTime::currentMSecsSinceEpoch();
-
 
 	g_opengl.glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	m_cam->walk(m_KeyBeingPressed);
 
-
-	float speed = 2 * m_deltaTime * 0.001;
-	auto camPos = m_cam->getPosition();
-	if(m_KeyBeingPressed[0])
-		camPos.z -= speed;
-	if (m_KeyBeingPressed[1])
-		camPos.x -= speed;
-	if (m_KeyBeingPressed[2])
-		camPos.x += speed;
-	if (m_KeyBeingPressed[3])
-		camPos.z += speed;
-	m_cam->setPosition(camPos);
-
-
-
-	static unsigned int i = 0;
 	for (auto &renderable : m_toRender) {
 		auto pos = m_cam->getPosition();
 		renderable->render();
-		i++;
 	}
 }
 
@@ -89,7 +74,7 @@ void RenderingWindow::keyPressEvent(QKeyEvent* event) {
 		m_KeyBeingPressed[3] = true;
 }
 
-	void RenderingWindow::keyReleaseEvent(QKeyEvent * event) {
+void RenderingWindow::keyReleaseEvent(QKeyEvent * event) {
 	if (event->text() == "z")
 		m_KeyBeingPressed[0] = false;
 
@@ -101,4 +86,20 @@ void RenderingWindow::keyPressEvent(QKeyEvent* event) {
 
 	if (event->text() == "s")
 		m_KeyBeingPressed[3] = false;
+}
+
+
+
+void RenderingWindow::mouseMoveEvent(QMouseEvent* event) {
+	glm::vec2 delta;
+	float intensity = .05f;
+
+	auto center = geometry().center();
+	auto globalCenter = mapToGlobal(center);
+
+	delta.x = (event->pos().x() - center.x()) * intensity;
+	delta.y = (center.y() - event->pos().y()) * intensity;
+
+	m_cam->addRotation(delta.x, delta.y);
+	cursor().setPos(globalCenter.x(), globalCenter.y());
 }

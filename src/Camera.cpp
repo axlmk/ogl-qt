@@ -1,15 +1,23 @@
 #include "Camera.hpp"
 
 
-Camera::Camera(const SpaceCoord &position, float fov, CameraProjection projection, CameraType type): m_position{position}, m_projection{projection}, m_fov{fov}, m_nearPlan{0.1f}, m_farPlan{100.f}, m_rotation{glm::vec4(0.0f, 1.f, 0.f, 0.f)}, m_type{ type } {
+Camera::Camera(const SpaceCoord& position, float fov, CameraType type) : 
+	m_position{ position },
+	m_projection{ CameraProjection::Perspective },
+	m_fov{ fov }, m_nearPlan{ 0.1f },
+	m_farPlan{ 100.f },
+	m_direction{ 0.0f, 0.0f, -1.0f },
+	m_type{ type },
+	m_yaw{ -90.0f },
+	m_pitch{ 0.0f } {
 }
 
 SpaceCoord Camera::getPosition() const {
 	return m_position;
 }
 
-glm::vec4 Camera::getRotation() const {
-	return  m_rotation;
+glm::vec2 Camera::getDirection() const {
+	return  m_direction;
 }
 
 float Camera::getFov() const {
@@ -28,28 +36,57 @@ void Camera::setType(CameraType type) {
 	m_type = type;
 }
 
-void Camera::setTarget(SpaceCoord target) {
-	if(m_type != CameraType::LookAt) {
-		m_err_msg = "A target can't be specified when Camera type isn't LookAt";
-		qCritical() << m_err_msg;
-		throw std::invalid_argument(m_err_msg);
-	}
-	m_target = target;
-}
+//void Camera::setTarget(SpaceCoord target) {
+//	if(m_type != CameraType::LookAt) {
+//		m_err_msg = "A target can't be specified when Camera type isn't LookAt";
+//		qCritical() << m_err_msg;
+//		throw std::invalid_argument(m_err_msg);
+//	}
+//	m_target = target;
+//}
 
 void Camera::setPosition(SpaceCoord pos) {
 	m_position = pos;
 }
 
+
+
+void Camera::addRotation(float xOffset, float yOffset) {
+	if(m_type != CameraType::FirstPerson) {
+		m_err_msg = "Rotation can only modified while being in FirstPerson mode";
+		qCritical() << m_err_msg;
+		throw std::invalid_argument(m_err_msg);
+	}
+
+	m_yaw += xOffset;
+	m_pitch += yOffset;
+
+	qDebug() << m_yaw << m_pitch;
+
+	if(m_pitch >= 85)
+		m_pitch = 85;
+	else if(m_pitch <= -75)
+		m_pitch = -75;
+
+	SpaceCoord direction {
+		cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch)),
+		sin(glm::radians(m_pitch)),
+		sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch))
+	};
+
+	m_direction = glm::normalize(direction);
+}
+
+
+
 glm::mat4 Camera::getSpaceMat() const {
     glm::mat4 view = glm::mat4(1.);
 	switch(m_type) {
 		case CameraType::LookAt:
-			view = glm::lookAt(m_position, m_target, glm::vec3(0., 1., 0.));
+			view = glm::lookAt(m_position, m_direction, { 0, 1., 0 });
 			break;
 		case CameraType::FirstPerson:
-			view = glm::translate(view, -m_position);
-			view = glm::rotate(view, m_rotation.x, {m_rotation.y, m_rotation.z, m_rotation.w});
+			view = glm::lookAt(m_position, m_direction + m_position, { 0, 1., 0 });
 			break;
 		default:
 			std::string err_msg = "Camera's type unrecognized";
@@ -58,4 +95,16 @@ glm::mat4 Camera::getSpaceMat() const {
 			break;
 	}
 	return view;
+}
+
+void Camera::walk(bool keyPressed[]) {
+	float speed = 2 * g_deltaTime * 0.001;
+	if (keyPressed[0])
+		m_position += speed * m_direction;
+	if (keyPressed[1])
+		m_position -= speed * glm::normalize(glm::cross(m_direction, { 0.0, 1.0, 0.0 }));
+	if (keyPressed[2])
+		m_position += speed * glm::normalize(glm::cross(m_direction, { 0.0, 1.0, 0.0 }));
+	if (keyPressed[3])
+		m_position -= speed * m_direction;
 }

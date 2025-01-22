@@ -9,3 +9,4 @@
 
 extern char g_infoLog[INFO_LOG_SIZE];
 extern QOpenGLExtraFunctions g_opengl;
+extern int g_deltaTime;

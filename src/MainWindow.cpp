@@ -17,6 +17,10 @@ MainWindow::MainWindow() : QDialog(nullptr, Qt::WindowSystemMenuHint | Qt::Windo
 	m_rectangleWindow = new RenderingWindow;
 	m_rectangleWindow->setFormat(format);
 
+	m_rectangleWindow->setCursor(QCursor(Qt::BlankCursor));
+	auto globalCenter = mapToGlobal(m_rectangleWindow->geometry().center());
+	cursor().setPos(globalCenter.x(), globalCenter.y());
+
 	// *** create window container widget
 	QWidget* container = QWidget::createWindowContainer(m_rectangleWindow);
 	container->setMinimumSize(QSize(600, 400));
