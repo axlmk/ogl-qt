@@ -98,8 +98,8 @@ glm::mat4 Camera::getSpaceMat() {
 	return view;
 }
 
-void Camera::walk(bool keyPressed[]) {
-	float speed = 2 * g_deltaTime * 0.001;
+void Camera::walk(bool keyPressed[], qint64 deltaTime) {
+	float speed = 2 * deltaTime * 0.001;
 	if (keyPressed[0])
 		m_position += speed * m_direction;
 	if (keyPressed[1])

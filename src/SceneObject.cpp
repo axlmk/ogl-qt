@@ -1,21 +1,20 @@
-#include "Renderable.hpp"
+#include "SceneObject.hpp"
 
-Renderable::Renderable() : m_geo{ nullptr }, m_shd{ nullptr } {
+SceneObject::SceneObject() : m_geo{ nullptr }, m_shd{ nullptr } {
 	m_vbo = 0;
 	m_vao = 0;
 	m_ebo = 0;
 	m_err_msg = "";
 }
 
-Renderable::Renderable(std::shared_ptr<Geometry> geometry, std::shared_ptr<Shader> shader, std::shared_ptr<Camera> camera) : Renderable() {
+SceneObject::SceneObject(std::shared_ptr<Geometry> geometry, std::shared_ptr<Shader> shader) : SceneObject() {
 	linkGeo(geometry);
 	linkShader(shader);
-	linkCamera(camera);
 }
 
 
 
-Renderable::~Renderable() {
+SceneObject::~SceneObject() {
 	g_opengl.glBindBuffer(GL_ARRAY_BUFFER, 0);
 	g_opengl.glDeleteBuffers(1, &m_vbo);
 	m_vbo = 0;
@@ -31,21 +30,19 @@ Renderable::~Renderable() {
 
 
 
-std::shared_ptr<Geometry> Renderable::getGeometry() const {
+std::shared_ptr<Geometry> SceneObject::getGeometry() const {
 	return m_geo;
 }
 
 
 
-std::shared_ptr<Shader> Renderable::getShader() const {
+std::shared_ptr<Shader> SceneObject::getShader() const {
 	return m_shd;
 }
 
 
 
-void Renderable::linkGeo(std::shared_ptr<Geometry> geometry) {
-	
-	/* Pretests */
+void SceneObject::linkGeo(std::shared_ptr<Geometry> geometry) {
 
 	if(m_geo == geometry) {
 		qWarning() << "The newly added geometry corresponds to the one actually in use";
@@ -53,61 +50,22 @@ void Renderable::linkGeo(std::shared_ptr<Geometry> geometry) {
 	}
 
 	if(geometry->empty()) {
-		qCritical() << "An empty geometry can't be added to a renderable object";
+		qCritical() << "An empty geometry can't be added to a SceneObject object";
 		return;
 	}
 
-	if(m_geo != nullptr) {
-		deleteBuffers();
-	}
-
-	/* Get co-ownership of the newly added geometry */
-
 	m_geo = geometry;
-
-	/* We configure the geometry according to the type of the associated shader */
-
-	if(m_shd != nullptr && m_shd->getShaderType() == ShaderType::Texture) {
-		m_geo->setTextureMapping();
-	}
-
-	/* Element Buffer Object (EBO) management */
-
-	g_opengl.glGenBuffers(1, &m_ebo);
-	g_opengl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-	g_opengl.glBufferData(GL_ELEMENT_ARRAY_BUFFER, VERTICE_LINK_SIZEOF * m_geo->getVerticesLink().size(), m_geo->getVerticesLink().data(), GL_STATIC_DRAW);
-
-	/* Vertex Array Object (VAO) management */
-
-	g_opengl.glGenVertexArrays(1, &m_vao);
-
-	/* Vertex Buffer Object (VBO) management */
-
-	g_opengl.glGenBuffers(1, &m_vbo);
-
-	/* Specify vertex attribute format */
-
-	generateRender();
-	
-	return;
 }
 
-void Renderable::linkShader(std::shared_ptr<Shader> shader) {
+void SceneObject::linkShader(std::shared_ptr<Shader> shader) {
 	
-	/* Pretests */
-
 	if(m_shd == shader) {
 		qWarning() << "The newly added shader corresponds to the one actually in use";
 		return;
 	}
 	
-	/* Get co-ownership of the newly added shader */
-
 	m_shd = shader;
 
-	if(m_geo == nullptr)
-		return;
-	
 	switch (m_shd->getShaderType()) {
 		case ShaderType::Texture:
 			m_geo->setTextureMapping();
@@ -120,17 +78,10 @@ void Renderable::linkShader(std::shared_ptr<Shader> shader) {
 			qCritical() << m_err_msg;
 			throw std::invalid_argument(m_err_msg);
 	}
-	
-	generateRender();
-
 }
 
 
-void Renderable::linkCamera(std::shared_ptr<Camera> camera) {
-	m_cam = camera;
-}
-
-void Renderable::render() const {
+void SceneObject::render(std::shared_ptr<Camera> camera) const {
 
 	if(m_shd == nullptr)
 		return;
@@ -151,9 +102,9 @@ void Renderable::render() const {
 	glm::vec4 modelRotation = m_geo->getRotation();
 	model = glm::rotate(model, modelRotation.x, {modelRotation.y, modelRotation.z, modelRotation.w});
 	
-	view = m_cam->getSpaceMat();
+	view = camera->getSpaceMat();
 
-	projection = glm::perspective(glm::radians(m_cam->getFov()), 600.f / 400.f, m_cam->getNearPlan(), m_cam->getFarPlan());
+	projection = glm::perspective(glm::radians(camera->getFov()), 600.f / 400.f, camera->getNearPlan(), camera->getFarPlan());
 	clip = projection * view * model;
 	
 	m_shd->setTransformation(clip);
@@ -163,15 +114,35 @@ void Renderable::render() const {
 }
 
 
-void Renderable::generateRender() {
+void SceneObject::generateRender() {
 
 	/* Pretests */
 
-	if(m_geo == nullptr) {
+	if(m_geo == nullptr || m_shd == nullptr) {
 		m_err_msg = "Vertices could not be interpreted if the geometry hasn't been set";
 		qCritical() << m_err_msg;
 		throw std::invalid_argument(m_err_msg);
 	}
+
+	// We configure the geometry according to the type of the associated shader
+
+	if (m_shd->getShaderType() == ShaderType::Texture) {
+		m_geo->setTextureMapping();
+	}
+
+	// Element Buffer Object (EBO) management
+
+	g_opengl.glGenBuffers(1, &m_ebo);
+	g_opengl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+	g_opengl.glBufferData(GL_ELEMENT_ARRAY_BUFFER, VERTICE_LINK_SIZEOF * m_geo->getVerticesLink().size(), m_geo->getVerticesLink().data(), GL_STATIC_DRAW);
+
+	// Vertex Array Object (VAO) management
+
+	g_opengl.glGenVertexArrays(1, &m_vao);
+
+	// Vertex Buffer Object (VBO) management
+
+	g_opengl.glGenBuffers(1, &m_vbo);
 
 	/* Geometry transformation into float's array for OpenGL to render */
 
@@ -198,7 +169,7 @@ void Renderable::generateRender() {
 
 
 
-void Renderable::deleteBuffers() {
+void SceneObject::deleteBuffers() {
 
 	g_opengl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	g_opengl.glDeleteBuffers(1, &m_ebo);

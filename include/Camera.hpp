@@ -36,7 +36,7 @@ public:
 	//void setTarget(SpaceCoord target);
 	void setPosition(SpaceCoord pos);
 	void addRotation(float xOffset, float yOffset);
-	void walk(bool keyPressed[]);
+	void walk(bool keyPressed[], qint64 deltaTime);
 
 	glm::mat4 getSpaceMat();
 

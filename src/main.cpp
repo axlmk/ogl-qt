@@ -1,18 +1,6 @@
-#include <iostream>
-
-#include <QApplication>
-#include <QDebug>
-#include <QCursor>
-
-#include "Utils.hpp"
-#include "MainWindow.hpp"
+#include <App3D.hpp>
 
 int main(int argc, char** argv) {
-	QApplication app(argc, argv);
-	MainWindow mainWin;
-	mainWin.show();
-	mainWin.setFocus();
-
-	int ret = mainWin.exec();
-	return ret;
+	App3D app(argc, argv);
+	return app.run();
 }

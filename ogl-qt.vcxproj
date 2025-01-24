@@ -11,24 +11,28 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\App3D.cpp" />
+    <ClCompile Include="src\App3DViewer.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="lib\src\stb_image.cpp" />
     <ClCompile Include="src\Geometry.cpp" />
-    <ClCompile Include="src\MainWindow.cpp" />
-    <ClCompile Include="src\Renderable.cpp" />
+    <ClCompile Include="src\SceneManager.cpp" />
+    <ClCompile Include="src\SceneObject.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Utils.cpp" />
     <ClCompile Include="src\Vertex.cpp" />
-    <QtMoc Include="include\MainWindow.hpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\RenderingWindow.cpp" />
+    <ClCompile Include="src\SceneViewer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Downloads\stb_image.h" />
+    <ClInclude Include="include\App3D.hpp" />
+    <ClInclude Include="include\App3DViewer.hpp" />
     <ClInclude Include="include\Camera.hpp" />
     <ClInclude Include="include\Geometry.hpp" />
-    <ClInclude Include="include\RenderingWindow.hpp" />
-    <ClInclude Include="include\Renderable.hpp" />
+    <ClInclude Include="include\SceneViewer.hpp" />
+    <ClInclude Include="include\SceneObject.hpp" />
+    <ClInclude Include="include\SceneManager.hpp" />
     <ClInclude Include="include\Shader.hpp" />
     <ClInclude Include="include\Utils.hpp" />
     <ClInclude Include="include\Vertex.hpp" />

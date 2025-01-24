@@ -39,7 +39,9 @@ void Shader::setCustom(const std::filesystem::path& vtxShdPath, const std::files
 		qCritical() << m_err_msg;
 		throw std::invalid_argument(m_err_msg);
 	}
-	setShaders(vtxShdPath, frgShdPath);
+
+	m_vtxShdPath = vtxShdPath;
+	m_frgShdPath = frgShdPath;
 }
 
 
@@ -55,7 +57,6 @@ void Shader::setColor() {
 		deleteTexture();
 		deleteProgram();
 	}
-	setShaders("shaders/unicolor.vs", "shaders/unicolor.fs");
 }
 
 
@@ -76,30 +77,10 @@ void Shader::setTexture(const std::filesystem::path &texturePath) {
 		throw std::invalid_argument(m_err_msg);
 	}
 
-	GLenum format;
-	switch (nrChannels) {
-		case 3:
-			format = GL_RGB;
-			break;
-		case 4:
-			format = GL_RGBA;
-			break;
-		default:
-			break;
-	}
-
-	g_opengl.glGenTextures(1, &m_txtBuff);
-	g_opengl.glBindTexture(GL_TEXTURE_2D, m_txtBuff);
-	g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	g_opengl.glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-	g_opengl.glGenerateMipmap(GL_TEXTURE_2D);
-
-	stbi_image_free(data);
-
-	setShaders("shaders/texture.vs", "shaders/texture.fs");
+	m_textureInfo.data = data;
+	m_textureInfo.width = width;
+	m_textureInfo.height = height;
+	m_textureInfo.nrChannels = nrChannels;
 }
 
 
@@ -195,7 +176,6 @@ void Shader::use() const {
 	}
 
 	if(m_shaderType == ShaderType::Texture)
-		// TODO : test if binding went well
 		g_opengl.glBindTexture(GL_TEXTURE_2D, m_txtBuff);
 	g_opengl.glUseProgram(m_shdPrgId);
 }
@@ -244,4 +224,53 @@ void Shader::deleteProgram() {
 	g_opengl.glUseProgram(0);
 	g_opengl.glDeleteProgram(m_shdPrgId);
 	m_shdPrgId = 0;
+}
+
+
+
+void Shader::compile() {
+	if(m_shaderType == ShaderType::Texture) {
+		if(!m_textureInfo.data) {
+			m_err_msg = "Texture data have not been loaded before compilation";
+			qCritical() << m_err_msg;
+			throw std::invalid_argument(m_err_msg);
+		}
+
+		GLenum format;
+		switch (m_textureInfo.nrChannels) {
+			case 3:
+				format = GL_RGB;
+				break;
+			case 4:
+				format = GL_RGBA;
+				break;
+			default:
+				break;
+		}
+
+		g_opengl.glGenTextures(1, &m_txtBuff);
+		g_opengl.glBindTexture(GL_TEXTURE_2D, m_txtBuff);
+		g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		g_opengl.glTexImage2D(GL_TEXTURE_2D, 0, format, m_textureInfo.width, m_textureInfo.height, 0, format, GL_UNSIGNED_BYTE, m_textureInfo.data);
+		g_opengl.glGenerateMipmap(GL_TEXTURE_2D);
+
+		stbi_image_free(m_textureInfo.data);
+		setShaders("shaders/texture.vs", "shaders/texture.fs");
+
+	} else if(m_shaderType == ShaderType::Unicolor) {
+		setShaders("shaders/unicolor.vs", "shaders/unicolor.fs");
+
+	} else if(m_shaderType == ShaderType::Custom) {
+		if(m_vtxShdPath.empty() || m_frgShdPath.empty()) {
+			m_err_msg = "Vertex and fragment shaders have not been specified before compilation";
+			qCritical() << m_err_msg;
+			throw std::invalid_argument(m_err_msg);
+		}
+
+		setShaders(m_vtxShdPath, m_frgShdPath);
+	}
+	
 }
