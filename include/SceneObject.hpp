@@ -9,16 +9,16 @@ public:
 
 	// TODO : rule of 3
 	SceneObject();
-	SceneObject(std::shared_ptr<Geometry> geometry, std::shared_ptr<Shader> shader);
+	SceneObject(Geometry* geometry, Shader* shader);
 	~SceneObject();
 
-	std::shared_ptr<Geometry> getGeometry() const;
-	std::shared_ptr<Shader> getShader() const;
+	Geometry* getGeometry() const;
+	Shader* getShader() const;
 
-	void linkGeo(std::shared_ptr<Geometry> geometry);
-	void linkShader(std::shared_ptr<Shader> shader);
+	void linkGeo(Geometry* geometry);
+	void linkShader(Shader* shader);
 	void generateRender();
-	void render(std::shared_ptr<Camera> camera) const;
+	void render(Camera* camera) const;
 
 private:
 
@@ -26,10 +26,10 @@ private:
 	unsigned int m_vao;
 	unsigned int m_ebo;
 
-	std::string m_err_msg;
+	std::string err_msg;
 
-	std::shared_ptr<Geometry> m_geo;
-	std::shared_ptr<Shader> m_shd;
+	Geometry* m_geo;
+	Shader* m_shd;
 
 	void deleteBuffers();
 };

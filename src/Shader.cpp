@@ -11,6 +11,8 @@ Shader::Shader(ShaderType shaderType) : Shader() {
 
 
 
+
+
 Shader::~Shader() {
 	deleteShaders();
 	if(m_shdPrgId) {
@@ -35,52 +37,116 @@ ShaderType Shader::getShaderType() const {
 
 void Shader::setCustom(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath) {
 	if (m_shaderType != ShaderType::Custom) {
-		m_err_msg = "Shader type must be 'custom' to use setCustomShaders() function";
-		qCritical() << m_err_msg;
-		throw std::invalid_argument(m_err_msg);
+		std::string err_msg = "Shader type must be 'custom' to use setCustomShaders() function";
+		qCritical() << err_msg;
+		throw std::invalid_argument(err_msg);
 	}
 
 	m_vtxShdPath = vtxShdPath;
 	m_frgShdPath = frgShdPath;
+
+	compile();
 }
 
 
 
-void Shader::setColor() {
+void Shader::setColor(RGBColor color) {
+
+	// Pretest
+
 	if (m_shaderType != ShaderType::Unicolor) {
-		m_err_msg = "Shader type must be 'unicolor' to use setColor() function";
-		qCritical() << m_err_msg;
-		throw std::invalid_argument(m_err_msg);
+		std::string err_msg = "Shader type must be 'unicolor' to use setColor() function";
+		qCritical() << err_msg;
+		throw std::invalid_argument(err_msg);
 	}
+
+	// Delete old texture's elements
 
 	if(m_txtBuff != 0) {
 		deleteTexture();
 		deleteProgram();
 	}
+
+	// Compile
+
+	m_color = color;
+	compile();
+}
+
+
+
+void Shader::setColor(std::string color) {
+	
+	// Pretest
+
+	if (m_shaderType != ShaderType::Unicolor) {
+		std::string err_msg = "Shader type must be 'unicolor' to use setColor() function";
+		qCritical() << err_msg;
+		throw std::invalid_argument(err_msg);
+	}
+
+	// Delete old texture's elements
+
+	if (m_txtBuff != 0) {
+		deleteTexture();
+		deleteProgram();
+	}
+
+	// Basic string parsing test
+
+	if(color.size() != 7 || color[0] != '#') {
+		std::string err_msg = "Hex color is between #000000 and #ffffff";
+		qCritical() << err_msg;
+		throw std::invalid_argument(err_msg);
+	}
+
+	// Construct m_color
+
+	try {
+		m_color.x = std::stoi(color.substr(1, 2), nullptr, 16) / 255.0;
+		m_color.y = std::stoi(color.substr(3, 2), nullptr, 16) / 255.0;
+		m_color.z = std::stoi(color.substr(5, 2), nullptr, 16) / 255.0;
+	} catch (...) {
+		std::string err_msg = "Color hex code has unvalid format and must be #abc0123";
+		qCritical() << err_msg;
+		throw std::invalid_argument(err_msg);
+	}
+	
+	// Compile
+
+	compile();
 }
 
 
 
 void Shader::setTexture(const std::filesystem::path &texturePath) {
 	if (m_shaderType != ShaderType::Texture) {
-		m_err_msg = "Shader type must be 'texture' to use setTexture() function";
-		qCritical() << m_err_msg;
-		throw std::invalid_argument(m_err_msg);
+		std::string err_msg = "Shader type must be 'texture' to use setTexture() function";
+		qCritical() << err_msg;
+		throw std::invalid_argument(err_msg);
+	}
+
+	if (!std::filesystem::exists(texturePath)) {
+		std::string err_msg = "Path[" + texturePath.string() + "] doesn't not exist";
+		qCritical() << err_msg;
+		throw std::invalid_argument(err_msg);
 	}
 
 	int width, height, nrChannels;
 	unsigned char* data = stbi_load(texturePath.string().c_str(), &width, &height, &nrChannels, 0);
 
 	if (!data) {
-		m_err_msg = "Texture located at '" + texturePath.string() + "' failed to load";
-		qCritical() << m_err_msg;
-		throw std::invalid_argument(m_err_msg);
+		std::string err_msg = "Texture located at '" + texturePath.string() + "' failed to load";
+		qCritical() << err_msg;
+		throw std::invalid_argument(err_msg);
 	}
 
 	m_textureInfo.data = data;
 	m_textureInfo.width = width;
 	m_textureInfo.height = height;
 	m_textureInfo.nrChannels = nrChannels;
+
+	compile();
 }
 
 
@@ -93,9 +159,9 @@ void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::file
 
 	const std::string vertexShaderContent = getFileContent(vtxShdPath);
 	if (vertexShaderContent.empty()) {
-		m_err_msg = "Vertex shader content could not be loaded";
-		qCritical() << m_err_msg;
-		throw std::invalid_argument(m_err_msg);
+		std::string err_msg = "Vertex shader content could not be loaded";
+		qCritical() << err_msg;
+		throw std::invalid_argument(err_msg);
 	}
 	
 	const char* vertexShaderContentChar = vertexShaderContent.c_str();
@@ -106,20 +172,20 @@ void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::file
 	g_opengl.glGetShaderiv(m_vtxShd, GL_COMPILE_STATUS, &success);
 	if (success == GL_FALSE) {
 		g_opengl.glGetShaderInfoLog(m_vtxShd, INFO_LOG_SIZE, NULL, g_infoLog);
-		m_err_msg = "Error compiling vertex shader: " + std::string(g_infoLog);
-		qCritical() << m_err_msg;
+		std::string err_msg = "Error compiling vertex shader: " + std::string(g_infoLog);
+		qCritical() << err_msg;
 		deleteShaders();
-		throw std::invalid_argument(m_err_msg);
+		throw std::invalid_argument(err_msg);
 	}
 
 	/* Fragment shader management */
 
 	const std::string fragmentShaderContent = getFileContent(frgShdPath);
 	if (fragmentShaderContent.empty()) {
-		m_err_msg = "Fragment shader content could not be loaded";
-		qCritical() << m_err_msg;
+		std::string err_msg = "Fragment shader content could not be loaded";
+		qCritical() << err_msg;
 		deleteShaders();
-		throw std::invalid_argument(m_err_msg);
+		throw std::invalid_argument(err_msg);
 	}
 	const char* fragmentShaderContentChar = fragmentShaderContent.c_str();
 
@@ -130,10 +196,10 @@ void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::file
 	g_opengl.glGetShaderiv(m_frgShd, GL_COMPILE_STATUS, &success);
 	if (success == GL_FALSE) {
 		g_opengl.glGetShaderInfoLog(m_frgShd, INFO_LOG_SIZE, NULL, g_infoLog);
-		m_err_msg = "Error compiling fragment shader: " + std::string(g_infoLog);
-		qCritical() << m_err_msg;
+		std::string err_msg = "Error compiling fragment shader: " + std::string(g_infoLog);
+		qCritical() << err_msg;
 		deleteShaders();
-		throw std::invalid_argument(m_err_msg);
+		throw std::invalid_argument(err_msg);
 	}
 
 	/* Shader linking management */
@@ -146,10 +212,11 @@ void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::file
 	
 	if (success == GL_FALSE) {
 		g_opengl.glGetProgramInfoLog(m_shdPrgId, INFO_LOG_SIZE, NULL, g_infoLog);
-		m_err_msg = "Error linking the shaders to the program: " + std::string(g_infoLog);
-		qCritical() << m_err_msg;
-		throw std::invalid_argument(m_err_msg);
+		std::string err_msg = "Error linking the shaders to the program: " + std::string(g_infoLog);
+		qCritical() << err_msg;
+		throw std::invalid_argument(err_msg);
 	}
+
 }
 
 
@@ -157,9 +224,9 @@ void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::file
 void Shader::setTransformation(glm::mat4 transform) {
 	int transformLocation = g_opengl.glGetUniformLocation(m_shdPrgId, "transformation");
 	if(transformLocation == -1) {
-		m_err_msg = "Transformation's location not found";
-		qCritical() << m_err_msg;
-		throw std::invalid_argument(m_err_msg);
+		std::string err_msg = "Uniform has not been found in the vertex shader";
+		qCritical() << err_msg;
+		throw std::invalid_argument(err_msg);
 	}
 	g_opengl.glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(transform));
 }
@@ -170,14 +237,28 @@ void Shader::use() const {
 	GLint isValid = GL_FALSE;
 	
 	g_opengl.glValidateProgram(m_shdPrgId);
+
 	g_opengl.glGetProgramiv(m_shdPrgId, GL_VALIDATE_STATUS, &isValid);
 	if (isValid == GL_FALSE) {
-		qCritical() << "Program ID" << m_shdPrgId << "is unvalid";
+		std::string err_msg = "Program ID " + std::to_string(m_shdPrgId) + " is unvalid";
+		qCritical() << err_msg;
+		throw std::invalid_argument(err_msg);
 	}
 
 	if(m_shaderType == ShaderType::Texture)
 		g_opengl.glBindTexture(GL_TEXTURE_2D, m_txtBuff);
+
 	g_opengl.glUseProgram(m_shdPrgId);
+
+	if (m_shaderType == ShaderType::Unicolor) {
+		int colorUniform = g_opengl.glGetUniformLocation(m_shdPrgId, "inColor");
+		if (colorUniform == -1) {
+			std::string err_msg = "Uniform has not been found in the fragment shader";
+			qCritical() << err_msg;
+			throw std::invalid_argument(err_msg);
+		}
+		g_opengl.glUniform4f(colorUniform, m_color.x, m_color.y, m_color.z, 1.0f);
+	}
 }
 
 
@@ -231,9 +312,9 @@ void Shader::deleteProgram() {
 void Shader::compile() {
 	if(m_shaderType == ShaderType::Texture) {
 		if(!m_textureInfo.data) {
-			m_err_msg = "Texture data have not been loaded before compilation";
-			qCritical() << m_err_msg;
-			throw std::invalid_argument(m_err_msg);
+			std::string err_msg = "Texture data have not been loaded before compilation";
+			qCritical() << err_msg;
+			throw std::invalid_argument(err_msg);
 		}
 
 		GLenum format;
@@ -261,13 +342,14 @@ void Shader::compile() {
 		setShaders("shaders/texture.vs", "shaders/texture.fs");
 
 	} else if(m_shaderType == ShaderType::Unicolor) {
+
 		setShaders("shaders/unicolor.vs", "shaders/unicolor.fs");
 
 	} else if(m_shaderType == ShaderType::Custom) {
 		if(m_vtxShdPath.empty() || m_frgShdPath.empty()) {
-			m_err_msg = "Vertex and fragment shaders have not been specified before compilation";
-			qCritical() << m_err_msg;
-			throw std::invalid_argument(m_err_msg);
+			std::string err_msg = "Vertex and fragment shaders have not been specified before compilation";
+			qCritical() << err_msg;
+			throw std::invalid_argument(err_msg);
 		}
 
 		setShaders(m_vtxShdPath, m_frgShdPath);

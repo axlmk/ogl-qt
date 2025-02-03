@@ -16,6 +16,7 @@ enum class ShaderType {
 	Custom
 };
 
+using RGBColor = glm::vec3;
 
 class Shader {
 public:
@@ -29,7 +30,8 @@ public:
 	void setShaderType(const ShaderType &shaderType);
 	ShaderType getShaderType() const;
 
-	void setColor();
+	void setColor(RGBColor color);
+	void setColor(std::string color);
 	void setTexture(const std::filesystem::path &texturePath);
 	void setCustom(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath);
 	void setTransformation(glm::mat4 transform);
@@ -45,8 +47,8 @@ private:
 		int height;
 		int nrChannels;
 	};
+	RGBColor m_color;
 
-	std::string m_err_msg;
 	ShaderType m_shaderType;
 	std::filesystem::path m_vtxShdPath;
 	std::filesystem::path m_frgShdPath;

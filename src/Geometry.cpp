@@ -42,10 +42,10 @@ Geometry::Geometry(GeometryType	geoType, float size) : Geometry() {
 			m_vertices.push_back(Vertex({ size, 0, 0 }));
 			m_vertices.push_back(Vertex({ 0, size, 0 }));
 			m_vertices.push_back(Vertex({ size, size, 0 }));
-			m_vertices.push_back(Vertex({ 0, 0, -size }));
-			m_vertices.push_back(Vertex({ size, 0, -size }));
-			m_vertices.push_back(Vertex({ 0, size, -size }));
-			m_vertices.push_back(Vertex({ size, size, -size }));
+			m_vertices.push_back(Vertex({ 0, 0, size }));
+			m_vertices.push_back(Vertex({ size, 0, size }));
+			m_vertices.push_back(Vertex({ 0, size, size }));
+			m_vertices.push_back(Vertex({ size, size, size }));
 
 			m_verticesLink = {	0, 1, 2, // 0
 								1, 2, 3,

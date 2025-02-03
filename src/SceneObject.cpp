@@ -4,10 +4,10 @@ SceneObject::SceneObject() : m_geo{ nullptr }, m_shd{ nullptr } {
 	m_vbo = 0;
 	m_vao = 0;
 	m_ebo = 0;
-	m_err_msg = "";
+	std::string err_msg = "";
 }
 
-SceneObject::SceneObject(std::shared_ptr<Geometry> geometry, std::shared_ptr<Shader> shader) : SceneObject() {
+SceneObject::SceneObject(Geometry* geometry, Shader* shader) : SceneObject() {
 	linkGeo(geometry);
 	linkShader(shader);
 }
@@ -30,19 +30,19 @@ SceneObject::~SceneObject() {
 
 
 
-std::shared_ptr<Geometry> SceneObject::getGeometry() const {
+Geometry* SceneObject::getGeometry() const {
 	return m_geo;
 }
 
 
 
-std::shared_ptr<Shader> SceneObject::getShader() const {
+Shader* SceneObject::getShader() const {
 	return m_shd;
 }
 
 
 
-void SceneObject::linkGeo(std::shared_ptr<Geometry> geometry) {
+void SceneObject::linkGeo(Geometry* geometry) {
 
 	if(m_geo == geometry) {
 		qWarning() << "The newly added geometry corresponds to the one actually in use";
@@ -55,9 +55,11 @@ void SceneObject::linkGeo(std::shared_ptr<Geometry> geometry) {
 	}
 
 	m_geo = geometry;
+
+	generateRender();
 }
 
-void SceneObject::linkShader(std::shared_ptr<Shader> shader) {
+void SceneObject::linkShader(Shader* shader) {
 	
 	if(m_shd == shader) {
 		qWarning() << "The newly added shader corresponds to the one actually in use";
@@ -74,41 +76,54 @@ void SceneObject::linkShader(std::shared_ptr<Shader> shader) {
 			m_geo->unsetTextureMapping();
 			break;
 		default:
-			m_err_msg = "ShaderType unknowed";
-			qCritical() << m_err_msg;
-			throw std::invalid_argument(m_err_msg);
+			std::string err_msg = "ShaderType unknowed";
+			qCritical() << err_msg;
+			throw std::invalid_argument(err_msg);
 	}
+
+	generateRender();
 }
 
 
-void SceneObject::render(std::shared_ptr<Camera> camera) const {
+void SceneObject::render(Camera* camera) const {
 
-	if(m_shd == nullptr)
-		return;
+	// Pretest
 
-	if(m_geo == nullptr)
+	if(m_shd == nullptr || m_geo == nullptr)
 		return;
+	
+	// Shader's appliucation
 
 	m_shd->use();
 
-	/* Coordinates transformation */
+	/* Coordinates' transformations */
 
-	glm::mat4 model = glm::mat4(1.f);
-	glm::mat4 view = glm::mat4(1.f);
-	glm::mat4 projection = glm::mat4(1.f);
-	glm::mat4 clip = glm::mat4(1.f);
+	glm::mat4 model			= glm::mat4(1.f);
+	glm::mat4 view			= glm::mat4(1.f);
+	glm::mat4 projection	= glm::mat4(1.f);
+	glm::mat4 clip			= glm::mat4(1.f);
 
-	model = glm::translate(model, m_geo->getPosition());
+	// Model (World's location)
+
 	glm::vec4 modelRotation = m_geo->getRotation();
 	model = glm::rotate(model, modelRotation.x, {modelRotation.y, modelRotation.z, modelRotation.w});
 	
+	model = glm::translate(model, m_geo->getPosition());
+	// View (camera's location)
+
 	view = camera->getSpaceMat();
 
+	// Projection (camera's settings)
+
 	projection = glm::perspective(glm::radians(camera->getFov()), 600.f / 400.f, camera->getNearPlan(), camera->getFarPlan());
+	
+	// Clip (combination of previous matrices)
+
 	clip = projection * view * model;
-	
 	m_shd->setTransformation(clip);
-	
+
+	// Render
+
 	g_opengl.glBindVertexArray(m_vao);
 	g_opengl.glDrawElements(GL_TRIANGLES, m_geo->getVerticesLink().size(), GL_UNSIGNED_INT, 0);
 }
@@ -116,45 +131,36 @@ void SceneObject::render(std::shared_ptr<Camera> camera) const {
 
 void SceneObject::generateRender() {
 
-	/* Pretests */
+	// Pretests
 
 	if(m_geo == nullptr || m_shd == nullptr) {
-		m_err_msg = "Vertices could not be interpreted if the geometry hasn't been set";
-		qCritical() << m_err_msg;
-		throw std::invalid_argument(m_err_msg);
+		std::string err_msg = "Geometry and shader must be specify to render a scene object";
+		qWarning() << err_msg;
+		return;
 	}
 
-	// We configure the geometry according to the type of the associated shader
-
-	if (m_shd->getShaderType() == ShaderType::Texture) {
-		m_geo->setTextureMapping();
-	}
-
-	// Element Buffer Object (EBO) management
-
-	g_opengl.glGenBuffers(1, &m_ebo);
-	g_opengl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-	g_opengl.glBufferData(GL_ELEMENT_ARRAY_BUFFER, VERTICE_LINK_SIZEOF * m_geo->getVerticesLink().size(), m_geo->getVerticesLink().data(), GL_STATIC_DRAW);
-
-	// Vertex Array Object (VAO) management
+	// Buffer generation
 
 	g_opengl.glGenVertexArrays(1, &m_vao);
-
-	// Vertex Buffer Object (VBO) management
-
 	g_opengl.glGenBuffers(1, &m_vbo);
+	g_opengl.glGenBuffers(1, &m_ebo);
+	
+	// Bind VAO before anything else
+	
+	g_opengl.glBindVertexArray(m_vao);
 
-	/* Geometry transformation into float's array for OpenGL to render */
+	// Send data to graphic card
 
 	std::vector<float> floatVertices = m_geo->getFloatVertices();
-
-	/* Transmission of the data to OpenGL */
-	g_opengl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-	g_opengl.glBindVertexArray(m_vao);
 	g_opengl.glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	g_opengl.glBufferData(GL_ARRAY_BUFFER, sizeof(float) * floatVertices.size(), floatVertices.data(), GL_STATIC_DRAW);
 
-	/* Set data for draw call */
+	// EBO management
+
+	g_opengl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+	g_opengl.glBufferData(GL_ELEMENT_ARRAY_BUFFER, VERTICE_LINK_SIZEOF * m_geo->getVerticesLink().size(), m_geo->getVerticesLink().data(), GL_STATIC_DRAW);
+
+	// Handle data between shaders and CPU
 
 	std::vector<unsigned int> attributesPositions = m_geo->getAttributesPositions();
 	unsigned int currentAttributePosition = 0;

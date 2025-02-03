@@ -2,15 +2,14 @@
 
 
 
-App3DViewer::App3DViewer(int argc, char* argv[], std::shared_ptr<SceneManager> sceneManager) :
-	m_mainWindow{ nullptr } {
+App3DViewer::App3DViewer(int argc, char* argv[], SceneManager* sceneManager) {
 
 	// Minimal required components
 
 	m_app = std::make_unique<QApplication>(argc, argv);
 	m_mainWindow = std::make_unique<QDialog>(nullptr, Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
 	m_sceneViewer = std::make_unique<SceneViewer>(sceneManager);
-
+	
 	// Format management
 
 	QSurfaceFormat format;

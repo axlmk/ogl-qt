@@ -38,9 +38,9 @@ void Camera::setType(CameraType type) {
 
 //void Camera::setTarget(SpaceCoord target) {
 //	if(m_type != CameraType::LookAt) {
-//		m_err_msg = "A target can't be specified when Camera type isn't LookAt";
-//		qCritical() << m_err_msg;
-//		throw std::invalid_argument(m_err_msg);
+//		std::string err_msg = "A target can't be specified when Camera type isn't LookAt";
+//		qCritical() << err_msg;
+//		throw std::invalid_argument(err_msg);
 //	}
 //	m_target = target;
 //}
@@ -53,15 +53,13 @@ void Camera::setPosition(SpaceCoord pos) {
 
 void Camera::addRotation(float xOffset, float yOffset) {
 	if(m_type != CameraType::FirstPerson) {
-		m_err_msg = "Rotation can only modified while being in FirstPerson mode";
-		qCritical() << m_err_msg;
-		throw std::invalid_argument(m_err_msg);
+		std::string err_msg = "Rotation can only modified while being in FirstPerson mode";
+		qCritical() << err_msg;
+		throw std::invalid_argument(err_msg);
 	}
 
 	m_yaw += xOffset;
 	m_pitch += yOffset;
-
-	qDebug() << m_yaw << m_pitch;
 
 	if(m_pitch >= 85)
 		m_pitch = 85;

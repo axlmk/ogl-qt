@@ -1,4 +1,5 @@
 #include <SceneManager.hpp>
+#include <SceneViewer.hpp>
 
 
 SceneManager::SceneManager() :
@@ -11,34 +12,34 @@ void SceneManager::initializeScene() {
 
 	// Camera
 
-	auto mainCam{ std::make_shared<Camera>(SpaceCoord(0., 0., 2.)) };
-	m_camera = mainCam;
+	m_camera = { std::make_unique<Camera>(SpaceCoord(0., 0., 2.)) };
 
 	// Cubes
 
-	auto texturedCube{ std::make_shared<Geometry>(GeometryType::Cube, .5) };
-	texturedCube->setPivot(.75, .25, -.25);
-	m_geometries.push_back(texturedCube);
+	Geometry* texturedCube = new Geometry(GeometryType::Cube, 0.5);
+	texturedCube->setPivot(0.25, 0.25, 0.25);
+	texturedCube->translate(-0.25);
+	m_geometries.push_back(std::unique_ptr<Geometry>(texturedCube));
 
-	auto faceCube{ std::make_shared<Geometry>(GeometryType::Cube, .5) };
-	faceCube->setPivot(.25, .25, -.25);
-	faceCube->rotate(45, 1., 0.5);
-	m_geometries.push_back(faceCube);
-	
+	Geometry* uniCube = new Geometry(GeometryType::Cube, 0.5);
+	uniCube->setPivot(0.25, 0.25, 0.25);
+	uniCube->translate(0.25);
+	m_geometries.push_back(std::unique_ptr<Geometry>(uniCube));
+
 	// Shaders
 
-	auto textShader{ std::make_shared<Shader>(ShaderType::Texture) };
-	textShader->setTexture("textures/container.jpg");
-	m_shaders.push_back(textShader);
+	Shader* face = new Shader(ShaderType::Texture);
+	face->setTexture("textures/container.jpg");
+	m_shaders.push_back(std::unique_ptr<Shader>(face));
 
-	auto faceShader{ std::make_shared<Shader>(ShaderType::Texture) };
-	faceShader->setTexture("textures/awesomeface.png");
-	m_shaders.push_back(faceShader);
-	
+	Shader* uni = new Shader(ShaderType::Unicolor);
+	uni->setColor("#a4dc18");
+	m_shaders.push_back(std::unique_ptr<Shader>(uni));
+
 	// Scene creation
 
-	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[0], m_shaders[0]));
-	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[1], m_shaders[1]));
+	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[0].get(), m_shaders[0].get()));
+	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[1].get(), m_shaders[1].get()));
 }
 
 
@@ -64,25 +65,19 @@ void SceneManager::walkCamera(Mouvement mouvement, bool active) {
 
 
 
-std::vector<std::shared_ptr<SceneObject>> SceneManager::getSceneObjects() {
+std::vector<std::unique_ptr<SceneObject>>& SceneManager::getSceneObjects() {
 	return m_sceneObjects;
 }
 
 
-void SceneManager::compileShaders() {
-
-	for(auto &shader : m_shaders) {
-		shader->compile();
-	}
-}
-
-void SceneManager::loadSceneObjects() {
-
-	for(auto &object : m_sceneObjects) {
-		object->generateRender();
-	}
-}
-
-std::shared_ptr<Camera> SceneManager::getCamera() {
+std::unique_ptr<Camera>& SceneManager::getCamera() {
 	return m_camera;
+}
+
+std::vector<std::unique_ptr<Shader>>& SceneManager::getShaders() {
+	return m_shaders;
+}
+
+std::vector<std::unique_ptr<Geometry>>& SceneManager::getGeometries() {
+	return m_geometries;
 }

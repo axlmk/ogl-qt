@@ -9,12 +9,15 @@
 
 #include "Utils.hpp"
 #include "SceneObject.hpp"
-#include "SceneManager.hpp"
+
+// Forward declaration
+class SceneManager;
+
 
 class SceneViewer : public QOpenGLWindow {
 public:
 	
-	SceneViewer(std::shared_ptr<SceneManager> sceneManager);
+	SceneViewer(SceneManager* sceneManager);
 	~SceneViewer() Q_DECL_OVERRIDE;
 
 
@@ -27,7 +30,7 @@ public:
 
 private:
 
-	std::shared_ptr<SceneManager> m_sceneManager;
+	SceneManager *m_manager;
 
 	// 0 = z, 1 = q, 2 = d, 3 = s
 	bool m_KeyBeingPressed[4];

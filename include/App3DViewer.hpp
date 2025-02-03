@@ -15,11 +15,11 @@
 
 class App3DViewer {
 public:
-	App3DViewer(int argc, char *argv[], std::shared_ptr<SceneManager> sceneManager);
+	App3DViewer(int argc, char *argv[], SceneManager* sceneManager);
 	int run();
 
 private:
 	std::unique_ptr<QApplication>	m_app;
 	std::unique_ptr<QDialog>		m_mainWindow;
-	std::shared_ptr<SceneViewer>	m_sceneViewer;
+	std::unique_ptr<SceneViewer>	m_sceneViewer;
 };

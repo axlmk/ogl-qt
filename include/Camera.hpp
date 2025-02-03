@@ -42,7 +42,7 @@ public:
 
 private:
 
-    std::string m_err_msg;
+    std::string err_msg;
 
 	SpaceCoord m_direction;
 	SpaceCoord m_position;
