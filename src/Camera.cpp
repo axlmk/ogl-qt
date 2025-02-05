@@ -98,9 +98,10 @@ void Camera::rotateAround(glm::vec2 lastPos, glm::vec2 currentPos) {
 
 	glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0, 1.0, 0.0));
 
-	glm::vec4 rotated = rotation * glm::vec4(m_position, 1.0f);
+	glm::vec4 rotated = rotation * glm::vec4(m_position - m_target, 1.0f);
 	m_position.x = rotated.x + m_target.x;
 	m_position.z = rotated.z + m_target.z;
+
 
 	m_direction = m_target - m_position;
 }

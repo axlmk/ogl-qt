@@ -13,13 +13,13 @@ void SceneManager::initializeScene() {
 	// Camera
 
 	m_camera = { std::make_unique<Camera>(SpaceCoord(0., 0., 2.)) };
-	m_camera->setTarget({0.25, 0, 0});
+	m_camera->setTarget({-5.25, 0, 0});
 
 	// Cubes
 
 	Geometry* texturedCube = new Geometry(GeometryType::Cube, 0.5);
 	texturedCube->setPivot(0.25, 0.25, 0.25);
-	texturedCube->translate(-0.25);
+	texturedCube->translate(-5.25);
 	m_geometries.push_back(std::unique_ptr<Geometry>(texturedCube));
 
 	Geometry* uniCube = new Geometry(GeometryType::Cube, 0.5);
