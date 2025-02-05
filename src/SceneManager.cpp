@@ -13,6 +13,7 @@ void SceneManager::initializeScene() {
 	// Camera
 
 	m_camera = { std::make_unique<Camera>(SpaceCoord(0., 0., 2.)) };
+	m_camera->setTarget({0.25, 0, 0});
 
 	// Cubes
 
@@ -29,7 +30,7 @@ void SceneManager::initializeScene() {
 	// Shaders
 
 	Shader* face = new Shader(ShaderType::Texture);
-	face->setTexture("textures/container.jpg");
+	face->setTexture("textures/awesomeface.png");
 	m_shaders.push_back(std::unique_ptr<Shader>(face));
 
 	Shader* uni = new Shader(ShaderType::Unicolor);

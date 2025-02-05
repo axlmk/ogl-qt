@@ -6,9 +6,11 @@
 #include <QKeyEvent>
 #include <QTimer>
 #include <QDateTime>
+#include <QApplication>
 
 #include "Utils.hpp"
 #include "SceneObject.hpp"
+#
 
 // Forward declaration
 class SceneManager;
@@ -24,6 +26,8 @@ public:
 	void initializeGL() Q_DECL_OVERRIDE;
 	void paintGL() Q_DECL_OVERRIDE;
 
+	void mousePressEvent(QMouseEvent* event) override;
+	void mouseReleaseEvent(QMouseEvent* event) override;
 	void keyPressEvent(QKeyEvent* event) override;
 	void keyReleaseEvent(QKeyEvent* event) override;
 	void mouseMoveEvent(QMouseEvent* event) override;
@@ -32,8 +36,12 @@ private:
 
 	SceneManager *m_manager;
 
-	// 0 = z, 1 = q, 2 = d, 3 = s
-	bool m_KeyBeingPressed[4];
+	bool m_altBeingPressed;
+	bool m_mousePressed[3];		// 0 = left, 1 = middle, 2 = right
+	bool m_KeyBeingPressed[4];	// 0 = z, 1 = q, 2 = d, 3 = s
+	
+	glm::vec2 m_lastMousePos;
+	glm::vec2 m_mousePosWhenPressed;
 
 	qint64 m_currentTime;
 	qint64 m_deltaTime;

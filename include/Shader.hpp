@@ -21,10 +21,8 @@ using RGBColor = glm::vec3;
 class Shader {
 public:
 	
-	// TODO : rule of 3
 	Shader();
 	Shader(ShaderType shaderType);
-	// TODO : delete everything
 	~Shader();
 
 	void setShaderType(const ShaderType &shaderType);

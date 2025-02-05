@@ -3,11 +3,15 @@
 
 
 SceneViewer::SceneViewer(SceneManager* sceneManager) :
-	m_manager{ sceneManager },
-	m_KeyBeingPressed{ false, false, false, false },
-	m_currentTime{ QDateTime::currentMSecsSinceEpoch() },
-	m_timer{ std::make_unique<QTimer>(this) },
-	m_deltaTime{ 0 } {
+	m_deltaTime			{ 0 },
+	m_lastMousePos		{ 0.0, 0.0 },
+	m_mousePosWhenPressed{ 0.0, 0.0 },
+	m_altBeingPressed	{ false },
+	m_mousePressed		{ false, false, false },
+	m_KeyBeingPressed	{ false, false, false, false },
+	m_manager			{ sceneManager },
+	m_timer				{ std::make_unique<QTimer>(this) },
+	m_currentTime		{ QDateTime::currentMSecsSinceEpoch() } {
 
 	connect(&(*m_timer), &QTimer::timeout, this, QOverload<>::of(&SceneViewer::update));
 	m_timer->start(16);
@@ -28,6 +32,8 @@ void SceneViewer::initializeGL() {
 	m_manager->initializeScene();
 }
 
+
+
 void SceneViewer::paintGL() {
 
 	m_deltaTime = QDateTime::currentMSecsSinceEpoch() - m_currentTime;
@@ -47,6 +53,8 @@ void SceneViewer::paintGL() {
 	i++;
 }
 
+
+
 void SceneViewer::keyPressEvent(QKeyEvent* event) {
 	
 	if(event->text() == "z")
@@ -60,6 +68,10 @@ void SceneViewer::keyPressEvent(QKeyEvent* event) {
 
 	if(event->text() == "s")
 		m_KeyBeingPressed[3] = true;
+
+	if(event->key() == Qt::Key_Alt ) {
+		m_altBeingPressed = true;
+	}
 }
 
 void SceneViewer::keyReleaseEvent(QKeyEvent * event) {
@@ -74,22 +86,81 @@ void SceneViewer::keyReleaseEvent(QKeyEvent * event) {
 
 	if (event->text() == "s")
 		m_KeyBeingPressed[3] = false;
+
+	if(event->key() == Qt::Key_Alt) {
+		m_altBeingPressed = false;
+	}
+}
+
+void SceneViewer::mousePressEvent(QMouseEvent* event) {
+	switch (event->button()) {
+		case Qt::LeftButton:
+			m_mousePressed[0] = true;
+			m_lastMousePos.x = event->pos().x();
+			m_lastMousePos.y = event->pos().y();
+			m_mousePosWhenPressed = m_lastMousePos;
+			break;
+		case Qt::MiddleButton:
+			m_mousePressed[1] = true;
+			break;
+		case Qt::RightButton:
+			m_mousePressed[2] = true;
+			break;
+		default:
+			break;
+	}
+}
+
+void SceneViewer::mouseReleaseEvent(QMouseEvent* event) {
+	switch (event->button()) {
+		case Qt::LeftButton:
+			m_mousePressed[0] = false;
+			break;
+		case Qt::MiddleButton:
+			m_mousePressed[1] = false;
+			break;
+		case Qt::RightButton:
+			m_mousePressed[2] = false;
+			break;
+		default:
+			break;
+	}
 }
 
 
-
 void SceneViewer::mouseMoveEvent(QMouseEvent* event) {
-	// AGA DBG
-	return;
-	glm::vec2 delta{};
-	float intensity = .05f;
+	
+	if(m_altBeingPressed) {
+	
+		// Viewing Mode
 
-	auto center = geometry().center();
-	auto globalCenter = mapToGlobal(center);
+		if(m_mousePressed[0]) {
+			qDebug() << event->pos().x() << '|' << m_lastMousePos.x << '|' << m_mousePosWhenPressed.x;
+			
+			m_manager->getCamera()->rotateAround(m_lastMousePos, { event->pos().x(), event->pos().y() });
+			m_lastMousePos.x = event->pos().x();
+			m_lastMousePos.y = event->pos().y();
+			
 
-	delta.x = (event->pos().x() - center.x()) * intensity;
-	delta.y = (center.y() - event->pos().y()) * intensity;
+		} else if(m_mousePressed[1]) {
+		
+		} else if(m_mousePressed[2]) {
+		
+		}
 
-	m_manager->getCamera()->addRotation(delta.x, delta.y);
-	cursor().setPos(globalCenter.x(), globalCenter.y());
+	} else { 
+
+		// Walking Mode
+		/*glm::vec2 delta{};
+		float intensity = .05f;
+
+		auto center = geometry().center();
+		auto globalCenter = mapToGlobal(center);
+
+		delta.x = (event->pos().x() - center.x()) * intensity;
+		delta.y = (center.y() - event->pos().y()) * intensity;
+
+		m_manager->getCamera()->addRotation(delta.x, delta.y);
+		cursor().setPos(globalCenter.x(), globalCenter.y());*/
+	}
 }

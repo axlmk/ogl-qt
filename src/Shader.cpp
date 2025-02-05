@@ -52,22 +52,16 @@ void Shader::setCustom(const std::filesystem::path& vtxShdPath, const std::files
 
 void Shader::setColor(RGBColor color) {
 
-	// Pretest
-
 	if (m_shaderType != ShaderType::Unicolor) {
 		std::string err_msg = "Shader type must be 'unicolor' to use setColor() function";
 		qCritical() << err_msg;
 		throw std::invalid_argument(err_msg);
 	}
 
-	// Delete old texture's elements
-
 	if(m_txtBuff != 0) {
 		deleteTexture();
 		deleteProgram();
 	}
-
-	// Compile
 
 	m_color = color;
 	compile();
@@ -77,15 +71,13 @@ void Shader::setColor(RGBColor color) {
 
 void Shader::setColor(std::string color) {
 	
-	// Pretest
-
 	if (m_shaderType != ShaderType::Unicolor) {
 		std::string err_msg = "Shader type must be 'unicolor' to use setColor() function";
 		qCritical() << err_msg;
 		throw std::invalid_argument(err_msg);
 	}
 
-	// Delete old texture's elements
+	// Deletion of old texture traces
 
 	if (m_txtBuff != 0) {
 		deleteTexture();
@@ -112,8 +104,6 @@ void Shader::setColor(std::string color) {
 		throw std::invalid_argument(err_msg);
 	}
 	
-	// Compile
-
 	compile();
 }
 

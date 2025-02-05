@@ -1,13 +1,13 @@
 #include "Camera.hpp"
 
 
-Camera::Camera(const SpaceCoord& position, float fov, CameraType type) : 
+Camera::Camera(const SpaceCoord& position, float fov) : 
 	m_position{ position },
 	m_projection{ CameraProjection::Perspective },
 	m_fov{ fov }, m_nearPlan{ 0.1f },
 	m_farPlan{ 100.f },
+	m_target { 0.0f, 0.0f, 0.0f },
 	m_direction{ 0.0f, 0.0f, -1.0f },
-	m_type{ type },
 	m_yaw{ -90.0f },
 	m_pitch{ 0.0f } {
 }
@@ -32,31 +32,24 @@ float Camera::getFarPlan() const {
 	return m_farPlan;
 }
 
-void Camera::setType(CameraType type) {
-	m_type = type;
-}
-
-//void Camera::setTarget(SpaceCoord target) {
-//	if(m_type != CameraType::LookAt) {
-//		std::string err_msg = "A target can't be specified when Camera type isn't LookAt";
-//		qCritical() << err_msg;
-//		throw std::invalid_argument(err_msg);
-//	}
-//	m_target = target;
-//}
 
 void Camera::setPosition(SpaceCoord pos) {
 	m_position = pos;
 }
 
+void Camera::setTarget(SpaceCoord target) {
+	/*float angle = std::atan((target.x - m_direction.x) / (target.z - m_direction.z + 1));
 
+	glm::mat4 rotation = glm::rotate(glm::mat4(1.f), angle, glm::vec3(0.0, 1.0, 0.0));
+
+	glm::vec4 rotated = rotation * glm::vec4(m_direction, 1.0f);*/
+
+
+	m_target = target;
+	m_direction = m_target - m_position;
+}
 
 void Camera::addRotation(float xOffset, float yOffset) {
-	if(m_type != CameraType::FirstPerson) {
-		std::string err_msg = "Rotation can only modified while being in FirstPerson mode";
-		qCritical() << err_msg;
-		throw std::invalid_argument(err_msg);
-	}
 
 	m_yaw += xOffset;
 	m_pitch += yOffset;
@@ -80,20 +73,7 @@ void Camera::addRotation(float xOffset, float yOffset) {
 glm::mat4 Camera::getSpaceMat() {
     glm::mat4 view = glm::mat4(1.);
 	m_position.y = 0.0f;
-	switch(m_type) {
-		case CameraType::LookAt:
-			view = glm::lookAt(m_position, m_direction, { 0, 1., 0 });
-			break;
-		case CameraType::FirstPerson:
-			view = glm::lookAt(m_position, m_direction + m_position, { 0, 1., 0 });
-			break;
-		default:
-			std::string err_msg = "Camera's type unrecognized";
-			qCritical() << err_msg;
-			throw std::invalid_argument(err_msg);
-			break;
-	}
-	return view;
+	return glm::lookAt(m_position, m_direction + m_position, { 0, 1., 0 });
 }
 
 void Camera::walk(bool keyPressed[], qint64 deltaTime) {
@@ -106,4 +86,21 @@ void Camera::walk(bool keyPressed[], qint64 deltaTime) {
 		m_position += speed * glm::normalize(glm::cross(m_direction, { 0.0, 1.0, 0.0 }));
 	if (keyPressed[3])
 		m_position -= speed * m_direction;
+}
+
+void Camera::rotateAround(glm::vec2 lastPos, glm::vec2 currentPos) {
+
+	float intensity = 0.1f;
+	
+	// X axis
+	float deltaX = currentPos.x - lastPos.x;
+	float angle = std::atan(deltaX / glm::length(m_direction)) * intensity;
+
+	glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0, 1.0, 0.0));
+
+	glm::vec4 rotated = rotation * glm::vec4(m_position, 1.0f);
+	m_position.x = rotated.x + m_target.x;
+	m_position.z = rotated.z + m_target.z;
+
+	m_direction = m_target - m_position;
 }
