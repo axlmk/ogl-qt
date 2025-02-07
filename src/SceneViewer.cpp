@@ -78,9 +78,8 @@ void SceneViewer::keyReleaseEvent(QKeyEvent * event) {
 
 
 
-void SceneViewer::mouseMoveEvent(QMouseEvent* event) {
-	// AGA DBG
-	return;
+void SceneViewer::mouseMoveEvent(QMouseEvent* event)
+{
 	glm::vec2 delta{};
 	float intensity = .05f;
 
@@ -90,6 +89,6 @@ void SceneViewer::mouseMoveEvent(QMouseEvent* event) {
 	delta.x = (event->pos().x() - center.x()) * intensity;
 	delta.y = (center.y() - event->pos().y()) * intensity;
 
-	m_manager->getCamera()->addRotation(delta.x, delta.y);
+	m_manager->getCamera()->lookAround(delta.x, delta.y);
 	cursor().setPos(globalCenter.x(), globalCenter.y());
 }
