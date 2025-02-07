@@ -12,35 +12,34 @@ void SceneManager::initializeScene() {
 
 	// Camera
 
-	m_camera = { std::make_unique<Camera>(SpaceCoord(0., 0., 2.)) };
-	m_camera->setTarget({-5.25, 0, 0});
+	m_camera = { std::make_unique<Camera>(SpaceCoord(0.0, 0.0, 2.0)) };
+	//m_camera->setTarget({-5.25, 0, 0});
 
 	// Cubes
 
 	Geometry* texturedCube = new Geometry(GeometryType::Cube, 0.5);
 	texturedCube->setPivot(0.25, 0.25, 0.25);
-	texturedCube->translate(-5.25);
 	m_geometries.push_back(std::unique_ptr<Geometry>(texturedCube));
 
-	Geometry* uniCube = new Geometry(GeometryType::Cube, 0.5);
+	/*Geometry* uniCube = new Geometry(GeometryType::Cube, 0.5);
 	uniCube->setPivot(0.25, 0.25, 0.25);
 	uniCube->translate(0.25);
-	m_geometries.push_back(std::unique_ptr<Geometry>(uniCube));
+	m_geometries.push_back(std::unique_ptr<Geometry>(uniCube));*/
 
 	// Shaders
 
 	Shader* face = new Shader(ShaderType::Texture);
-	face->setTexture("textures/awesomeface.png");
+	face->setTexture("textures/container.jpg");
 	m_shaders.push_back(std::unique_ptr<Shader>(face));
 
-	Shader* uni = new Shader(ShaderType::Unicolor);
+	/*Shader* uni = new Shader(ShaderType::Unicolor);
 	uni->setColor("#a4dc18");
-	m_shaders.push_back(std::unique_ptr<Shader>(uni));
+	m_shaders.push_back(std::unique_ptr<Shader>(uni));*/
 
 	// Scene creation
 
 	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[0].get(), m_shaders[0].get()));
-	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[1].get(), m_shaders[1].get()));
+	//m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[1].get(), m_shaders[1].get()));
 }
 
 

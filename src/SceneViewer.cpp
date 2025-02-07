@@ -45,9 +45,9 @@ void SceneViewer::paintGL() {
 	static int i = 0;
 
 	for (auto &sceneObject : m_manager->getSceneObjects()) {
-		m_manager->getCamera()->walk(m_KeyBeingPressed, m_deltaTime);
-		m_manager->getGeometries()[0]->rotate(i * 0.01, 1, 0, 0);
-		m_manager->getGeometries()[1]->rotate(i * 0.01, 1, 0, 0);
+		m_manager->getCamera()->move(m_KeyBeingPressed, m_deltaTime);
+		//m_manager->getGeometries()[0]->rotate(i * 0.01, 1, 0, 0);
+		//m_manager->getGeometries()[1]->rotate(i * 0.01, 1, 0, 0);
 		sceneObject->render(m_manager->getCamera().get());
 	}
 	i++;
@@ -96,9 +96,6 @@ void SceneViewer::mousePressEvent(QMouseEvent* event) {
 	switch (event->button()) {
 		case Qt::LeftButton:
 			m_mousePressed[0] = true;
-			m_lastMousePos.x = event->pos().x();
-			m_lastMousePos.y = event->pos().y();
-			m_mousePosWhenPressed = m_lastMousePos;
 			break;
 		case Qt::MiddleButton:
 			m_mousePressed[1] = true;
@@ -109,6 +106,9 @@ void SceneViewer::mousePressEvent(QMouseEvent* event) {
 		default:
 			break;
 	}
+	m_lastMousePos.x = event->pos().x();
+	m_lastMousePos.y = event->pos().y();
+	m_mousePosWhenPressed = m_lastMousePos;
 }
 
 void SceneViewer::mouseReleaseEvent(QMouseEvent* event) {
@@ -134,19 +134,14 @@ void SceneViewer::mouseMoveEvent(QMouseEvent* event) {
 	
 		// Viewing Mode
 
-		if(m_mousePressed[0]) {
-			qDebug() << event->pos().x() << '|' << m_lastMousePos.x << '|' << m_mousePosWhenPressed.x;
-			
-			m_manager->getCamera()->rotateAround(m_lastMousePos, { event->pos().x(), event->pos().y() });
-			m_lastMousePos.x = event->pos().x();
-			m_lastMousePos.y = event->pos().y();
-			
-
-		} else if(m_mousePressed[1]) {
-		
-		} else if(m_mousePressed[2]) {
-		
-		}
+		if(m_mousePressed[0])
+			m_manager->getCamera()->rotate(m_lastMousePos, { event->pos().x(), event->pos().y() });
+		else if(m_mousePressed[1])
+			m_manager->getCamera()->pan(m_lastMousePos, { event->pos().x(), event->pos().y() });
+		else if(m_mousePressed[2])
+			m_manager->getCamera()->zoom(m_lastMousePos, { event->pos().x(), event->pos().y() });
+		m_lastMousePos.x = event->pos().x();
+		m_lastMousePos.y = event->pos().y();
 
 	} else { 
 

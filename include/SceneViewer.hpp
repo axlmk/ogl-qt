@@ -10,7 +10,6 @@
 
 #include "Utils.hpp"
 #include "SceneObject.hpp"
-#
 
 // Forward declaration
 class SceneManager;
