@@ -3,11 +3,11 @@
 
 
 App3D::App3D(int argc, char *argv[]) :
-	m_sceneManager{ nullptr },
+	m_scene{ nullptr },
 	m_app3DViewer{ nullptr } {
 
-	m_sceneManager = std::make_unique<SceneManager>();
-	m_app3DViewer = std::make_unique<App3DViewer>(argc, argv, m_sceneManager.get());
+	m_scene = std::make_unique<scene>();
+	m_app3DViewer = std::make_unique<App3DViewer>(argc, argv, m_scene.get());
 }
 
 
@@ -18,6 +18,6 @@ int App3D::run() {
 
 
 
-SceneManager* App3D::getSceneManager() const {
-	return m_sceneManager.get();
+scene* App3D::getscene() const {
+	return m_scene.get();
 }

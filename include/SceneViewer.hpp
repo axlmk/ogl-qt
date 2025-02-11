@@ -12,13 +12,13 @@
 #include "SceneObject.hpp"
 
 // Forward declaration
-class SceneManager;
+class scene;
 
 
 class SceneViewer : public QOpenGLWindow {
 public:
 	
-	SceneViewer(SceneManager* sceneManager);
+	SceneViewer(scene* scene);
 	~SceneViewer() Q_DECL_OVERRIDE;
 
 
@@ -33,7 +33,7 @@ public:
 
 private:
 
-	SceneManager *m_manager;
+	scene *m_manager;
 
 	bool m_altBeingPressed;
 	bool m_mousePressed[3];		// 0 = left, 1 = middle, 2 = right

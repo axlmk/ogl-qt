@@ -11,12 +11,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="lib\src\stb_loader.cpp" />
     <ClCompile Include="src\App3D.cpp" />
     <ClCompile Include="src\App3DViewer.cpp" />
     <ClCompile Include="src\Camera.cpp" />
-    <ClCompile Include="lib\src\stb_image.cpp" />
     <ClCompile Include="src\Geometry.cpp" />
-    <ClCompile Include="src\SceneManager.cpp" />
+    <ClCompile Include="src\HUD.cpp" />
+    <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\SceneObject.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Utils.cpp" />
@@ -25,14 +26,13 @@
     <ClCompile Include="src\SceneViewer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Downloads\stb_image.h" />
     <ClInclude Include="include\App3D.hpp" />
     <ClInclude Include="include\App3DViewer.hpp" />
     <ClInclude Include="include\Camera.hpp" />
     <ClInclude Include="include\Geometry.hpp" />
     <ClInclude Include="include\SceneViewer.hpp" />
     <ClInclude Include="include\SceneObject.hpp" />
-    <ClInclude Include="include\SceneManager.hpp" />
+    <ClInclude Include="include\Scene.hpp" />
     <ClInclude Include="include\Shader.hpp" />
     <ClInclude Include="include\Utils.hpp" />
     <ClInclude Include="include\Vertex.hpp" />
@@ -47,6 +47,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\container.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="lib\freetype.lib" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6F8E86F3-9D4B-47C1-8897-77F952FE7C58}</ProjectGuid>
@@ -100,14 +103,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <ExecutablePath>$(VC_ExecutablePath_x64);$(CommonExecutablePath)</ExecutablePath>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)/include;$(SolutionDir)/lib/include;</IncludePath>
+    <LibraryPath>$(SolutionDir)/lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <ExecutablePath>$(VC_ExecutablePath_x64);$(CommonExecutablePath)</ExecutablePath>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)/include;$(SolutionDir)/lib/include;</IncludePath>
+    <LibraryPath>$(SolutionDir)/lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);OpenGL32.Lib;</AdditionalDependencies>
@@ -116,6 +122,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);OpenGL32.Lib;</AdditionalDependencies>

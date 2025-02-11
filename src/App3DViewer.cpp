@@ -2,13 +2,13 @@
 
 
 
-App3DViewer::App3DViewer(int argc, char* argv[], SceneManager* sceneManager) {
-
+App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
+{
 	// Minimal required components
 
 	m_app = std::make_unique<QApplication>(argc, argv);
 	m_mainWindow = std::make_unique<QDialog>(nullptr, Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
-	m_sceneViewer = std::make_unique<SceneViewer>(sceneManager);
+	m_sceneViewer = std::make_unique<SceneViewer>(scene);
 	
 	// Format management
 
@@ -35,17 +35,6 @@ App3DViewer::App3DViewer(int argc, char* argv[], SceneManager* sceneManager) {
 	vlay->setSpacing(0);
 	vlay->addWidget(container);
 
-	// Buttons
-	
-	QHBoxLayout* hlay = new QHBoxLayout;
-
-	QPushButton* closeBtn = new QPushButton(m_mainWindow->tr("Close"), &(*m_mainWindow));
-	m_mainWindow->connect(closeBtn, &QPushButton::clicked, &(*m_mainWindow), &QDialog::accept);
-
-	// Window setup
-	
-	hlay->addWidget(closeBtn);
-	vlay->addLayout(hlay);
 	m_mainWindow->setLayout(vlay);
 	m_mainWindow->show();
 }

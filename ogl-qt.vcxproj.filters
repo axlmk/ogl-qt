@@ -24,6 +24,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{a3ee6b69-8e25-4272-9ef5-b6a7ee93ae09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Dependencies">
+      <UniqueIdentifier>{12c9ac2d-9f94-4a5e-8426-c72bfcdd1f2f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\SceneViewer.cpp">
@@ -36,9 +39,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\src\stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\SceneObject.cpp">
@@ -59,7 +59,13 @@
     <ClCompile Include="src\App3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\SceneManager.cpp">
+    <ClCompile Include="src\Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\src\stb_loader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HUD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -71,9 +77,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Utils.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Downloads\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\SceneObject.hpp">
@@ -88,7 +91,7 @@
     <ClInclude Include="include\Camera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\SceneManager.hpp">
+    <ClInclude Include="include\Scene.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\App3D.hpp">
@@ -118,5 +121,10 @@
     <Text Include="shaders\unicolor.vs">
       <Filter>Shaders</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="lib\freetype.lib">
+      <Filter>Dependencies</Filter>
+    </Library>
   </ItemGroup>
 </Project>

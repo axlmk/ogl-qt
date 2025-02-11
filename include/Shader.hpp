@@ -1,9 +1,9 @@
 #pragma once
 
-#include "stb_image.h"
 #include <filesystem>
 #include <fstream>
 
+#include "stb_image.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -12,7 +12,6 @@
 enum class ShaderType {
 	Texture,
 	Unicolor,
-	VertexColor,
 	Custom
 };
 
@@ -30,11 +29,14 @@ public:
 
 	void setColor(RGBColor color);
 	void setColor(std::string color);
-	void setTexture(const std::filesystem::path &texturePath);
-	void setCustom(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath);
-	void setTransformation(glm::mat4 transform);
-	void compile();
 
+	void setTexture(const std::filesystem::path &texturePath, bool isFont=false);
+	void setCustom(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath);
+	
+	void setTransformation(glm::mat4 transform);
+	int getUniform(std::string) const;
+
+	void compile();
 	void use() const;
 
 private:
@@ -45,9 +47,11 @@ private:
 		int height;
 		int nrChannels;
 	};
+
 	RGBColor m_color;
 
 	ShaderType m_shaderType;
+	bool m_font;
 	std::filesystem::path m_vtxShdPath;
 	std::filesystem::path m_frgShdPath;
 

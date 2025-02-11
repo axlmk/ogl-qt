@@ -11,11 +11,11 @@
 #include <QHBoxLayout>
 
 #include <SceneViewer.hpp>
-#include <SceneManager.hpp>
+#include <Scene.hpp>
 
 class App3DViewer {
 public:
-	App3DViewer(int argc, char *argv[], SceneManager* sceneManager);
+	App3DViewer(int argc, char *argv[], scene* scene);
 	int run();
 
 private:

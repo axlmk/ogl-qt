@@ -1,6 +1,6 @@
 #include <Shader.hpp>
 
-Shader::Shader() : m_shdPrgId{}, m_vtxShd{}, m_frgShd{}, m_shaderType{}, m_txtBuff{} {
+Shader::Shader() : m_shdPrgId{}, m_vtxShd{}, m_frgShd{}, m_shaderType{}, m_txtBuff{}, m_font{ false } {
 }
 
 
@@ -109,7 +109,7 @@ void Shader::setColor(std::string color) {
 
 
 
-void Shader::setTexture(const std::filesystem::path &texturePath) {
+void Shader::setTexture(const std::filesystem::path &texturePath, bool isFont) {
 	if (m_shaderType != ShaderType::Texture) {
 		std::string err_msg = "Shader type must be 'texture' to use setTexture() function";
 		qCritical() << err_msg;
@@ -136,19 +136,22 @@ void Shader::setTexture(const std::filesystem::path &texturePath) {
 	m_textureInfo.height = height;
 	m_textureInfo.nrChannels = nrChannels;
 
+	m_font = isFont;
+
 	compile();
 }
 
 
 
-void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath) {
-	
+void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath)
+{	
 	int success;
 
 	/* Verter shader management */
 
 	const std::string vertexShaderContent = getFileContent(vtxShdPath);
-	if (vertexShaderContent.empty()) {
+	if (vertexShaderContent.empty())
+	{
 		std::string err_msg = "Vertex shader content could not be loaded";
 		qCritical() << err_msg;
 		throw std::invalid_argument(err_msg);
@@ -160,7 +163,8 @@ void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::file
 	g_opengl.glCompileShader(m_vtxShd);
 
 	g_opengl.glGetShaderiv(m_vtxShd, GL_COMPILE_STATUS, &success);
-	if (success == GL_FALSE) {
+	if (success == GL_FALSE)
+	{
 		g_opengl.glGetShaderInfoLog(m_vtxShd, INFO_LOG_SIZE, NULL, g_infoLog);
 		std::string err_msg = "Error compiling vertex shader: " + std::string(g_infoLog);
 		qCritical() << err_msg;
@@ -171,7 +175,8 @@ void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::file
 	/* Fragment shader management */
 
 	const std::string fragmentShaderContent = getFileContent(frgShdPath);
-	if (fragmentShaderContent.empty()) {
+	if (fragmentShaderContent.empty())
+	{
 		std::string err_msg = "Fragment shader content could not be loaded";
 		qCritical() << err_msg;
 		deleteShaders();
@@ -184,7 +189,8 @@ void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::file
 	g_opengl.glCompileShader(m_frgShd);
 	
 	g_opengl.glGetShaderiv(m_frgShd, GL_COMPILE_STATUS, &success);
-	if (success == GL_FALSE) {
+	if (success == GL_FALSE)
+	{
 		g_opengl.glGetShaderInfoLog(m_frgShd, INFO_LOG_SIZE, NULL, g_infoLog);
 		std::string err_msg = "Error compiling fragment shader: " + std::string(g_infoLog);
 		qCritical() << err_msg;
@@ -200,7 +206,8 @@ void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::file
 	g_opengl.glLinkProgram(m_shdPrgId); // Creation of the link
 	g_opengl.glGetProgramiv(m_shdPrgId, GL_LINK_STATUS, &success); // Get info on how the link went
 	
-	if (success == GL_FALSE) {
+	if (success == GL_FALSE)
+	{
 		g_opengl.glGetProgramInfoLog(m_shdPrgId, INFO_LOG_SIZE, NULL, g_infoLog);
 		std::string err_msg = "Error linking the shaders to the program: " + std::string(g_infoLog);
 		qCritical() << err_msg;
@@ -298,9 +305,23 @@ void Shader::deleteProgram() {
 }
 
 
+int Shader::getUniform(std::string uniform) const
+{
+	int ret = g_opengl.glGetUniformLocation(m_shdPrgId, uniform.c_str());
+	if(ret == -1)
+	{
+		std::string err_msg = "Uniform [" + uniform + "] doesn't exist";
+		qCritical() << err_msg;
+		throw std::invalid_argument(err_msg);
+	}
+	return ret;
+}
 
-void Shader::compile() {
-	if(m_shaderType == ShaderType::Texture) {
+
+void Shader::compile()
+{
+	if(m_shaderType == ShaderType::Texture)
+	{
 		if(!m_textureInfo.data) {
 			std::string err_msg = "Texture data have not been loaded before compilation";
 			qCritical() << err_msg;
@@ -308,7 +329,11 @@ void Shader::compile() {
 		}
 
 		GLenum format;
+
 		switch (m_textureInfo.nrChannels) {
+			case 1:
+				format = GL_RED;
+				break;
 			case 3:
 				format = GL_RGB;
 				break;
@@ -319,17 +344,25 @@ void Shader::compile() {
 				break;
 		}
 
+		if(m_font)
+			g_opengl.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
 		g_opengl.glGenTextures(1, &m_txtBuff);
 		g_opengl.glBindTexture(GL_TEXTURE_2D, m_txtBuff);
 		g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
 		g_opengl.glTexImage2D(GL_TEXTURE_2D, 0, format, m_textureInfo.width, m_textureInfo.height, 0, format, GL_UNSIGNED_BYTE, m_textureInfo.data);
 		g_opengl.glGenerateMipmap(GL_TEXTURE_2D);
 
 		stbi_image_free(m_textureInfo.data);
-		setShaders("shaders/texture.vs", "shaders/texture.fs");
+
+		if(m_font)
+			setShaders("shaders/font.vs", "shaders/font.fs");
+		else
+			setShaders("shaders/texture.vs", "shaders/texture.fs");
 
 	} else if(m_shaderType == ShaderType::Unicolor) {
 
@@ -344,5 +377,4 @@ void Shader::compile() {
 
 		setShaders(m_vtxShdPath, m_frgShdPath);
 	}
-	
 }
