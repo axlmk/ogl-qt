@@ -43,7 +43,8 @@ glm::mat4 Camera::getSpaceMat() {
 	return glm::lookAt(m_position, m_target, {0.0, 1.0, 0.0});
 }
 
-void Camera::move(bool keyPressed[], qint64 deltaTime) {
+void Camera::move(bool keyPressed[], qint64 deltaTime)
+{
 	float speed = 4 * deltaTime * 0.001;
 	SpaceCoord direction = glm::normalize(m_target - m_position);
 
@@ -80,39 +81,40 @@ void Camera::rotate(glm::vec2 lastPos, glm::vec2 currentPos)
 	float deltaMouseY = currentPos.y - lastPos.y;
 	float angleRightAxis = std::atan(deltaMouseY / glm::length(direction)) * intensity;
 
-	auto rotation = glm::rotate(glm::mat4(1.0), -angleRightAxis, m_rightVec);
-	rotation = glm::rotate(rotation, -angleUpAxis, m_upVec);
+	auto rightRotation = glm::rotate(glm::mat4(1.0), -angleUpAxis, { 0.0, 1.0, 0.0 });
+	auto rotation = glm::rotate(rightRotation, -angleRightAxis, m_rightVec);
 
-	glm::vec3 tempDirection = rotation * glm::vec4(direction, 1.0);
+	glm::vec3 tempDirection = rotation * glm::vec4(m_position, 1.0);
 	auto comparisonVector = SpaceCoord(tempDirection.x, 0.0, tempDirection.z);
 	auto angleWithRightAxis = std::acos(glm::dot(tempDirection, comparisonVector) / (glm::length(comparisonVector) * glm::length(tempDirection)));
 
 	if (angleWithRightAxis < M_PI / 2 * (1 - yConstraint))
 	{	
-		m_position = tempDirection;
-		m_rightVec = rotation * glm::vec4(m_rightVec, 1.0);
-		m_upVec = rotation * glm::vec4(m_upVec, 1.0);
+		m_position	= tempDirection;
+		m_rightVec	= rightRotation * glm::vec4(m_rightVec, 1.0);
+		m_upVec		= rotation * glm::vec4(m_upVec, 1.0);
 	}
 }
 
-void Camera::pan(glm::vec2 lastPos, glm::vec2 currentPos) {
-	
+void Camera::pan(glm::vec2 lastPos, glm::vec2 currentPos)
+{
 	float deltaX = currentPos.x - lastPos.x;
-	float speed = 4 * deltaX * 0.001;
+	float speed = deltaX * 0.004;
 	SpaceCoord right = speed * m_rightVec;
 
 	float deltaY = currentPos.y - lastPos.y;
-	speed = 4 * deltaY * 0.0003;
+	speed = 4 * deltaY * 0.001;
 	SpaceCoord up = speed * m_upVec;
 
 	m_position += up - right;
 	m_target += up - right;
 }
 
-void Camera::zoom(glm::vec2 lastPos, glm::vec2 currentPos) {
-	
+void Camera::zoom(glm::vec2 lastPos, glm::vec2 currentPos)
+{
 	float speed = (currentPos.x - lastPos.x) * 2 * 0.01;
 	SpaceCoord mouvement = glm::normalize(m_position - m_target) * speed;
-	m_position -= mouvement;
-	//m_target -= mouvement;
+
+	if(glm::length(m_position - m_target - mouvement) > 0.1)
+		m_position -= mouvement;
 }
