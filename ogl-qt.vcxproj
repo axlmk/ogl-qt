@@ -38,6 +38,9 @@
     <ClInclude Include="include\Vertex.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\font.fs" />
+    <None Include="shaders\font.vs" />
+    <None Include="shaders\light.fs" />
     <None Include="shaders\texture.fs" />
     <None Include="shaders\texture.vs" />
     <None Include="shaders\unicolor.fs" />

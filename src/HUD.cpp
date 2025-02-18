@@ -130,7 +130,8 @@ HUD::~HUD()
 void HUD::RenderText(std::string text, float x, float y, glm::vec3 color, float scale)
 {
     m_shd->use();
-    m_shd->setTransformation(glm::ortho(0.0, 800.0, 0.0, 600.0));
+    glm::mat4 ortho = glm::ortho(0.0, 800.0, 0.0, 600.0);
+    g_opengl.glUniformMatrix4fv(m_shd->getUniform("transformation"), 1, GL_FALSE, glm::value_ptr(ortho));
 
     g_opengl.glUniform3f(m_shd->getUniform("textColor"), color.x, color.y, color.z);
     g_opengl.glBindVertexArray(m_vao);

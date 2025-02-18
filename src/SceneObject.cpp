@@ -73,6 +73,7 @@ void SceneObject::linkShader(Shader* shader) {
 			m_geo->setTextureMapping();
 			break;
 		case ShaderType::Unicolor:
+		case ShaderType::Light:
 			m_geo->unsetTextureMapping();
 			break;
 		default:
@@ -85,45 +86,40 @@ void SceneObject::linkShader(Shader* shader) {
 }
 
 
-void SceneObject::render(Camera* camera) const {
-
-	// Pretest
-
+void SceneObject::render(Camera* camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const
+{
 	if(m_shd == nullptr || m_geo == nullptr)
 		return;
 	
-	// Shader's appliucation
-
+	// Shader's application
 	m_shd->use();
-
-	/* Coordinates' transformations */
 
 	glm::mat4 model			= glm::mat4(1.f);
 	glm::mat4 view			= glm::mat4(1.f);
 	glm::mat4 projection	= glm::mat4(1.f);
-	glm::mat4 clip			= glm::mat4(1.f);
 
 	// Model (World's location)
-
-	glm::vec4 modelRotation = m_geo->getRotation();
-	model = glm::rotate(model, modelRotation.x, {modelRotation.y, modelRotation.z, modelRotation.w});
-	
+	/*glm::vec4 modelRotation = m_geo->getRotation();
+	model = glm::rotate(model, modelRotation.x, {modelRotation.y, modelRotation.z, modelRotation.w});*/
 	model = glm::translate(model, m_geo->getPosition());
+	
 	// View (camera's location)
-
 	view = camera->getSpaceMat();
 
 	// Projection (camera's settings)
-
 	projection = glm::perspective(glm::radians(camera->getFov()), 600.f / 400.f, camera->getNearPlan(), camera->getFarPlan());
 	
 	// Clip (combination of previous matrices)
+	m_shd->setTransformation(model, view, projection);
 
-	clip = projection * view * model;
-	m_shd->setTransformation(clip);
+	if(this != &lights[0].get())
+	{
+		unsigned int lightPosUni = m_shd->getUniform("lightPos");
+		SpaceCoord lightPos = lights[0].get().getGeometry()->getPosition();
+		g_opengl.glUniform3f(lightPosUni, lightPos.x, lightPos.y, lightPos.z);
+	}
 
 	// Render
-
 	g_opengl.glBindVertexArray(m_vao);
 	g_opengl.glDrawElements(GL_TRIANGLES, m_geo->getVerticesLink().size(), GL_UNSIGNED_INT, 0);
 }
@@ -150,6 +146,7 @@ void SceneObject::generateRender() {
 	g_opengl.glBindVertexArray(m_vao);
 
 	// Send data to graphic card
+
 
 	std::vector<float> floatVertices = m_geo->getFloatVertices();
 	g_opengl.glBindBuffer(GL_ARRAY_BUFFER, m_vbo);

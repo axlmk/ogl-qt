@@ -22,11 +22,12 @@ enum class Mouvement {
 class scene {
 public:
 	scene();
-	std::vector<std::unique_ptr<SceneObject>>& getSceneObjects();
-	std::vector<std::unique_ptr<Shader>>& getShaders();
-	std::vector<std::unique_ptr<Geometry>>& getGeometries();
-	std::vector<std::unique_ptr<HUD>>& getHUDs();
-	std::unique_ptr<Camera>& getCamera();
+	std::vector<std::unique_ptr<SceneObject>>&	getSceneObjects();
+	std::vector<std::unique_ptr<Shader>>&		getShaders();
+	std::vector<std::unique_ptr<Geometry>>&		getGeometries();
+	std::vector<std::unique_ptr<HUD>>&			getHUDs();
+	std::unique_ptr<Camera>&					getCamera();
+	std::vector<std::reference_wrapper<SceneObject>>&					getLights();
 	void setSceneViewer(SceneViewer* sceneViewer);
 	
 	void initializeScene();
@@ -35,10 +36,12 @@ public:
 private:
 
 	bool m_cameraDirection[4];
-	std::vector<std::unique_ptr<Geometry>> m_geometries;
-	std::vector<std::unique_ptr<Shader>> m_shaders;
-	std::vector<std::unique_ptr<SceneObject>> m_sceneObjects;
-	std::vector<std::unique_ptr<HUD>> m_huds;
+	std::vector<std::unique_ptr<Geometry>>				m_geometries;
+	std::vector<std::unique_ptr<Shader>>				m_shaders;
+	std::vector<std::reference_wrapper<SceneObject>>	m_lights;
+	std::vector<std::unique_ptr<HUD>>					m_huds;
+	std::vector<std::unique_ptr<SceneObject>>			m_sceneObjects;
+	
 	std::unique_ptr<Camera> m_camera;
 	SceneViewer* m_viewer;
 };

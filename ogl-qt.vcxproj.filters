@@ -111,6 +111,15 @@
     <None Include="shaders\unicolor.fs">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shaders\font.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\font.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\light.fs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\container.jpg">

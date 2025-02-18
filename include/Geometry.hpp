@@ -23,8 +23,6 @@ class Geometry {
 public:
 	using uint = unsigned int;
 	
-	// TODO : rule of 3
-	
 	Geometry();
 	Geometry(GeometryType geoType, float size);
 
@@ -36,6 +34,8 @@ public:
 
 	void setTextureMapping();
 	void unsetTextureMapping();
+
+	void setNormals();
 
 	void translate(float x = 0.f, float y = 0.f, float z = 0.f);
 	void scale(float scale = 1.f);
@@ -58,6 +58,7 @@ private:
 	float m_scale;
 	
 	bool m_hasTexture;
+	bool m_hasNormals;
 	uint getStrideLength() const;
 
 };

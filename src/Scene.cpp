@@ -1,50 +1,42 @@
 #include <Scene.hpp>
 #include <SceneViewer.hpp>
 
-
 scene::scene() :
-	m_cameraDirection{ false, false, false, false } {
+	m_cameraDirection { false, false, false, false },
+	m_viewer { nullptr } {
 }
 
 
 
-void scene::initializeScene() {
+void scene::initializeScene()
+{
+	m_camera = { std::make_unique<Camera>(SpaceCoord(0.0, 0.0, 3.0)) };
 
-	// Camera
+	Geometry* refCube = new Geometry(GeometryType::Cube, 0.5);
+	refCube->setPivot(0.25, 0.25, 0.25);
+	refCube->setNormals();
+	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(refCube)));
 
-	m_camera = { std::make_unique<Camera>(SpaceCoord(0.0, 0.0, 2.0)) };
-	//m_camera->setTarget({-5.25, 0, 0});
+	Geometry* lightCube = new Geometry(GeometryType::Cube, 0.3);
+	lightCube->setPivot(0.15, 0.15, 0.15);
+	lightCube->translate(0.7, 1.0, 0.8);
+	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(lightCube)));
 
-	// Cubes
+	Shader* color = new Shader(ShaderType::Unicolor);
+	color->setColor("#e29804");
+	m_shaders.push_back(std::unique_ptr<Shader>(std::move(color)));
 
-	Geometry* texturedCube = new Geometry(GeometryType::Cube, 0.5);
-	texturedCube->setPivot(0.25, 0.25, 0.25);
-	m_geometries.push_back(std::unique_ptr<Geometry>(texturedCube));
-
-	/*Geometry* uniCube = new Geometry(GeometryType::Cube, 0.5);
-	uniCube->setPivot(0.25, 0.25, 0.25);
-	uniCube->translate(0.25);
-	m_geometries.push_back(std::unique_ptr<Geometry>(uniCube));*/
-
-	// Shaders
-
-	Shader* face = new Shader(ShaderType::Texture);
-	face->setTexture("textures/container.jpg");
-	m_shaders.push_back(std::unique_ptr<Shader>(face));
-
-	/*Shader* uni = new Shader(ShaderType::Unicolor);
-	uni->setColor("#a4dc18");
-	m_shaders.push_back(std::unique_ptr<Shader>(uni));*/
-
-	// HUD
+	Shader* lightShd = new Shader(ShaderType::Light);
+	lightShd->setLight();
+	m_shaders.push_back(std::unique_ptr<Shader>(std::move(lightShd)));
 
 	HUD* hud = new HUD("arial");
-	m_huds.push_back(std::unique_ptr<HUD>(hud));
-
-	// Scene creation
+	m_huds.push_back(std::unique_ptr<HUD>(std::move(hud)));
 
 	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[0].get(), m_shaders[0].get()));
-	//m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[1].get(), m_shaders[1].get()));
+	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[1].get(), m_shaders[1].get()));
+
+	m_lights.push_back(*m_sceneObjects[1]);
 }
 
 
@@ -89,4 +81,9 @@ std::vector<std::unique_ptr<Geometry>>& scene::getGeometries() {
 
 std::vector<std::unique_ptr<HUD>>& scene::getHUDs() {
 	return m_huds;
+}
+
+std::vector<std::reference_wrapper<SceneObject>>& scene::getLights()
+{
+	return m_lights;
 }

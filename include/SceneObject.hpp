@@ -7,7 +7,6 @@
 class SceneObject {
 public:
 
-	// TODO : rule of 3
 	SceneObject();
 	SceneObject(Geometry* geometry, Shader* shader);
 	~SceneObject();
@@ -18,7 +17,7 @@ public:
 	void linkGeo(Geometry* geometry);
 	void linkShader(Shader* shader);
 	void generateRender();
-	void render(Camera* camera) const;
+	void render(Camera* camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const;
 
 private:
 
