@@ -99,8 +99,6 @@ void SceneObject::render(Camera* camera, const std::vector<std::reference_wrappe
 	glm::mat4 projection	= glm::mat4(1.f);
 
 	// Model (World's location)
-	/*glm::vec4 modelRotation = m_geo->getRotation();
-	model = glm::rotate(model, modelRotation.x, {modelRotation.y, modelRotation.z, modelRotation.w});*/
 	model = glm::translate(model, m_geo->getPosition());
 	
 	// View (camera's location)
@@ -117,6 +115,10 @@ void SceneObject::render(Camera* camera, const std::vector<std::reference_wrappe
 		unsigned int lightPosUni = m_shd->getUniform("lightPos");
 		SpaceCoord lightPos = lights[0].get().getGeometry()->getPosition();
 		g_opengl.glUniform3f(lightPosUni, lightPos.x, lightPos.y, lightPos.z);
+
+		unsigned int cameraPosUni = m_shd->getUniform("cameraPos");
+		SpaceCoord cameraPos = camera->getPosition();
+		g_opengl.glUniform3f(cameraPosUni, cameraPos.x, cameraPos.y, cameraPos.z);
 	}
 
 	// Render
