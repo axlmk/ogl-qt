@@ -30,6 +30,7 @@
     <ClInclude Include="include\App3DViewer.hpp" />
     <ClInclude Include="include\Camera.hpp" />
     <ClInclude Include="include\Geometry.hpp" />
+    <ClInclude Include="include\HUD.hpp" />
     <ClInclude Include="include\SceneViewer.hpp" />
     <ClInclude Include="include\SceneObject.hpp" />
     <ClInclude Include="include\Scene.hpp" />
@@ -50,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\container.jpg" />
+    <Image Include="textures\container2.png" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\freetype.lib" />

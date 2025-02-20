@@ -22,8 +22,8 @@ void scene::initializeScene()
 	lightCube->translate(0.7, 1.0, 0.8);
 	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(lightCube)));
 
-	Shader* color = new Shader(ShaderType::Unicolor);
-	color->setColor("#e29804");
+	Shader* color = new Shader(ShaderType::Texture);
+	color->setTexture("textures/container.jpg");
 	m_shaders.push_back(std::unique_ptr<Shader>(std::move(color)));
 
 	Shader* lightShd = new Shader(ShaderType::Light);

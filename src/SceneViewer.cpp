@@ -3,6 +3,40 @@
 
 
 
+void SceneViewer::paintGL()
+{
+	static int i = 0;
+	static auto fpsSmoother = 600;
+	static std::string smoothDT = "";
+
+	m_deltaTime = QDateTime::currentMSecsSinceEpoch() - m_currentTime;
+	m_currentTime = QDateTime::currentMSecsSinceEpoch();
+	fpsSmoother += m_deltaTime;
+
+	g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	for (auto &sceneObject : m_manager->getSceneObjects())
+	{
+		m_manager->getCamera()->move(m_KeyBeingPressed, m_deltaTime);
+		m_manager->getGeometries()[1]->rotate(i * 0.01, 0, 1, 0);
+		sceneObject->render(m_manager->getCamera().get(), m_manager->getLights());
+	}
+
+	for(auto &hud : m_manager->getHUDs())
+	{
+		if(fpsSmoother > 600)
+		{
+			smoothDT = std::to_string(int(1000 / m_deltaTime));
+			fpsSmoother = 0;
+		}
+		hud->RenderText(smoothDT, 1, 1, {255, 255, 255}, 0.5);
+	}
+	i++;
+}
+
+
+
 SceneViewer::SceneViewer(scene* scene) :
 	m_deltaTime			{ 0 },
 	m_lastMousePos		{ 0.0, 0.0 },
@@ -35,40 +69,6 @@ void SceneViewer::initializeGL()
 	g_opengl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	m_manager->initializeScene();
-}
-
-
-
-void SceneViewer::paintGL()
-{
-	static int i = 0;
-	static auto fpsSmoother = 600;
-	static std::string smoothDT = "";
-
-	m_deltaTime = QDateTime::currentMSecsSinceEpoch() - m_currentTime;
-	m_currentTime = QDateTime::currentMSecsSinceEpoch();
-	fpsSmoother += m_deltaTime;
-
-	g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	for (auto &sceneObject : m_manager->getSceneObjects())
-	{
-		m_manager->getCamera()->move(m_KeyBeingPressed, m_deltaTime);
-		//m_manager->getGeometries()[1]->rotate(i * 0.01, 0, 1, 0);
-		sceneObject->render(m_manager->getCamera().get(), m_manager->getLights());
-	}
-
-	for(auto &hud : m_manager->getHUDs())
-	{
-		if(fpsSmoother > 600)
-		{
-			smoothDT = std::to_string(int(1000 / m_deltaTime));
-			fpsSmoother = 0;
-		}
-		hud->RenderText(smoothDT, 1, 1, {255, 255, 255}, 0.5);
-	}
-	i++;
 }
 
 

@@ -228,13 +228,13 @@ void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::file
 
 void Shader::setTransformation(glm::mat4 model, glm::mat4 view, glm::mat4 projection)
 {
-	unsigned int modelUni = getUniform("model");
+	unsigned int modelUni = getUniform("t.model");
 	g_opengl.glUniformMatrix4fv(modelUni, 1, GL_FALSE, glm::value_ptr(model));
 
-	unsigned int viewUni = getUniform("view");
+	unsigned int viewUni = getUniform("t.view");
 	g_opengl.glUniformMatrix4fv(viewUni, 1, GL_FALSE, glm::value_ptr(view));
 
-	unsigned int projectionUni = getUniform("projection");
+	unsigned int projectionUni = getUniform("t.projection");
 	g_opengl.glUniformMatrix4fv(projectionUni, 1, GL_FALSE, glm::value_ptr(projection));
 }
 
@@ -243,7 +243,6 @@ void Shader::setTransformation(glm::mat4 model, glm::mat4 view, glm::mat4 projec
 void Shader::use() const
 {
 	GLint isValid = GL_FALSE;
-	
 	g_opengl.glValidateProgram(m_shdPrgId);
 	g_opengl.glGetProgramiv(m_shdPrgId, GL_VALIDATE_STATUS, &isValid);
 	if (isValid == GL_FALSE) {
@@ -252,26 +251,42 @@ void Shader::use() const
 		throw std::invalid_argument(err_msg);
 	}
 
-	if(m_shaderType == ShaderType::Texture)
-		g_opengl.glBindTexture(GL_TEXTURE_2D, m_txtBuff);
-
 	g_opengl.glUseProgram(m_shdPrgId);
 
-	if(m_shaderType == ShaderType::Light)
-	{
-		int uniform = getUniform("color");
-		g_opengl.glUniform3f(uniform, 1.0, 1.0, 1.0);
-	}
-	else if (m_shaderType == ShaderType::Unicolor)
-	{
-		int uniform = getUniform("material.diffuse");
-		g_opengl.glUniform3f(uniform, 1.0f, 0.5f, 0.31f);
+	switch (m_shaderType) {
+		case ShaderType::Texture:
+		{
+			g_opengl.glBindTexture(GL_TEXTURE_2D, m_txtBuff);
+			
+			if(m_font)
+				break;
 
-		uniform = getUniform("material.specular");
-		g_opengl.glUniform3f(uniform, 0.5f, 0.5f, 0.5f);
+			int uniform = getUniform("material.diffuse");
+			g_opengl.glUniform1f(uniform, 0);
+			g_opengl.glActiveTexture(GL_TEXTURE0);
+		}
+			break;
+		case ShaderType::Unicolor:
+		{
+			int uniform = getUniform("material.diffuse");
+			g_opengl.glUniform3f(uniform, m_color.x, m_color.y, m_color.z);
 
-		uniform = getUniform("material.shininess");
-		g_opengl.glUniform1f(uniform, 32.0f);
+			uniform = getUniform("material.specular");
+			g_opengl.glUniform3f(uniform, m_color.x * 0.5, m_color.y * 0.5, m_color.z * 0.5);
+
+			uniform = getUniform("material.shininess");
+			g_opengl.glUniform1f(uniform, 32.0);
+		}
+			break;
+		case ShaderType::Light:
+		{
+			int uniform = getUniform("color");
+			g_opengl.glUniform3f(uniform, 1.0, 1.0, 1.0);
+		}
+			break;
+		case ShaderType::Custom:
+		default:
+			break;
 	}
 }
 
@@ -338,6 +353,12 @@ int Shader::getUniform(std::string uniform) const
 
 void Shader::compile(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath)
 {
+	if (vtxShdPath.empty() || frgShdPath.empty()) {
+		std::string err_msg = "Vertex and fragment shaders have not been specified before compilation";
+		qCritical() << err_msg;
+		throw std::invalid_argument(err_msg);
+	}
+
 	switch (m_shaderType) {
 		case ShaderType::Texture:
 			if (!m_textureInfo.data) {
@@ -384,12 +405,6 @@ void Shader::compile(const std::filesystem::path& vtxShdPath, const std::filesys
 		case ShaderType::Custom:
 		default:
 			break;
-	}
-
-	if (vtxShdPath.empty() || frgShdPath.empty()) {
-		std::string err_msg = "Vertex and fragment shaders have not been specified before compilation";
-		qCritical() << err_msg;
-		throw std::invalid_argument(err_msg);
 	}
 
 	setShaders(vtxShdPath, frgShdPath);

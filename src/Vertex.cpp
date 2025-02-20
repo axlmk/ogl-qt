@@ -12,16 +12,17 @@ void Vertex::setSpaceCoord(SpaceCoord coord) {
 }
 
 std::vector<TextCoord> Vertex::getTextCoord() const {
-	return { { m_textCoord.x, m_textCoord.y } };
+	return m_textCoord;
 }
 
-void Vertex::setTextureCoordinates(const TextCoord &textCoord) {
+void Vertex::setTextCoords(const std::vector<TextCoord>& textCoord)
+{
 	m_textCoord = textCoord;
 }
 
 std::vector<SpaceCoord> Vertex::getNormals() const
 {
-	return { m_normals[0], m_normals[1], m_normals[2] };
+	return m_normals;
 }
 
 void Vertex::setNormals(const std::vector<SpaceCoord>& normal)

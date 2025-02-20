@@ -97,34 +97,32 @@ std::vector<float> Geometry::getFloatVertices() const {
 	std::vector<float> floatVertices;
 
 	// hardcoded, for a cube its 3
-	int facesNumber = 3;
+	int facesNumber = 1;
+	if(m_geoType == GeometryType::Cube)
+		facesNumber = 3;
 	floatVertices.reserve(m_vertices.size() * getStrideLength() * facesNumber);
 
 	for (size_t i = 0; i < m_vertices.size() ; i++)
 	{
-		std::vector<TextCoord> tmpText;
-		std::vector<SpaceCoord> tmpNormals;
-		if(m_hasTexture)
-			tmpText = m_vertices[i].getTextCoord();
-		if(m_hasNormals)
-			tmpNormals = m_vertices[i].getNormals();
-
+		auto tmpText	= m_vertices[i].getTextCoord();
+		auto tmpNormals = m_vertices[i].getNormals();
+		
 		for(size_t j = 0; j < facesNumber; j++)
 		{
-			const std::vector<float>& tmpFloat = m_vertices[i].getSpaceCoord();
+			std::vector<float> tmpFloat = m_vertices[i].getSpaceCoord();
 			std::copy(tmpFloat.begin(), tmpFloat.end(), std::back_inserter(floatVertices));
-
-			if (!tmpText.empty())
-			{
-				floatVertices.push_back(tmpText[j].x);
-				floatVertices.push_back(tmpText[j].y);
-			}
 
 			if(m_hasNormals)
 			{
 				floatVertices.push_back(tmpNormals[j].x);
 				floatVertices.push_back(tmpNormals[j].y);
 				floatVertices.push_back(tmpNormals[j].z);
+			}
+
+			if (m_hasTexture)
+			{
+				floatVertices.push_back(tmpText[j].x);
+				floatVertices.push_back(tmpText[j].y);
 			}
 		}
 	}
@@ -137,14 +135,14 @@ std::vector<unsigned int> Geometry::getVerticesLink() const {
 }
 
 
-
-std::vector<unsigned int> Geometry::getAttributesPositions() const {
-	int n = 1;
+std::vector<unsigned int> Geometry::getAttributesPositions() const
+{
+	std::vector<unsigned int> ret = { m_attributesPositions[0] };
 	if(m_hasNormals)
-		n++;
+		ret.push_back( m_attributesPositions[1] );
 	if(m_hasTexture)
-		n++;
-	return std::vector<unsigned int> (m_attributesPositions.begin(), m_attributesPositions.begin() + n);
+		ret.push_back( m_attributesPositions[2] );
+	return ret;
 }
 
 
@@ -205,20 +203,20 @@ bool Geometry::empty() const {
 void Geometry::setTextureMapping() {
 	switch (m_geoType) {
 		case GeometryType::Square:
-			m_vertices[0].setTextureCoordinates({ 0.f, 0.f });
-			m_vertices[1].setTextureCoordinates({ 1.f, 0.f });
-			m_vertices[2].setTextureCoordinates({ 0.f, 1.f });
-			m_vertices[3].setTextureCoordinates({ 1.f, 1.f });
+			m_vertices[0].setTextCoords({ { 0.f, 0.f } });
+			m_vertices[1].setTextCoords({ { 1.f, 0.f } });
+			m_vertices[2].setTextCoords({ { 0.f, 1.f } });
+			m_vertices[3].setTextCoords({ { 1.f, 1.f } });
 			break;
 		case GeometryType::Cube:
-			m_vertices[0].setTextureCoordinates({ 0.f, 0.f });
-			m_vertices[1].setTextureCoordinates({ 1.f, 0.f });
-			m_vertices[2].setTextureCoordinates({ 0.f, 1.f });
-			m_vertices[3].setTextureCoordinates({ 1.f, 1.f });
-			m_vertices[4].setTextureCoordinates({ 0.f, 1.f });
-			m_vertices[5].setTextureCoordinates({ 1.f, 1.f });
-			m_vertices[6].setTextureCoordinates({ 0.f, 0.f });
-			m_vertices[7].setTextureCoordinates({ 1.f, 0.f });
+			m_vertices[0].setTextCoords({ { 0.0, 0.0 }, { 0.0, 0.0 }, { 0.0, 0.0 } });
+			m_vertices[1].setTextCoords({ { 1.0, 1.0 }, { 1.0, 0.0 }, { 1.0, 0.0 } });
+			m_vertices[2].setTextCoords({ { 0.0, 1.0 }, { 1.0, 1.0 }, { 0.0, 1.0 } });
+			m_vertices[3].setTextCoords({ { 1.0, 0.0 }, { 1.0, 0.0 }, { 1.0, 1.0 } });
+			m_vertices[4].setTextCoords({ { 1.0, 0.0 }, { 0.0, 1.0 }, { 1.0, 1.0 } });
+			m_vertices[5].setTextCoords({ { 0.0, 1.0 }, { 1.0, 1.0 }, { 0.0, 1.0 } });
+			m_vertices[6].setTextCoords({ { 1.0, 1.0 }, { 0.0, 1.0 }, { 1.0, 0.0 } });
+			m_vertices[7].setTextCoords({ { 0.0, 0.0 }, { 0.0, 0.0 }, { 0.0, 0.0 } });
 			break;
 		case GeometryType::Model:
 		default:
