@@ -240,11 +240,11 @@ void Shader::setTransformation(glm::mat4 model, glm::mat4 view, glm::mat4 projec
 
 
 
-void Shader::use() const {
+void Shader::use() const
+{
 	GLint isValid = GL_FALSE;
 	
 	g_opengl.glValidateProgram(m_shdPrgId);
-
 	g_opengl.glGetProgramiv(m_shdPrgId, GL_VALIDATE_STATUS, &isValid);
 	if (isValid == GL_FALSE) {
 		std::string err_msg = "Program ID " + std::to_string(m_shdPrgId) + " is unvalid";
@@ -257,13 +257,24 @@ void Shader::use() const {
 
 	g_opengl.glUseProgram(m_shdPrgId);
 
-	if (m_shaderType == ShaderType::Unicolor)
+	if(m_shaderType == ShaderType::Light)
 	{
-		int uniform = getUniform("lightColor");
-		g_opengl.glUniform3f(uniform, 1.0f, 1.0f, 1.0f);
+		int uniform = getUniform("color");
+		g_opengl.glUniform3f(uniform, 1.0, 1.0, 1.0);
+	}
+	else if (m_shaderType == ShaderType::Unicolor)
+	{
+		int uniform = getUniform("material.ambient");
+		g_opengl.glUniform3f(uniform, 1.0f, 0.5f, 0.31f);
 
-		uniform = getUniform("objColor");
-		g_opengl.glUniform3f(uniform, m_color.x, m_color.y, m_color.z);
+		uniform = getUniform("material.diffuse");
+		g_opengl.glUniform3f(uniform, 1.0f, 0.5f, 0.31f);
+
+		uniform = getUniform("material.specular");
+		g_opengl.glUniform3f(uniform, 0.5f, 0.5f, 0.5f);
+
+		uniform = getUniform("material.shininess");
+		g_opengl.glUniform1f(uniform, 32.0f);
 	}
 }
 

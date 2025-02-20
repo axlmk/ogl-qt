@@ -112,13 +112,24 @@ void SceneObject::render(Camera* camera, const std::vector<std::reference_wrappe
 
 	if(this != &lights[0].get())
 	{
-		unsigned int lightPosUni = m_shd->getUniform("lightPos");
 		SpaceCoord lightPos = lights[0].get().getGeometry()->getPosition();
-		g_opengl.glUniform3f(lightPosUni, lightPos.x, lightPos.y, lightPos.z);
 
-		unsigned int cameraPosUni = m_shd->getUniform("cameraPos");
+		int uniform = m_shd->getUniform("light.position");
+		g_opengl.glUniform3f(uniform, lightPos.x, lightPos.y, lightPos.z);
+
+		uniform = m_shd->getUniform("light.ambient");
+		g_opengl.glUniform3f(uniform, 0.2f, 0.2f, 0.2f);
+
+		uniform = m_shd->getUniform("light.diffuse");
+		g_opengl.glUniform3f(uniform, 0.65f, 0.65f, 0.65f);
+
+		uniform = m_shd->getUniform("light.specular");
+		g_opengl.glUniform3f(uniform, 1.0f, 1.0f, 1.0f);
+
+		
 		SpaceCoord cameraPos = camera->getPosition();
-		g_opengl.glUniform3f(cameraPosUni, cameraPos.x, cameraPos.y, cameraPos.z);
+		uniform = m_shd->getUniform("cameraPos");
+		g_opengl.glUniform3f(uniform, cameraPos.x, cameraPos.y, cameraPos.z);
 	}
 
 	// Render
@@ -148,7 +159,6 @@ void SceneObject::generateRender() {
 	g_opengl.glBindVertexArray(m_vao);
 
 	// Send data to graphic card
-
 
 	std::vector<float> floatVertices = m_geo->getFloatVertices();
 	g_opengl.glBindBuffer(GL_ARRAY_BUFFER, m_vbo);

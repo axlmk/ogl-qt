@@ -1,29 +1,47 @@
 #version 330 core
 
-out vec4 FragColor;
+// Phong shader
 
-uniform vec3 lightColor;
-uniform vec3 objColor;
-uniform vec3 lightPos;
+struct Material {
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+	float shininess;
+};
+
+struct Light {
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+
+	vec3 position;
+};
+
 uniform vec3 cameraPos;
+uniform Material material;
+uniform Light light;
 
 in vec3 normal;
 in vec3 fragPos;
+out vec4 FragColor;
 
 void main()
 {
-	float ambientStrenght = 0.2;
-	vec3 ambientLight = lightColor * ambientStrenght;
+	// Ambient
+	vec3 ambient	= light.ambient * material.ambient;
 
-	vec3 lightDir = normalize(lightPos - fragPos);
-	float diff = max(dot(normal, lightDir), 0.0);
-	vec3 diffuse = lightColor * diff;
+	// Diffuse
+	vec3 lightDir	= normalize(light.position - fragPos);
+	float diff		= max(dot(normal, lightDir), 0.0);
+	vec3 diffuse	= light.diffuse * material.diffuse * diff;
 
-	vec3 cameraDir = normalize(cameraPos - fragPos);
+	// Specular
+	vec3 cameraDir	= normalize(cameraPos - fragPos);
 	vec3 reflectDir = reflect(-lightDir, normal);
-	float spec = pow(max(dot(cameraDir, reflectDir), 0.0), 32);
-	vec3 specular = 0.5 * spec * lightColor;
+	float spec		= pow(max(dot(cameraDir, reflectDir), 0.0), material.shininess);
+	vec3 specular	= light.specular * material.specular * spec;
 
-	vec3 outColor = objColor * (ambientLight + diffuse + specular);
+	// Output
+	vec3 outColor	= ambient + diffuse + specular;
 	FragColor = vec4(outColor, 1.0);
 }
