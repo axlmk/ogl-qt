@@ -3,17 +3,15 @@
 // Phong shader
 
 struct Material {
-	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
 	float shininess;
 };
 
 struct Light {
-	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
-
+	vec3 ambient;
 	vec3 position;
 };
 
@@ -28,7 +26,7 @@ out vec4 FragColor;
 void main()
 {
 	// Ambient
-	vec3 ambient	= light.ambient * material.ambient;
+	vec3 ambient	= light.ambient * material.diffuse;
 
 	// Diffuse
 	vec3 lightDir	= normalize(light.position - fragPos);

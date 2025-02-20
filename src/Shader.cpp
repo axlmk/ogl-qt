@@ -264,10 +264,7 @@ void Shader::use() const
 	}
 	else if (m_shaderType == ShaderType::Unicolor)
 	{
-		int uniform = getUniform("material.ambient");
-		g_opengl.glUniform3f(uniform, 1.0f, 0.5f, 0.31f);
-
-		uniform = getUniform("material.diffuse");
+		int uniform = getUniform("material.diffuse");
 		g_opengl.glUniform3f(uniform, 1.0f, 0.5f, 0.31f);
 
 		uniform = getUniform("material.specular");
