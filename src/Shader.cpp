@@ -1,14 +1,17 @@
 #include <Shader.hpp>
 
-Shader::Shader() : m_shdPrgId{}, m_shaderType{}, m_font{ false } {
+Shader::Shader() : Shader(ShaderType::Custom) {
 }
 
 
 
-Shader::Shader(ShaderType shaderType, bool isFont) : Shader()
+Shader::Shader(ShaderType shaderType, bool isFont) :
+	m_shaderType { shaderType },
+	m_shdPrgId { },
+	m_font { isFont },
+	m_color { }
 {
-	m_shaderType = shaderType;
-	m_font = isFont;
+
 }
 
 
