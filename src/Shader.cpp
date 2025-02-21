@@ -1,12 +1,14 @@
 #include <Shader.hpp>
 
-Shader::Shader() : m_shdPrgId{}, m_shaderType{}, m_txtBuff{}, m_font{ false } {
+Shader::Shader() : m_shdPrgId{}, m_shaderType{}, m_font{ false } {
 }
 
 
 
-Shader::Shader(ShaderType shaderType) : Shader() {
+Shader::Shader(ShaderType shaderType, bool isFont) : Shader()
+{
 	m_shaderType = shaderType;
+	m_font = isFont;
 }
 
 
@@ -20,12 +22,6 @@ Shader::~Shader()
 		g_opengl.glDeleteProgram(m_shdPrgId);
 		m_shdPrgId = 0;
 	}
-}
-
-
-
-void Shader::setShaderType(const ShaderType &shaderType) {
-	m_shaderType = shaderType;
 }
 
 
@@ -65,11 +61,6 @@ void Shader::setColor(RGBColor color)
 		throw std::invalid_argument(err_msg);
 	}
 
-	if(m_txtBuff != 0) {
-		deleteTexture();
-		deleteProgram();
-	}
-
 	m_color = color;
 	compile("shaders/unicolor.vs", "shaders/unicolor.fs");
 }
@@ -82,11 +73,6 @@ void Shader::setColor(std::string color)
 		std::string err_msg = "Shader type must be 'unicolor' to use setColor() function";
 		qCritical() << err_msg;
 		throw std::invalid_argument(err_msg);
-	}
-
-	if (m_txtBuff != 0) {
-		deleteTexture();
-		deleteProgram();
 	}
 
 	// Basic string parsing test
@@ -112,7 +98,8 @@ void Shader::setColor(std::string color)
 
 
 
-void Shader::setTexture(const std::filesystem::path &texturePath, bool isFont) {
+void Shader::addTexture(const std::filesystem::path &texturePath)
+{
 	if (m_shaderType != ShaderType::Texture) {
 		std::string err_msg = "Shader type must be 'texture' to use setTexture() function";
 		qCritical() << err_msg;
@@ -133,13 +120,8 @@ void Shader::setTexture(const std::filesystem::path &texturePath, bool isFont) {
 		qCritical() << err_msg;
 		throw std::invalid_argument(err_msg);
 	}
-
-	m_textureInfo.data = data;
-	m_textureInfo.width = width;
-	m_textureInfo.height = height;
-	m_textureInfo.nrChannels = nrChannels;
-
-	m_font = isFont;
+	
+	m_texturesInfo.push_back({ data, width, height, nrChannels, 0, texturePath });
 
 	if(m_font)
 		compile("shaders/font.vs", "shaders/font.fs");
@@ -256,14 +238,25 @@ void Shader::use() const
 	switch (m_shaderType) {
 		case ShaderType::Texture:
 		{
-			g_opengl.glBindTexture(GL_TEXTURE_2D, m_txtBuff);
-			
 			if(m_font)
+			{
+				g_opengl.glBindTexture(GL_TEXTURE_2D, m_texturesInfo[0].buffer);
 				break;
+			}
 
 			int uniform = getUniform("material.diffuse");
-			g_opengl.glUniform1f(uniform, 0);
+			g_opengl.glUniform1i(uniform, 0);
 			g_opengl.glActiveTexture(GL_TEXTURE0);
+			g_opengl.glBindTexture(GL_TEXTURE_2D, m_texturesInfo[0].buffer);
+
+			uniform = getUniform("material.specular");
+			g_opengl.glUniform1i(uniform, 1);
+			g_opengl.glActiveTexture(GL_TEXTURE1);
+			g_opengl.glBindTexture(GL_TEXTURE_2D, m_texturesInfo[1].buffer);
+
+			uniform = getUniform("material.shininess");
+			g_opengl.glUniform1f(uniform, 32);
+
 		}
 			break;
 		case ShaderType::Unicolor:
@@ -325,8 +318,8 @@ void Shader::deleteShaders(unsigned int vtx, unsigned frg)
 
 void Shader::deleteTexture() {
 	g_opengl.glBindTexture(GL_TEXTURE_2D, 0);
-	g_opengl.glDeleteTextures(1, &m_txtBuff);
-	m_txtBuff = 0;
+	g_opengl.glDeleteTextures(1, &m_texturesInfo.back().buffer);
+	m_texturesInfo.back().buffer = 0;
 }
 
 
@@ -359,9 +352,12 @@ void Shader::compile(const std::filesystem::path& vtxShdPath, const std::filesys
 		throw std::invalid_argument(err_msg);
 	}
 
+
 	switch (m_shaderType) {
 		case ShaderType::Texture:
-			if (!m_textureInfo.data) {
+		{
+			TextureInfo& textInfo = m_texturesInfo.back();
+			if (!textInfo.data) {
 				std::string err_msg = "Texture data have not been loaded before compilation";
 				qCritical() << err_msg;
 				throw std::invalid_argument(err_msg);
@@ -369,7 +365,7 @@ void Shader::compile(const std::filesystem::path& vtxShdPath, const std::filesys
 
 			GLenum format;
 
-			switch (m_textureInfo.nrChannels) {
+			switch (textInfo.nrChannels) {
 				case 1:
 					format = GL_RED;
 					break;
@@ -387,18 +383,22 @@ void Shader::compile(const std::filesystem::path& vtxShdPath, const std::filesys
 			if (m_font)
 				g_opengl.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-			g_opengl.glGenTextures(1, &m_txtBuff);
-			g_opengl.glBindTexture(GL_TEXTURE_2D, m_txtBuff);
+			g_opengl.glGenTextures(1, &textInfo.buffer);
+			g_opengl.glBindTexture(GL_TEXTURE_2D, textInfo.buffer);
 			g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 			g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 			g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-			g_opengl.glTexImage2D(GL_TEXTURE_2D, 0, format, m_textureInfo.width, m_textureInfo.height, 0, format, GL_UNSIGNED_BYTE, m_textureInfo.data);
+			g_opengl.glTexImage2D(GL_TEXTURE_2D, 0, format, textInfo.width, textInfo.height, 0, format, GL_UNSIGNED_BYTE, textInfo.data);
 			g_opengl.glGenerateMipmap(GL_TEXTURE_2D);
 
-			stbi_image_free(m_textureInfo.data);
+			stbi_image_free(textInfo.data);
 
+			// No need to set the shaders if a texture has already been added
+			if (m_texturesInfo.size() > 1)
+				return;
+		}
 			break;
 		case ShaderType::Unicolor:
 		case ShaderType::Light:

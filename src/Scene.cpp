@@ -23,7 +23,8 @@ void scene::initializeScene()
 	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(lightCube)));
 
 	Shader* color = new Shader(ShaderType::Texture);
-	color->setTexture("textures/container.jpg");
+	color->addTexture("textures/container2.png");
+	color->addTexture("textures/container2_specular.png");
 	m_shaders.push_back(std::unique_ptr<Shader>(std::move(color)));
 
 	Shader* lightShd = new Shader(ShaderType::Light);

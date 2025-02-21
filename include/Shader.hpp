@@ -22,16 +22,15 @@ class Shader {
 public:
 	
 	Shader();
-	Shader(ShaderType shaderType);
+	Shader(ShaderType shaderType, bool isFont=false);
 	~Shader();
 
-	void setShaderType(const ShaderType &shaderType);
 	ShaderType getShaderType() const;
 
 	void setColor(RGBColor color);
 	void setColor(std::string color);
 	void setLight();
-	void setTexture(const std::filesystem::path &texturePath, bool isFont=false);
+	void addTexture(const std::filesystem::path &texturePath);
 	void setCustom(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath);
 	
 	void setTransformation(glm::mat4 model, glm::mat4 view, glm::mat4 projection);
@@ -47,9 +46,12 @@ private:
 		int width;
 		int height;
 		int nrChannels;
+		
+		unsigned int buffer;
+		std::filesystem::path path;
 	};
-	TextureInfo m_textureInfo;
-	unsigned int m_txtBuff;
+	
+	std::vector<TextureInfo> m_texturesInfo;
 	bool m_font;
 
 	RGBColor m_color;

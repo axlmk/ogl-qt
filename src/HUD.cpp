@@ -112,8 +112,8 @@ HUD::HUD(std::string font)
 
     generateOGLBuffers();
 
-    Shader* s = new Shader(ShaderType::Texture);
-    s->setTexture("textures/arial.png", true);
+    Shader* s = new Shader(ShaderType::Texture, true);
+    s->addTexture("textures/arial.png");
     m_shd = std::unique_ptr<Shader>(s);
 
 
