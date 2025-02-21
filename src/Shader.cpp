@@ -238,16 +238,17 @@ void Shader::use() const
 	switch (m_shaderType) {
 		case ShaderType::Texture:
 		{
+			int uniform = 0;
 			if(m_font)
-			{
-				g_opengl.glBindTexture(GL_TEXTURE_2D, m_texturesInfo[0].buffer);
-				break;
-			}
-
-			int uniform = getUniform("material.diffuse");
+				uniform = getUniform("atlas");
+			else
+				uniform = getUniform("material.diffuse");
 			g_opengl.glUniform1i(uniform, 0);
 			g_opengl.glActiveTexture(GL_TEXTURE0);
 			g_opengl.glBindTexture(GL_TEXTURE_2D, m_texturesInfo[0].buffer);
+
+			if(m_font)
+				break;
 
 			uniform = getUniform("material.specular");
 			g_opengl.glUniform1i(uniform, 1);
