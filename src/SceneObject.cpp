@@ -1,13 +1,22 @@
 #include "SceneObject.hpp"
 
-SceneObject::SceneObject() : m_geo{ nullptr }, m_shd{ nullptr } {
+SceneObject::SceneObject(SceneObjectType type) : m_geo{ nullptr }, m_shd{ nullptr }
+{
 	m_vbo = 0;
 	m_vao = 0;
 	m_ebo = 0;
 	std::string err_msg = "";
+	m_type = type;
+
+	if(m_type == SceneObjectType::Light)
+	{
+		m_lightProperties.type = LightType::Directional;
+	}
 }
 
-SceneObject::SceneObject(Geometry* geometry, Shader* shader) : SceneObject() {
+
+
+SceneObject::SceneObject(Geometry* geometry, Shader* shader, SceneObjectType type) : SceneObject(type) {
 	linkGeo(geometry);
 	linkShader(shader);
 }
@@ -42,8 +51,8 @@ Shader* SceneObject::getShader() const {
 
 
 
-void SceneObject::linkGeo(Geometry* geometry) {
-
+void SceneObject::linkGeo(Geometry* geometry)
+{
 	if(m_geo == geometry) {
 		qWarning() << "The newly added geometry corresponds to the one actually in use";
 		return;
@@ -81,15 +90,87 @@ void SceneObject::linkShader(Shader* shader) {
 			qCritical() << err_msg;
 			throw std::invalid_argument(err_msg);
 	}
-
 	generateRender();
+}
+
+
+void SceneObject::setLightProperties(LightType type, glm::vec3 direction, float linear, float quadratic, float cutoff)
+{
+	m_lightProperties.type = type;
+	switch (m_lightProperties.type)
+	{
+		case LightType::Point:
+		{
+			m_lightProperties.linear = linear;
+			m_lightProperties.quadratic = quadratic;
+			break;
+		}
+		case LightType::Spot:
+		{
+			m_lightProperties.cutoff = cutoff;
+			break;
+		}
+		case LightType::Directional:
+		{
+			m_lightProperties.direction = direction;
+		}
+		default:
+		{
+			break;
+		}
+	}
+}
+
+
+
+void SceneObject::setUpLights(Camera* camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const
+{
+	SceneObject &light = lights[0].get();
+	if (this == &light)
+	{
+		return;
+	}
+	
+	int uniform = -1;
+	switch (m_lightProperties.type)
+	{
+		case LightType::Directional:
+		{
+			int uniform = m_shd->getUniform("light.direction");
+			g_opengl.glUniform3f(uniform, light.m_lightProperties.direction.x, light.m_lightProperties.direction.y, light.m_lightProperties.direction.z);
+			break;
+		}
+		case LightType::Spot:
+		{
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
+
+	uniform = m_shd->getUniform("light.ambient");
+	g_opengl.glUniform3f(uniform, 0.2f, 0.2f, 0.2f);
+
+	uniform = m_shd->getUniform("light.diffuse");
+	g_opengl.glUniform3f(uniform, 0.65f, 0.65f, 0.65f);
+
+	uniform = m_shd->getUniform("light.specular");
+	g_opengl.glUniform3f(uniform, 1.0f, 1.0f, 1.0f);
+
+	SpaceCoord cameraPos = camera->getPosition();
+	uniform = m_shd->getUniform("cameraPos");
+	g_opengl.glUniform3f(uniform, cameraPos.x, cameraPos.y, cameraPos.z);
 }
 
 
 void SceneObject::render(Camera* camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const
 {
 	if(m_shd == nullptr || m_geo == nullptr)
+	{
 		return;
+	}
 	
 	// Shader's application
 	m_shd->use();
@@ -110,27 +191,8 @@ void SceneObject::render(Camera* camera, const std::vector<std::reference_wrappe
 	// Clip (combination of previous matrices)
 	m_shd->setTransformation(model, view, projection);
 
-	if(this != &lights[0].get())
-	{
-		SpaceCoord lightPos = lights[0].get().getGeometry()->getPosition();
-
-		int uniform = m_shd->getUniform("light.position");
-		g_opengl.glUniform3f(uniform, lightPos.x, lightPos.y, lightPos.z);
-
-		uniform = m_shd->getUniform("light.ambient");
-		g_opengl.glUniform3f(uniform, 0.2f, 0.2f, 0.2f);
-
-		uniform = m_shd->getUniform("light.diffuse");
-		g_opengl.glUniform3f(uniform, 0.65f, 0.65f, 0.65f);
-
-		uniform = m_shd->getUniform("light.specular");
-		g_opengl.glUniform3f(uniform, 1.0f, 1.0f, 1.0f);
-
-		
-		SpaceCoord cameraPos = camera->getPosition();
-		uniform = m_shd->getUniform("cameraPos");
-		g_opengl.glUniform3f(uniform, cameraPos.x, cameraPos.y, cameraPos.z);
-	}
+	// Lights calculations
+	setUpLights(camera, lights);
 
 	// Render
 	g_opengl.glBindVertexArray(m_vao);
@@ -138,13 +200,13 @@ void SceneObject::render(Camera* camera, const std::vector<std::reference_wrappe
 }
 
 
-void SceneObject::generateRender() {
-
+void SceneObject::generateRender()
+{
 	// Pretests
 
-	if(m_geo == nullptr || m_shd == nullptr) {
-		std::string err_msg = "Geometry and shader must be specify to render a scene object";
-		qWarning() << err_msg;
+	if(m_geo == nullptr || m_shd == nullptr) 
+	{
+		qWarning() << "Geometry and shader must be specify to render a scene object";
 		return;
 	}
 
@@ -175,7 +237,10 @@ void SceneObject::generateRender() {
 	unsigned int currentAttributePosition = 0;
 	unsigned int stride = std::accumulate(attributesPositions.begin(), attributesPositions.end(), 0);
 
-	for (size_t i = 0; i < attributesPositions.size(); i++) {
+	// Generate all attributes per vertex
+
+	for (size_t i = 0; i < attributesPositions.size(); i++)
+	{
 		g_opengl.glVertexAttribPointer(i, attributesPositions[i], GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(currentAttributePosition * sizeof(float)));
 		currentAttributePosition += attributesPositions[i];
 		g_opengl.glEnableVertexAttribArray(i);

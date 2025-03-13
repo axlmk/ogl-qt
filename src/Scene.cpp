@@ -35,9 +35,10 @@ void scene::initializeScene()
 	m_huds.push_back(std::unique_ptr<HUD>(std::move(hud)));
 
 	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[0].get(), m_shaders[0].get()));
-	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[1].get(), m_shaders[1].get()));
+	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[1].get(), m_shaders[1].get(), SceneObjectType::Light));
 
 	m_lights.push_back(*m_sceneObjects[1]);
+	m_lights[0].get().setLightProperties(LightType::Directional, {-1, -1, -1});
 }
 
 

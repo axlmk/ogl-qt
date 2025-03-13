@@ -401,12 +401,11 @@ void Shader::compile(const std::filesystem::path& vtxShdPath, const std::filesys
 
 			// No need to set the shaders if a texture has already been added
 			if (m_texturesInfo.size() > 1)
+			{
 				return;
+			}
 		}
 			break;
-		case ShaderType::Unicolor:
-		case ShaderType::Light:
-		case ShaderType::Custom:
 		default:
 			break;
 	}
