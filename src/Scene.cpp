@@ -48,7 +48,7 @@ void scene::initializeScene()
 	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[3].get(), m_shaders[0].get()));
 
 	m_lights.push_back(*m_sceneObjects[1]);
-	m_lights[0].get().setLightProperties(LightType::Spot, {0, -2, 0}, 0, 0, 10);
+	m_lights[0].get().setSpotLight({0, -2, 0}, 10, 12);
 }
 
 

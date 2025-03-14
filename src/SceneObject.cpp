@@ -94,23 +94,30 @@ void SceneObject::linkShader(Shader* shader) {
 }
 
 
-void SceneObject::setLightProperties(LightType type, glm::vec3 direction, float linear, float quadratic, float cutoff)
+
+void SceneObject::setSpotLight(glm::vec3 direction, float cutoff, float outerCutoff)
 {
-	m_lightProperties.type = type;
-	switch (m_lightProperties.type)
-	{
-		case LightType::Point:
-			m_lightProperties.linear = linear;
-			m_lightProperties.quadratic = quadratic;
-			break;
-		case LightType::Spot:
-			m_lightProperties.cutoff = cutoff;
-		case LightType::Directional:
-			m_lightProperties.direction = direction;
-			break;
-		default:
-			break;
-	}
+	m_lightProperties.type = LightType::Spot;
+	m_lightProperties.cutoff = cutoff;
+	m_lightProperties.direction = direction;
+	m_lightProperties.outerCutoff = outerCutoff;
+}
+
+
+
+void SceneObject::setPointLight(float linear, float quadratic)
+{
+	m_lightProperties.type = LightType::Point;
+	m_lightProperties.linear = linear;
+	m_lightProperties.quadratic = quadratic;
+}
+
+
+
+void SceneObject::setDirectionalLight(glm::vec3 direction)
+{
+	m_lightProperties.type = LightType::Directional;
+	m_lightProperties.direction = direction;
 }
 
 
@@ -143,6 +150,9 @@ void SceneObject::setUpLights(Camera* camera, const std::vector<std::reference_w
 			uniform = m_shd->getUniform("light.cutoff");
 			g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light.m_lightProperties.cutoff)));
 
+			uniform = m_shd->getUniform("light.outerCutoff");
+			g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light.m_lightProperties.outerCutoff)));
+
 			uniform = m_shd->getUniform("light.position");
 			g_opengl.glUniform3f(uniform, light.getGeometry()->getPosition().x, light.getGeometry()->getPosition().y, light.getGeometry()->getPosition().z);
 		}
@@ -150,6 +160,7 @@ void SceneObject::setUpLights(Camera* camera, const std::vector<std::reference_w
 		{
 			uniform = m_shd->getUniform("light.direction");
 			g_opengl.glUniform3f(uniform, light.m_lightProperties.direction.x, light.m_lightProperties.direction.y, light.m_lightProperties.direction.z);
+			break;
 		}
 		default:
 		{

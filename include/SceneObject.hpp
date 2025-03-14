@@ -27,8 +27,9 @@ struct LightProperties
 
 	// Spot light;
 	float cutoff;
+	float outerCutoff;
 
-	// Directional light
+	// Directional light & Spot
 	glm::vec3 direction;
 };
 
@@ -45,9 +46,12 @@ public:
 	void generateRender();
 	void linkShader(Shader* shader);
 	void linkGeo(Geometry* geometry);
-	void setLightProperties(LightType type, glm::vec3 direction = {0, 0, 0}, float linear = 1, float quadratic = 1, float cutoff = 1);
-
+	
+	void setDirectionalLight(glm::vec3 direction);
+	void setPointLight(float linear, float quadratic);
+	void setSpotLight(glm::vec3 direction, float cutoff, float outerCutoff = 0.0);
 	void setUpLights(Camera* camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const;
+	
 	void render(Camera* camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const;
 
 private:

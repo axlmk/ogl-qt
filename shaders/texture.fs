@@ -18,6 +18,7 @@ struct Light {
 	float	quadratic;
 	vec3	direction;
 	float	cutoff;
+	float	outerCutoff;
 };
 
 uniform vec3		cameraPos;
@@ -49,16 +50,12 @@ void main()
 
 	// Cutoff
 	float theta			= dot(fragToLight, normalize(-light.direction));
-	if(theta > light.cutoff)
-	{
-		// Output
-		vec3 outCol		= (ambient + diffuse + specular) * 2;
-		FragColor		= vec4(outCol, 1.0);
-	} else 
-	{
-		FragColor		= vec4(ambient, 1.0) * 2;
-	}
+	float epsilon		= light.cutoff - light.outerCutoff;
+	float intensity		= clamp((theta - light.outerCutoff) / epsilon, 0.0, 1.0);
 
+	// Output
+	vec3 outCol		= ambient * 2 + (diffuse + specular) * 2 * intensity;
+	FragColor		= vec4(outCol, 1.0);
 
 	// attenuation
 	//float distance	= length(lightDir);
