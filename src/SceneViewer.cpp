@@ -19,7 +19,7 @@ void SceneViewer::paintGL()
 	for (auto &sceneObject : m_manager->getSceneObjects())
 	{
 		m_manager->getCamera()->move(m_KeyBeingPressed, m_deltaTime);
-		//m_manager->getGeometries()[1]->rotate(i * 0.01, 0, 1, 0);
+		m_manager->getGeometries()[1]->rotate(i * 0.01, 0, 1, 0);
 		sceneObject->render(m_manager->getCamera().get(), m_manager->getLights());
 	}
 

@@ -19,8 +19,18 @@ void scene::initializeScene()
 
 	Geometry* lightCube = new Geometry(GeometryType::Cube, 0.3);
 	lightCube->setPivot(0.15, 0.15, 0.15);
-	lightCube->translate(0.7, 1.0, 0.8);
+	lightCube->translate(1.0, 1.0, 1.0);
 	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(lightCube)));
+
+	Geometry* refCube2 = new Geometry(GeometryType::Cube, 0.5);
+	refCube2->setNormals();
+	refCube2->translate(0, 0, -4);
+	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(refCube2)));
+
+	Geometry* refCube3 = new Geometry(GeometryType::Cube, 0.5);
+	refCube3->setNormals();
+	refCube3->translate(0, 0, -2);
+	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(refCube3)));
 
 	Shader* color = new Shader(ShaderType::Texture);
 	color->addTexture("textures/container2.png");
@@ -36,9 +46,11 @@ void scene::initializeScene()
 
 	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[0].get(), m_shaders[0].get()));
 	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[1].get(), m_shaders[1].get(), SceneObjectType::Light));
+	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[2].get(), m_shaders[0].get()));
+	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[3].get(), m_shaders[0].get()));
 
 	m_lights.push_back(*m_sceneObjects[1]);
-	m_lights[0].get().setLightProperties(LightType::Directional, {-1, -1, -1});
+	m_lights[0].get().setLightProperties(LightType::Point, {}, 0.35, 0.44);
 }
 
 

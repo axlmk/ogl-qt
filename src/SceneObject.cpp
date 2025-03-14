@@ -113,6 +113,7 @@ void SceneObject::setLightProperties(LightType type, glm::vec3 direction, float 
 		case LightType::Directional:
 		{
 			m_lightProperties.direction = direction;
+			break;
 		}
 		default:
 		{
@@ -132,16 +133,24 @@ void SceneObject::setUpLights(Camera* camera, const std::vector<std::reference_w
 	}
 	
 	int uniform = -1;
-	switch (m_lightProperties.type)
+	switch (light.m_lightProperties.type)
 	{
 		case LightType::Directional:
 		{
-			int uniform = m_shd->getUniform("light.direction");
+			uniform = m_shd->getUniform("light.direction");
 			g_opengl.glUniform3f(uniform, light.m_lightProperties.direction.x, light.m_lightProperties.direction.y, light.m_lightProperties.direction.z);
 			break;
 		}
-		case LightType::Spot:
+		case LightType::Point:
 		{
+			uniform = m_shd->getUniform("light.position");
+			g_opengl.glUniform3f(uniform, light.getGeometry()->getPosition().x, light.getGeometry()->getPosition().y, light.getGeometry()->getPosition().z);
+
+			uniform = m_shd->getUniform("light.linear");
+			g_opengl.glUniform1f(uniform, light.m_lightProperties.linear);
+
+			uniform = m_shd->getUniform("light.quadratic");
+			g_opengl.glUniform1f(uniform, light.m_lightProperties.quadratic);
 			break;
 		}
 		default:
