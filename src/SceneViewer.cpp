@@ -6,12 +6,10 @@
 void SceneViewer::paintGL()
 {
 	static int i = 0;
-	static auto fpsSmoother = 600;
 	static std::string smoothDT = "";
 
 	m_deltaTime = QDateTime::currentMSecsSinceEpoch() - m_currentTime;
 	m_currentTime = QDateTime::currentMSecsSinceEpoch();
-	fpsSmoother += m_deltaTime;
 
 	g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -25,11 +23,8 @@ void SceneViewer::paintGL()
 
 	for(auto &hud : m_manager->getHUDs())
 	{
-		if(fpsSmoother > 600)
-		{
+		if(!(i % 4))
 			smoothDT = std::to_string(int(1000 / m_deltaTime));
-			fpsSmoother = 0;
-		}
 		hud->RenderText(smoothDT, 1, 1, {255, 255, 255}, 0.5);
 	}
 	i++;
@@ -45,8 +40,8 @@ SceneViewer::SceneViewer(scene* scene) :
 	m_KeyBeingPressed	{ false, false, false, false },
 	m_manager			{ scene },
 	m_timer				{ std::make_unique<QTimer>(this) },
-	m_currentTime		{ QDateTime::currentMSecsSinceEpoch() } {
-
+	m_currentTime		{ QDateTime::currentMSecsSinceEpoch() }
+{
 	connect(&(*m_timer), &QTimer::timeout, this, QOverload<>::of(&SceneViewer::update));
 	m_timer->start(16);
 }

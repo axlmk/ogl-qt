@@ -100,25 +100,16 @@ void SceneObject::setLightProperties(LightType type, glm::vec3 direction, float 
 	switch (m_lightProperties.type)
 	{
 		case LightType::Point:
-		{
 			m_lightProperties.linear = linear;
 			m_lightProperties.quadratic = quadratic;
 			break;
-		}
 		case LightType::Spot:
-		{
 			m_lightProperties.cutoff = cutoff;
-			break;
-		}
 		case LightType::Directional:
-		{
 			m_lightProperties.direction = direction;
 			break;
-		}
 		default:
-		{
 			break;
-		}
 	}
 }
 
@@ -135,12 +126,6 @@ void SceneObject::setUpLights(Camera* camera, const std::vector<std::reference_w
 	int uniform = -1;
 	switch (light.m_lightProperties.type)
 	{
-		case LightType::Directional:
-		{
-			uniform = m_shd->getUniform("light.direction");
-			g_opengl.glUniform3f(uniform, light.m_lightProperties.direction.x, light.m_lightProperties.direction.y, light.m_lightProperties.direction.z);
-			break;
-		}
 		case LightType::Point:
 		{
 			uniform = m_shd->getUniform("light.position");
@@ -152,6 +137,19 @@ void SceneObject::setUpLights(Camera* camera, const std::vector<std::reference_w
 			uniform = m_shd->getUniform("light.quadratic");
 			g_opengl.glUniform1f(uniform, light.m_lightProperties.quadratic);
 			break;
+		}
+		case LightType::Spot:
+		{
+			uniform = m_shd->getUniform("light.cutoff");
+			g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light.m_lightProperties.cutoff)));
+
+			uniform = m_shd->getUniform("light.position");
+			g_opengl.glUniform3f(uniform, light.getGeometry()->getPosition().x, light.getGeometry()->getPosition().y, light.getGeometry()->getPosition().z);
+		}
+		case LightType::Directional:
+		{
+			uniform = m_shd->getUniform("light.direction");
+			g_opengl.glUniform3f(uniform, light.m_lightProperties.direction.x, light.m_lightProperties.direction.y, light.m_lightProperties.direction.z);
 		}
 		default:
 		{

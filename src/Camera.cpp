@@ -112,12 +112,8 @@ void Camera::pan(glm::vec2 lastPos, glm::vec2 currentPos)
 
 void Camera::zoom(glm::vec2 lastPos, glm::vec2 currentPos)
 {
-
 	float speed = (currentPos.x - lastPos.x) * 2 * 0.01;
-	
 	SpaceCoord mouvement = (m_position - m_target) * speed;
-	
-	qDebug() << glm::dot(m_position - m_target, m_position - m_target - mouvement);
 
 	if(glm::dot(m_position - m_target, m_position - m_target - mouvement) >= 0 && glm::length(m_position - m_target - mouvement) > 0.1)
 	{

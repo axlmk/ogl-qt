@@ -3,54 +3,65 @@
 // Phong shader
 
 struct Material {
-	sampler2D diffuse;
-	sampler2D specular;
-	float shininess;
+	sampler2D	diffuse;
+	sampler2D	specular;
+	float		shininess;
 };
 
 struct Light {
-	//vec3 direction;
-	vec3 position;
-	vec3 diffuse;
-	vec3 specular;
-	vec3 ambient;
+	vec3	diffuse;
+	vec3	specular;
+	vec3	ambient;
 
-	float linear;
-	float quadratic;
+	vec3	position;
+	float	linear;
+	float	quadratic;
+	vec3	direction;
+	float	cutoff;
 };
 
-uniform vec3 cameraPos;
-uniform Material material;
-uniform Light light;
+uniform vec3		cameraPos;
+uniform Material	material;
+uniform Light		light;
 
-in vec3 normal;
-in vec3 fragPos;
-in vec2 textureCoord;
-out vec4 FragColor;
+in vec3		normal;
+in vec3		fragPos;
+in vec2		textureCoord;
+
+out vec4	FragColor;
 
 void main()
 {
-	vec3 direction = light.position - fragPos;
+	vec3 fragToLight	= normalize(light.position - fragPos);
 
 	// Ambient
-	vec3 ambient	= light.ambient * vec3(texture(material.diffuse, textureCoord));
+	vec3 ambient		= light.ambient * vec3(texture(material.diffuse, textureCoord));
 
 	// Diffuse
-	vec3 lightDir	= normalize(direction);
-	float diff		= max(dot(normal, lightDir), 0.0);
-	vec3 diffuse	= light.diffuse * vec3(texture(material.diffuse, textureCoord)) * diff;
+	float diff			= max(dot(normal, fragToLight), 0.0);
+	vec3 diffuse		= light.diffuse * vec3(texture(material.diffuse, textureCoord)) * diff;
 
 	// Specular
-	vec3 cameraDir	= normalize(cameraPos - fragPos);
-	vec3 reflectDir = reflect(-lightDir, normal);
-	float spec		= pow(max(dot(cameraDir, reflectDir), 0.0), material.shininess);
-	vec3 specular	= light.specular * spec * vec3(texture(material.specular, textureCoord));
+	vec3 fragToCam		= normalize(cameraPos - fragPos);
+	vec3 reflectDir		= reflect(-fragToLight, normal);
+	float spec			= pow(max(dot(fragToCam, reflectDir), 0.0), material.shininess);
+	vec3 specular		= light.specular * spec * vec3(texture(material.specular, textureCoord));
+
+	// Cutoff
+	float theta			= dot(fragToLight, normalize(-light.direction));
+	if(theta > light.cutoff)
+	{
+		// Output
+		vec3 outCol		= (ambient + diffuse + specular) * 2;
+		FragColor		= vec4(outCol, 1.0);
+	} else 
+	{
+		FragColor		= vec4(ambient, 1.0) * 2;
+	}
+
 
 	// attenuation
-	float distance	= length(direction);
-	float attenuation = 1.0 / ( 1.0 + light.linear * distance + light.quadratic * distance * distance );
+	//float distance	= length(lightDir);
+	//float attenuation = 1.0 / ( 1.0 + light.linear * distance + light.quadratic * distance * distance );
 
-	// Output
-	vec3 outColor	= (ambient + diffuse + specular) * 4 * attenuation;
-	FragColor = vec4(outColor, 1.0);
 }

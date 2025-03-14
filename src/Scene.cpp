@@ -13,13 +13,11 @@ void scene::initializeScene()
 	m_camera = { std::make_unique<Camera>(SpaceCoord(0.0, 0.0, 3.0)) };
 
 	Geometry* refCube = new Geometry(GeometryType::Cube, 0.5);
-	refCube->setPivot(0.25, 0.25, 0.25);
 	refCube->setNormals();
 	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(refCube)));
 
 	Geometry* lightCube = new Geometry(GeometryType::Cube, 0.3);
-	lightCube->setPivot(0.15, 0.15, 0.15);
-	lightCube->translate(1.0, 1.0, 1.0);
+	lightCube->translate(0, 2.0, 0);
 	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(lightCube)));
 
 	Geometry* refCube2 = new Geometry(GeometryType::Cube, 0.5);
@@ -50,7 +48,7 @@ void scene::initializeScene()
 	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[3].get(), m_shaders[0].get()));
 
 	m_lights.push_back(*m_sceneObjects[1]);
-	m_lights[0].get().setLightProperties(LightType::Point, {}, 0.35, 0.44);
+	m_lights[0].get().setLightProperties(LightType::Spot, {0, -2, 0}, 0, 0, 10);
 }
 
 
