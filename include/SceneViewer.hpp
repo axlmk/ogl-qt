@@ -39,8 +39,7 @@ private:
 	bool m_mousePressed[3];		// 0 = left, 1 = middle, 2 = right
 	bool m_KeyBeingPressed[4];	// 0 = z, 1 = q, 2 = d, 3 = s
 	
-	glm::vec2 m_lastMousePos;
-	glm::vec2 m_mousePosWhenPressed;
+	glm::ivec2 m_lastMousePos;
 
 	qint64 m_currentTime;
 	qint64 m_deltaTime;

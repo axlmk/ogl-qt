@@ -20,7 +20,6 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
 
 	// Cursor management
 	
-	m_sceneViewer->setCursor(QCursor(Qt::BlankCursor));
 	auto globalCenter = m_mainWindow->mapToGlobal(m_sceneViewer->geometry().center());
 	m_mainWindow->cursor().setPos(globalCenter.x(), globalCenter.y());
 

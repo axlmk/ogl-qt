@@ -19,7 +19,7 @@ void SceneViewer::paintGL()
 	for (auto &sceneObject : m_manager->getSceneObjects())
 	{
 		m_manager->getCamera()->move(m_KeyBeingPressed, m_deltaTime);
-		m_manager->getGeometries()[1]->rotate(i * 0.01, 0, 1, 0);
+		//m_manager->getGeometries()[1]->rotate(i * 0.01, 0, 1, 0);
 		sceneObject->render(m_manager->getCamera().get(), m_manager->getLights());
 	}
 
@@ -40,7 +40,6 @@ void SceneViewer::paintGL()
 SceneViewer::SceneViewer(scene* scene) :
 	m_deltaTime			{ 0 },
 	m_lastMousePos		{ 0.0, 0.0 },
-	m_mousePosWhenPressed{ 0.0, 0.0 },
 	m_altBeingPressed	{ false },
 	m_mousePressed		{ false, false, false },
 	m_KeyBeingPressed	{ false, false, false, false },
@@ -89,6 +88,13 @@ void SceneViewer::keyPressEvent(QKeyEvent* event) {
 
 	if(event->key() == Qt::Key_Alt ) {
 		m_altBeingPressed = true;
+		
+		// Reset cursor
+		setCursor(QCursor(Qt::BlankCursor));
+		m_lastMousePos.x = cursor().pos().x();
+		m_lastMousePos.y = cursor().pos().y();
+		auto globalCenter = mapToGlobal(geometry().center());
+		cursor().setPos(globalCenter.x(), globalCenter.y());
 	}
 }
 
@@ -109,6 +115,8 @@ void SceneViewer::keyReleaseEvent(QKeyEvent * event) {
 
 	if(event->key() == Qt::Key_Alt) {
 		m_altBeingPressed = false;
+		setCursor(QCursor(Qt::BitmapCursor));
+		cursor().setPos({m_lastMousePos.x, m_lastMousePos.y});
 	}
 }
 
@@ -126,9 +134,6 @@ void SceneViewer::mousePressEvent(QMouseEvent* event) {
 		default:
 			break;
 	}
-	m_lastMousePos.x = event->pos().x();
-	m_lastMousePos.y = event->pos().y();
-	m_mousePosWhenPressed = m_lastMousePos;
 }
 
 void SceneViewer::mouseReleaseEvent(QMouseEvent* event) {
@@ -153,15 +158,18 @@ void SceneViewer::mouseMoveEvent(QMouseEvent* event) {
 	if(m_altBeingPressed)
 	{
 		// Viewing Mode
+		auto centered = mapToGlobal(geometry().center());
+		auto current = mapToGlobal(event->pos());
+		glm::vec2 centeredCursor	{ centered.x(), centered.y() };
+		glm::vec2 currentCursor		{ current.x(), current.y() };
 
 		if(m_mousePressed[0])
-			m_manager->getCamera()->rotate(m_lastMousePos, { event->pos().x(), event->pos().y() });
+			m_manager->getCamera()->rotate(centeredCursor, currentCursor);
 		else if(m_mousePressed[1])
-			m_manager->getCamera()->pan(m_lastMousePos, { event->pos().x(), event->pos().y() });
+			m_manager->getCamera()->pan(centeredCursor, currentCursor);
 		else if(m_mousePressed[2])
-			m_manager->getCamera()->zoom(m_lastMousePos, { event->pos().x(), event->pos().y() });
-		m_lastMousePos.x = event->pos().x();
-		m_lastMousePos.y = event->pos().y();
+			m_manager->getCamera()->zoom(centeredCursor, currentCursor);
 
+		cursor().setPos(centeredCursor.x, centeredCursor.y);
 	}
 }
