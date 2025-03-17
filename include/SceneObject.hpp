@@ -10,11 +10,11 @@ enum class SceneObjectType
 	Light
 };
 
-enum class LightType
+enum LightType
 {
-	Directional,
+	Spot,
 	Point,
-	Spot
+	Directional
 };
 
 struct LightProperties

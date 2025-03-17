@@ -16,10 +16,6 @@ void scene::initializeScene()
 	refCube->setNormals();
 	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(refCube)));
 
-	Geometry* lightCube = new Geometry(GeometryType::Cube, 0.3);
-	lightCube->translate(0, 2.0, 0);
-	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(lightCube)));
-
 	Geometry* refCube2 = new Geometry(GeometryType::Cube, 0.5);
 	refCube2->setNormals();
 	refCube2->translate(0, 0, -4);
@@ -29,6 +25,19 @@ void scene::initializeScene()
 	refCube3->setNormals();
 	refCube3->translate(0, 0, -2);
 	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(refCube3)));
+
+	Geometry* lightCube = new Geometry(GeometryType::Cube, 0.3);
+	lightCube->translate(0.1, 2.0, 0.2);
+	lightCube->setPivot(0.15, 0.15, 0.15);
+	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(lightCube)));
+
+	Geometry* lightCube2 = new Geometry(GeometryType::Cube, 0.3);
+	lightCube2->translate(0, 1.0, -4);
+	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(lightCube2)));
+
+	Geometry* lightCube3 = new Geometry(GeometryType::Cube, 0.3);
+	lightCube3->translate(0, -1, 0);
+	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(lightCube3)));
 
 	Shader* color = new Shader(ShaderType::Texture);
 	color->addTexture("textures/container2.png");
@@ -43,12 +52,20 @@ void scene::initializeScene()
 	m_huds.push_back(std::unique_ptr<HUD>(std::move(hud)));
 
 	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[0].get(), m_shaders[0].get()));
-	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[1].get(), m_shaders[1].get(), SceneObjectType::Light));
+	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[1].get(), m_shaders[0].get()));
 	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[2].get(), m_shaders[0].get()));
-	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[3].get(), m_shaders[0].get()));
+	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[3].get(), m_shaders[1].get(), SceneObjectType::Light));
+	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[4].get(), m_shaders[1].get(), SceneObjectType::Light));
+	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[5].get(), m_shaders[1].get(), SceneObjectType::Light));
 
-	m_lights.push_back(*m_sceneObjects[1]);
-	m_lights[0].get().setSpotLight({0, -2, 0}, 10, 12);
+	m_lights.push_back(*m_sceneObjects[3]);
+	m_lights[0].get().setSpotLight({0, -1, 0}, 12, 14);
+
+	m_lights.push_back(*m_sceneObjects[4]);
+	m_lights[1].get().setPointLight(0.35, 0.44);
+
+	m_lights.push_back(*m_sceneObjects[5]);
+	m_lights[2].get().setDirectionalLight({1.0, 1.0, 1.0});
 }
 
 

@@ -124,58 +124,67 @@ void SceneObject::setDirectionalLight(glm::vec3 direction)
 
 void SceneObject::setUpLights(Camera* camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const
 {
-	SceneObject &light = lights[0].get();
-	if (this == &light)
+	size_t n = lights.size();
+	int uniform = m_shd->getUniform("nLights");;
+	g_opengl.glUniform1i(uniform, n);
+
+	for(size_t i = 0; i < n; i++)
 	{
-		return;
+		auto& light = lights[i].get();
+		std::string iStr = std::to_string(i);
+
+		uniform = m_shd->getUniform("lights[" + iStr + "].type");
+		g_opengl.glUniform1i(uniform, light.m_lightProperties.type);
+
+		switch (light.m_lightProperties.type)
+		{
+			case LightType::Point:
+			{
+
+				uniform = m_shd->getUniform("lights[" + iStr + "].position");
+				g_opengl.glUniform3f(uniform, light.getGeometry()->getPosition().x, light.getGeometry()->getPosition().y, light.getGeometry()->getPosition().z);
+
+				uniform = m_shd->getUniform("lights[" + iStr + "].linear");
+				g_opengl.glUniform1f(uniform, light.m_lightProperties.linear);
+
+				uniform = m_shd->getUniform("lights[" + iStr + "].quadratic");
+				g_opengl.glUniform1f(uniform, light.m_lightProperties.quadratic);
+				break;
+			}
+			case LightType::Spot:
+			{
+				uniform = m_shd->getUniform("lights[" + iStr + "].cutoff");
+				g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light.m_lightProperties.cutoff)));
+
+				uniform = m_shd->getUniform("lights[" + iStr + "].outerCutoff");
+				g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light.m_lightProperties.outerCutoff)));
+
+				uniform = m_shd->getUniform("lights[" + iStr + "].position");
+				g_opengl.glUniform3f(uniform, light.getGeometry()->getPosition().x, light.getGeometry()->getPosition().y, light.getGeometry()->getPosition().z);
+
+				// On purpose fallthrough
+			}
+			case LightType::Directional:
+			{
+				uniform = m_shd->getUniform("lights[" + iStr + "].direction");
+				g_opengl.glUniform3f(uniform, light.m_lightProperties.direction.x, light.m_lightProperties.direction.y, light.m_lightProperties.direction.z);
+				break;
+			}
+			default:
+			{
+				break;
+			}
+		}
+
+		uniform = m_shd->getUniform("lights[" + iStr + "].ambient");
+		g_opengl.glUniform3f(uniform, 0.2f, 0.2f, 0.2f);
+
+		uniform = m_shd->getUniform("lights[" + iStr + "].diffuse");
+		g_opengl.glUniform3f(uniform, 0.65f, 0.65f, 0.65f);
+
+		uniform = m_shd->getUniform("lights[" + iStr + "].specular");
+		g_opengl.glUniform3f(uniform, 1.0f, 1.0f, 1.0f);
 	}
-	
-	int uniform = -1;
-	switch (light.m_lightProperties.type)
-	{
-		case LightType::Point:
-		{
-			uniform = m_shd->getUniform("light.position");
-			g_opengl.glUniform3f(uniform, light.getGeometry()->getPosition().x, light.getGeometry()->getPosition().y, light.getGeometry()->getPosition().z);
-
-			uniform = m_shd->getUniform("light.linear");
-			g_opengl.glUniform1f(uniform, light.m_lightProperties.linear);
-
-			uniform = m_shd->getUniform("light.quadratic");
-			g_opengl.glUniform1f(uniform, light.m_lightProperties.quadratic);
-			break;
-		}
-		case LightType::Spot:
-		{
-			uniform = m_shd->getUniform("light.cutoff");
-			g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light.m_lightProperties.cutoff)));
-
-			uniform = m_shd->getUniform("light.outerCutoff");
-			g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light.m_lightProperties.outerCutoff)));
-
-			uniform = m_shd->getUniform("light.position");
-			g_opengl.glUniform3f(uniform, light.getGeometry()->getPosition().x, light.getGeometry()->getPosition().y, light.getGeometry()->getPosition().z);
-		}
-		case LightType::Directional:
-		{
-			uniform = m_shd->getUniform("light.direction");
-			g_opengl.glUniform3f(uniform, light.m_lightProperties.direction.x, light.m_lightProperties.direction.y, light.m_lightProperties.direction.z);
-			break;
-		}
-		default:
-		{
-			break;
-		}
-	}
-
-	uniform = m_shd->getUniform("light.ambient");
-	g_opengl.glUniform3f(uniform, 0.2f, 0.2f, 0.2f);
-
-	uniform = m_shd->getUniform("light.diffuse");
-	g_opengl.glUniform3f(uniform, 0.65f, 0.65f, 0.65f);
-
-	uniform = m_shd->getUniform("light.specular");
-	g_opengl.glUniform3f(uniform, 1.0f, 1.0f, 1.0f);
 
 	SpaceCoord cameraPos = camera->getPosition();
 	uniform = m_shd->getUniform("cameraPos");
@@ -210,7 +219,10 @@ void SceneObject::render(Camera* camera, const std::vector<std::reference_wrappe
 	m_shd->setTransformation(model, view, projection);
 
 	// Lights calculations
-	setUpLights(camera, lights);
+	if(m_type != SceneObjectType::Light)
+	{
+		setUpLights(camera, lights);
+	}
 
 	// Render
 	g_opengl.glBindVertexArray(m_vao);
