@@ -43,27 +43,27 @@ glm::mat4 Camera::getSpaceMat() {
 	return glm::lookAt(m_position, m_target, {0.0, 1.0, 0.0});
 }
 
-void Camera::move(bool keyPressed[], qint64 deltaTime)
+void Camera::move(std::unordered_map<std::string, bool> inputsBeingPressed, qint64 deltaTime)
 {
-	float speed = 4 * deltaTime * 0.001;
+	float speed = 2 * deltaTime * 0.001;
 	SpaceCoord direction = glm::normalize(m_target - m_position);
 
 	SpaceCoord forward = speed * direction;
 	SpaceCoord right = speed * glm::normalize(glm::cross(direction, m_upVec));
 
-	if (keyPressed[0]) {
+	if (inputsBeingPressed["z"]) {
 		m_position += forward;
 		m_target += forward;
 	}
-	if (keyPressed[1]) {
+	if (inputsBeingPressed["q"]) {
 		m_position -= right;
 		m_target -= right;
 	}
-	if (keyPressed[2]) {
+	if (inputsBeingPressed["d"]) {
 		m_position += right;
 		m_target += right;
 	}
-	if (keyPressed[3]) {
+	if (inputsBeingPressed["s"]) {
 		m_position -= forward;
 		m_target -= forward;
 	}

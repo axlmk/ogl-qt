@@ -5,39 +5,21 @@
 
 void SceneViewer::paintGL()
 {
-	static int i = 0;
-	static std::string smoothDT = "";
-
 	m_deltaTime = QDateTime::currentMSecsSinceEpoch() - m_currentTime;
 	m_currentTime = QDateTime::currentMSecsSinceEpoch();
 
 	g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (auto &sceneObject : m_manager->getSceneObjects())
-	{
-		m_manager->getCamera()->move(m_KeyBeingPressed, m_deltaTime);
-		//m_manager->getGeometries()[1]->rotate(i * 0.01, 0, 1, 0);
-		sceneObject->render(m_manager->getCamera().get(), m_manager->getLights());
-	}
-
-	for(auto &hud : m_manager->getHUDs())
-	{
-		if(!(i % 4))
-			smoothDT = std::to_string(int(1000 / m_deltaTime));
-		hud->RenderText(smoothDT, 1, 1, {255, 255, 255}, 0.5);
-	}
-	i++;
+	m_manager->renderLoop(m_inputsBeingPressed, m_deltaTime);
 }
 
 
 
 SceneViewer::SceneViewer(scene* scene) :
+	m_inputsBeingPressed	{ },
 	m_deltaTime			{ 0 },
 	m_lastMousePos		{ 0.0, 0.0 },
-	m_altBeingPressed	{ false },
-	m_mousePressed		{ false, false, false },
-	m_KeyBeingPressed	{ false, false, false, false },
 	m_manager			{ scene },
 	m_timer				{ std::make_unique<QTimer>(this) },
 	m_currentTime		{ QDateTime::currentMSecsSinceEpoch() }
@@ -70,19 +52,20 @@ void SceneViewer::initializeGL()
 void SceneViewer::keyPressEvent(QKeyEvent* event) {
 	
 	if(event->text() == "z")
-		m_KeyBeingPressed[0] = true;
+		m_inputsBeingPressed["z"] = true;
 
 	if(event->text() == "q")
-		m_KeyBeingPressed[1] = true;
+		m_inputsBeingPressed["q"] = true;
 
 	if(event->text() == "d")
-		m_KeyBeingPressed[2] = true;
+		m_inputsBeingPressed["d"] = true;
 
 	if(event->text() == "s")
-		m_KeyBeingPressed[3] = true;
+		m_inputsBeingPressed["s"] = true;
 
-	if(event->key() == Qt::Key_Alt ) {
-		m_altBeingPressed = true;
+	if(event->key() == Qt::Key_Alt )
+	{
+		m_inputsBeingPressed["alt"] = true;
 		
 		// Reset cursor
 		setCursor(QCursor(Qt::BlankCursor));
@@ -97,19 +80,20 @@ void SceneViewer::keyPressEvent(QKeyEvent* event) {
 
 void SceneViewer::keyReleaseEvent(QKeyEvent * event) {
 	if (event->text() == "z")
-		m_KeyBeingPressed[0] = false;
+		m_inputsBeingPressed["z"] = false;
 
 	if (event->text() == "q")
-		m_KeyBeingPressed[1] = false;
+		m_inputsBeingPressed["q"] = false;
 
 	if (event->text() == "d")
-		m_KeyBeingPressed[2] = false;
+		m_inputsBeingPressed["d"] = false;
 
 	if (event->text() == "s")
-		m_KeyBeingPressed[3] = false;
+		m_inputsBeingPressed["s"] = false;
 
-	if(event->key() == Qt::Key_Alt) {
-		m_altBeingPressed = false;
+	if(event->key() == Qt::Key_Alt)
+	{
+		m_inputsBeingPressed["alt"] = false;
 		setCursor(QCursor(Qt::BitmapCursor));
 		cursor().setPos({m_lastMousePos.x, m_lastMousePos.y});
 	}
@@ -118,13 +102,13 @@ void SceneViewer::keyReleaseEvent(QKeyEvent * event) {
 void SceneViewer::mousePressEvent(QMouseEvent* event) {
 	switch (event->button()) {
 		case Qt::LeftButton:
-			m_mousePressed[0] = true;
+			m_inputsBeingPressed["left"] = true;
 			break;
 		case Qt::MiddleButton:
-			m_mousePressed[1] = true;
+			m_inputsBeingPressed["middle"] = true;
 			break;
 		case Qt::RightButton:
-			m_mousePressed[2] = true;
+			m_inputsBeingPressed["right"] = true;
 			break;
 		default:
 			break;
@@ -134,13 +118,13 @@ void SceneViewer::mousePressEvent(QMouseEvent* event) {
 void SceneViewer::mouseReleaseEvent(QMouseEvent* event) {
 	switch (event->button()) {
 		case Qt::LeftButton:
-			m_mousePressed[0] = false;
+			m_inputsBeingPressed["left"] = false;
 			break;
 		case Qt::MiddleButton:
-			m_mousePressed[1] = false;
+			m_inputsBeingPressed["middle"] = false;
 			break;
 		case Qt::RightButton:
-			m_mousePressed[2] = false;
+			m_inputsBeingPressed["right"] = false;
 			break;
 		default:
 			break;
@@ -150,7 +134,7 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent* event) {
 
 void SceneViewer::mouseMoveEvent(QMouseEvent* event) {
 	
-	if(m_altBeingPressed)
+	if(m_inputsBeingPressed["alt"])
 	{
 		// Viewing Mode
 		auto centered = mapToGlobal(geometry().center());
@@ -158,11 +142,11 @@ void SceneViewer::mouseMoveEvent(QMouseEvent* event) {
 		glm::vec2 centeredCursor	{ centered.x(), centered.y() };
 		glm::vec2 currentCursor		{ current.x(), current.y() };
 
-		if(m_mousePressed[0])
+		if(m_inputsBeingPressed["left"])
 			m_manager->getCamera()->rotate(centeredCursor, currentCursor);
-		else if(m_mousePressed[1])
+		else if(m_inputsBeingPressed["middle"])
 			m_manager->getCamera()->pan(centeredCursor, currentCursor);
-		else if(m_mousePressed[2])
+		else if(m_inputsBeingPressed["right"])
 			m_manager->getCamera()->zoom(centeredCursor, currentCursor);
 
 		cursor().setPos(centeredCursor.x, centeredCursor.y);

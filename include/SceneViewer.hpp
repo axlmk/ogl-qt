@@ -35,9 +35,7 @@ private:
 
 	scene *m_manager;
 
-	bool m_altBeingPressed;
-	bool m_mousePressed[3];		// 0 = left, 1 = middle, 2 = right
-	bool m_KeyBeingPressed[4];	// 0 = z, 1 = q, 2 = d, 3 = s
+	std::unordered_map<std::string, bool> m_inputsBeingPressed;
 	
 	glm::ivec2 m_lastMousePos;
 

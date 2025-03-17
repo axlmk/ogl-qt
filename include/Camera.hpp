@@ -30,7 +30,7 @@ public:
 	void setTarget(SpaceCoord targ0et);
 	void setPosition(SpaceCoord pos);
 
-	void move(bool keyPressed[], qint64 deltaTime);
+	void move(std::unordered_map<std::string, bool> inputsBeingPressed, qint64 deltaTime);
 
 	void rotate(glm::vec2 lastPos, glm::vec2 currentPos);
 	void pan(glm::vec2 lastPos, glm::vec2 currentPos);

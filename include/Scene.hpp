@@ -22,15 +22,14 @@ enum class Mouvement {
 class scene {
 public:
 	scene();
-	std::vector<std::unique_ptr<SceneObject>>&	getSceneObjects();
 	std::vector<std::unique_ptr<Shader>>&		getShaders();
 	std::vector<std::unique_ptr<Geometry>>&		getGeometries();
-	std::vector<std::unique_ptr<HUD>>&			getHUDs();
 	std::unique_ptr<Camera>&					getCamera();
 	std::vector<std::reference_wrapper<SceneObject>>&					getLights();
 	void setSceneViewer(SceneViewer* sceneViewer);
 	
 	void initializeScene();
+	void renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed, qint64 deltaTime);
 	void walkCamera(Mouvement mouvement, bool active);
 
 private:

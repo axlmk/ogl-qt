@@ -70,6 +70,27 @@ void scene::initializeScene()
 
 
 
+void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed, qint64 deltaTime)
+{
+	static unsigned int i = 0;
+	static std::string smoothDT = "";
+
+	for (auto& sceneObject : m_sceneObjects) {
+		m_camera->move(inputsBeingPressed, deltaTime);
+		//m_manager->getGeometries()[1]->rotate(i * 0.01, 0, 1, 0);
+		sceneObject->render(m_camera.get(), getLights());
+	}
+
+	for (auto& hud : m_huds) {
+		if (!(i % 4))
+			smoothDT = std::to_string(int(1000 / deltaTime));
+		hud->RenderText(smoothDT, 1, 1, { 255, 255, 255 }, 0.5);
+	}
+	i++;
+}
+
+
+
 void scene::walkCamera(Mouvement mouvement, bool active) {
 	switch (mouvement) {
 		case Mouvement::Forward:
@@ -91,25 +112,17 @@ void scene::walkCamera(Mouvement mouvement, bool active) {
 
 
 
-std::vector<std::unique_ptr<SceneObject>>& scene::getSceneObjects() {
-	return m_sceneObjects;
-}
-
-
-std::unique_ptr<Camera>& scene::getCamera() {
-	return m_camera;
-}
-
 std::vector<std::unique_ptr<Shader>>& scene::getShaders() {
 	return m_shaders;
 }
 
-std::vector<std::unique_ptr<Geometry>>& scene::getGeometries() {
-	return m_geometries;
+std::unique_ptr<Camera>& scene::getCamera()
+{
+	return m_camera;
 }
 
-std::vector<std::unique_ptr<HUD>>& scene::getHUDs() {
-	return m_huds;
+std::vector<std::unique_ptr<Geometry>>& scene::getGeometries() {
+	return m_geometries;
 }
 
 std::vector<std::reference_wrapper<SceneObject>>& scene::getLights()
