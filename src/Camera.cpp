@@ -2,14 +2,16 @@
 
 
 Camera::Camera(const SpaceCoord& position, float fov) : 
-	m_position{ position },
-	m_projection{ CameraProjection::Perspective },
-	m_fov{ fov },
-	m_nearPlan{ 0.1f },
-	m_farPlan{ 100.f },
-	m_target{ 0.0f, 0.0f, 0.0f },
-	m_upVec{ 0.0f, 1.0f, 0.0f },
-	m_rightVec{ 1.0, 0.0, 0.0 } {
+	m_fov		{ fov },
+	m_upVec		{ 0.0f, 1.0f, 0.0f },
+	m_target	{ 0.0f, 0.0f, 0.0f },
+	m_farPlan	{ 100.f },
+	m_nearPlan	{ 0.1f },
+	m_rightVec	{ glm::cross(glm::normalize(position), {0.0, 1.0, 0.0}) },
+	m_position	{ position },
+	m_projection{ CameraProjection::Perspective }
+{
+	m_upVec = glm::cross(glm::normalize(position), m_rightVec);
 }
 
 SpaceCoord Camera::getPosition() const {
@@ -82,15 +84,15 @@ void Camera::rotate(glm::vec2 lastPos, glm::vec2 currentPos)
 	float angleRightAxis = std::atan(deltaMouseY / glm::length(direction)) * intensity;
 
 	auto rightRotation = glm::rotate(glm::mat4(1.0), -angleUpAxis, { 0.0, 1.0, 0.0 });
-	auto rotation = glm::rotate(rightRotation, -angleRightAxis, m_rightVec);
+	auto rotation = glm::rotate(rightRotation, angleRightAxis, m_rightVec);
 
-	glm::vec3 tempDirection = rotation * glm::vec4(m_position, 1.0);
+	glm::vec3 tempDirection = rotation * glm::vec4(direction, 1.0);
 	auto comparisonVector = SpaceCoord(tempDirection.x, 0.0, tempDirection.z);
 	auto angleWithRightAxis = std::acos(glm::dot(tempDirection, comparisonVector) / (glm::length(comparisonVector) * glm::length(tempDirection)));
 
 	if (angleWithRightAxis < M_PI / 2 * (1 - yConstraint))
 	{	
-		m_position	= tempDirection;
+		m_position	= tempDirection + m_target;
 		m_rightVec	= rightRotation * glm::vec4(m_rightVec, 1.0);
 		m_upVec		= rotation * glm::vec4(m_upVec, 1.0);
 	}
@@ -98,16 +100,16 @@ void Camera::rotate(glm::vec2 lastPos, glm::vec2 currentPos)
 
 void Camera::pan(glm::vec2 lastPos, glm::vec2 currentPos)
 {
-	float deltaX = currentPos.x - lastPos.x;
-	float speed = deltaX * 0.004;
-	SpaceCoord right = speed * m_rightVec;
+	float deltaX		= currentPos.x - lastPos.x;
+	float speed			= deltaX * 0.002;
+	SpaceCoord right	= speed * m_rightVec;
 
-	float deltaY = currentPos.y - lastPos.y;
-	speed = 4 * deltaY * 0.001;
-	SpaceCoord up = speed * m_upVec;
+	float deltaY		= currentPos.y - lastPos.y;
+	speed				= deltaY * 0.002;
+	SpaceCoord up		= speed * m_upVec;
 
-	m_position += up - right;
-	m_target += up - right;
+	m_position	+= up - right;
+	m_target	+= up - right;
 }
 
 void Camera::zoom(glm::vec2 lastPos, glm::vec2 currentPos)

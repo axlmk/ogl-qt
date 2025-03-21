@@ -47,16 +47,20 @@ vec3 calculateLight(Light light, vec3 normal, vec3 fragPos, vec3 camDir);
 void main()
 {
 	vec3 finalColor = vec3(0.0);
-	vec3 nNormal	= normalize(normal);
-	vec3 nCameraDir = normalize(cameraPos - fragPos);
+	vec3 ambient	= vec3(0.0);
 
-	float baseIntensity = 2;
-	// Ambient
-	vec3 ambient  = 0.2 * vec3(texture(material.diffuse, textureCoord));
-
-	for(int i = 0; i < nLights; i++)
+	if(nLights <= MAX_LIGHTS)
 	{
-		finalColor += calculateLight(lights[i], nNormal, fragPos, nCameraDir) * baseIntensity;
+		vec3 nNormal	= normalize(normal);
+		vec3 nCameraDir = normalize(cameraPos - fragPos);
+
+		float baseIntensity = 2;
+		ambient  = 0.2 * vec3(texture(material.diffuse, textureCoord));
+
+		for(int i = 0; i < nLights; i++)
+		{
+			finalColor += calculateLight(lights[i], nNormal, fragPos, nCameraDir) * baseIntensity;
+		}
 	}
 	final = vec4(finalColor + ambient, 1.0);
 }
