@@ -108,8 +108,8 @@ void Camera::pan(glm::vec2 lastPos, glm::vec2 currentPos)
 	speed				= deltaY * 0.002;
 	SpaceCoord up		= speed * m_upVec;
 
-	m_position	+= up - right;
-	m_target	+= up - right;
+	m_position	+= right - up;
+	m_target	+= right - up;
 }
 
 void Camera::zoom(glm::vec2 lastPos, glm::vec2 currentPos)
