@@ -100,6 +100,9 @@
     <ClInclude Include="include\App3DViewer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\HUD.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\texture.vs">
@@ -120,9 +123,13 @@
     <None Include="shaders\light.fs">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="lib\dlls\assimp-vc143-mtd.dll" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\container.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\container2.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
@@ -135,5 +142,6 @@
     <Library Include="lib\freetype.lib">
       <Filter>Dependencies</Filter>
     </Library>
+    <Library Include="lib\assimp-vc143-mtd.lib" />
   </ItemGroup>
 </Project>

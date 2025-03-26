@@ -39,6 +39,7 @@
     <ClInclude Include="include\Vertex.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="lib\dlls\assimp-vc143-mtd.dll" />
     <None Include="shaders\font.fs" />
     <None Include="shaders\font.vs" />
     <None Include="shaders\light.fs" />
@@ -54,6 +55,7 @@
     <Image Include="textures\container2.png" />
   </ItemGroup>
   <ItemGroup>
+    <Library Include="lib\assimp-vc143-mtd.lib" />
     <Library Include="lib\freetype.lib" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -121,7 +123,8 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);OpenGL32.Lib;</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);OpenGL32.Lib;assimp-vc143-mtd.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\a.gauthier\MyFolder\ogl-qt\lib\assimp\bin\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -130,7 +133,8 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);OpenGL32.Lib;</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);OpenGL32.Lib;assimp-vc143-mtd.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\a.gauthier\MyFolder\ogl-qt\lib\assimp\bin\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
