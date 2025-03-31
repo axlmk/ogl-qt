@@ -9,6 +9,8 @@
 
 #include "Utils.hpp"
 
+using RGBColor = glm::vec3;
+
 enum class ShaderType {
 	Texture,
 	Unicolor,
@@ -16,7 +18,19 @@ enum class ShaderType {
 	Light
 };
 
-using RGBColor = glm::vec3;
+enum class TextureType {
+	Diffuse,
+	Specular
+};
+
+struct LoadedTextures {
+	unsigned int oglID;
+	TextureType type;
+};
+
+extern std::map<std::filesystem::path, LoadedTextures> g_loadedTextures;
+
+int TextureFromFile(const std::filesystem::path &texturePath, TextureType type);
 
 class Shader {
 public:

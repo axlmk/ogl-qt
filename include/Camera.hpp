@@ -22,10 +22,11 @@ public:
 	
 	Camera(const SpaceCoord& position, float fov = 45.f);
 	
-	SpaceCoord	getPosition()	const;
 	float		getFov()		const;
-	float		getNearPlan()	const;
 	float		getFarPlan()	const;
+	float		getNearPlan()	const;
+	glm::mat4	getSpaceMat()	const;
+	SpaceCoord	getPosition()	const;
 
 	void setTarget(SpaceCoord targ0et);
 	void setPosition(SpaceCoord pos);
@@ -36,7 +37,6 @@ public:
 	void pan(glm::vec2 lastPos, glm::vec2 currentPos);
 	void zoom(glm::vec2 lastPos, glm::vec2 currentPos);
 
-	glm::mat4 getSpaceMat();
 
 private:
 

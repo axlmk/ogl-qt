@@ -1,7 +1,7 @@
 #pragma once
 #include <filesystem>
 #include "Shader.hpp"
-#include "Geometry.hpp"
+#include "Model.hpp"
 #include "Camera.hpp"
 
 enum class SceneObjectType
@@ -35,36 +35,31 @@ struct LightProperties
 
 class SceneObject {
 public:
-
+	std::string debugName;
 	SceneObject(SceneObjectType type = SceneObjectType::Normal);
-	SceneObject(Geometry* geometry, Shader* shader, SceneObjectType type = SceneObjectType::Normal);
-	~SceneObject();
+	SceneObject(Model* geometry, Shader* shader, SceneObjectType type = SceneObjectType::Normal);
 
-	Geometry*	getGeometry() const;
-	Shader*		getShader() const;
+	Mesh*	getGeometry() const;
+	Shader*	getShader() const;
 
-	void generateRender();
-	void linkShader(Shader* shader);
-	void linkGeo(Geometry* geometry);
+	void linkShader(Shader *shader);
+	void linkModel(Model *model);
 	
 	void setDirectionalLight(glm::vec3 direction);
 	void setPointLight(float linear, float quadratic);
 	void setSpotLight(glm::vec3 direction, float cutoff, float outerCutoff = 0.0);
-	void setUpLights(Camera* camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const;
+	void setUpLights(const Camera &camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const;
 	
-	void render(Camera* camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const;
+	void render(const Camera &camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const;
 
 private:
-
-	unsigned int m_vbo;
-	unsigned int m_vao;
-	unsigned int m_ebo;
 
 	SceneObjectType m_type;
 	LightProperties m_lightProperties;
 
-	Geometry* m_geo;
-	Shader* m_shd;
+	glm::vec3 m_position;
+	glm::vec3 m_direction;
 
-	void deleteBuffers();
+	Model* m_model;
+	Shader* m_shd;
 };

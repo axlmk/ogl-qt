@@ -1,11 +1,7 @@
 #include "SceneObject.hpp"
 
-SceneObject::SceneObject(SceneObjectType type) : m_geo{ nullptr }, m_shd{ nullptr }
+SceneObject::SceneObject(SceneObjectType type) : m_model{ nullptr }, m_shd{ nullptr }
 {
-	m_vbo = 0;
-	m_vao = 0;
-	m_ebo = 0;
-	std::string err_msg = "";
 	m_type = type;
 
 	if(m_type == SceneObjectType::Light)
@@ -16,81 +12,29 @@ SceneObject::SceneObject(SceneObjectType type) : m_geo{ nullptr }, m_shd{ nullpt
 
 
 
-SceneObject::SceneObject(Geometry* geometry, Shader* shader, SceneObjectType type) : SceneObject(type) {
-	linkGeo(geometry);
+SceneObject::SceneObject(Model* model, Shader* shader, SceneObjectType type) : SceneObject(type)
+{
+	linkModel(model);
 	linkShader(shader);
 }
 
 
 
-SceneObject::~SceneObject() {
-	g_opengl.glBindBuffer(GL_ARRAY_BUFFER, 0);
-	g_opengl.glDeleteBuffers(1, &m_vbo);
-	m_vbo = 0;
-
-	g_opengl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	g_opengl.glDeleteBuffers(1, &m_ebo);
-	m_ebo = 0;
-
-	g_opengl.glBindVertexArray(0);
-	g_opengl.glDeleteVertexArrays(1, &m_vao);
-	m_vao = 0;
-}
-
-
-
-Geometry* SceneObject::getGeometry() const {
-	return m_geo;
-}
-
-
-
-Shader* SceneObject::getShader() const {
+Shader* SceneObject::getShader() const
+{
 	return m_shd;
 }
 
 
 
-void SceneObject::linkGeo(Geometry* geometry)
+void SceneObject::linkModel(Model *model)
 {
-	if(m_geo == geometry) {
-		qWarning() << "The newly added geometry corresponds to the one actually in use";
-		return;
-	}
-
-	if(geometry->empty()) {
-		qCritical() << "An empty geometry can't be added to a SceneObject object";
-		return;
-	}
-
-	m_geo = geometry;
-
-	generateRender();
+	m_model = model;
 }
 
-void SceneObject::linkShader(Shader* shader) {
-	
-	if(m_shd == shader) {
-		qWarning() << "The newly added shader corresponds to the one actually in use";
-		return;
-	}
-	
+void SceneObject::linkShader(Shader* shader)
+{
 	m_shd = shader;
-
-	switch (m_shd->getShaderType()) {
-		case ShaderType::Texture:
-			m_geo->setTextureMapping();
-			break;
-		case ShaderType::Unicolor:
-		case ShaderType::Light:
-			m_geo->unsetTextureMapping();
-			break;
-		default:
-			std::string err_msg = "ShaderType unknowed";
-			qCritical() << err_msg;
-			throw std::invalid_argument(err_msg);
-	}
-	generateRender();
 }
 
 
@@ -122,11 +66,11 @@ void SceneObject::setDirectionalLight(glm::vec3 direction)
 
 
 
-void SceneObject::setUpLights(Camera* camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const
+void SceneObject::setUpLights(const Camera &camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const
 {
 	size_t n = lights.size();
 	int uniform = m_shd->getUniform("nLights");;
-	g_opengl.glUniform1i(uniform, n);
+	g_opengl.glUniform1i(uniform, (int)n);
 
 	for(size_t i = 0; i < n; i++)
 	{
@@ -142,7 +86,7 @@ void SceneObject::setUpLights(Camera* camera, const std::vector<std::reference_w
 			{
 
 				uniform = m_shd->getUniform("lights[" + iStr + "].position");
-				g_opengl.glUniform3f(uniform, light.getGeometry()->getPosition().x, light.getGeometry()->getPosition().y, light.getGeometry()->getPosition().z);
+				g_opengl.glUniform3f(uniform, light.m_position.x, light.m_position.y, light.m_position.z);
 
 				uniform = m_shd->getUniform("lights[" + iStr + "].linear");
 				g_opengl.glUniform1f(uniform, light.m_lightProperties.linear);
@@ -160,7 +104,7 @@ void SceneObject::setUpLights(Camera* camera, const std::vector<std::reference_w
 				g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light.m_lightProperties.outerCutoff)));
 
 				uniform = m_shd->getUniform("lights[" + iStr + "].position");
-				g_opengl.glUniform3f(uniform, light.getGeometry()->getPosition().x, light.getGeometry()->getPosition().y, light.getGeometry()->getPosition().z);
+				g_opengl.glUniform3f(uniform, light.m_position.x, light.m_position.y, light.m_position.z);
 
 				// On purpose fallthrough
 			}
@@ -186,15 +130,15 @@ void SceneObject::setUpLights(Camera* camera, const std::vector<std::reference_w
 		g_opengl.glUniform3f(uniform, 1.0f, 1.0f, 1.0f);
 	}
 
-	SpaceCoord cameraPos = camera->getPosition();
+	SpaceCoord cameraPos = camera.getPosition();
 	uniform = m_shd->getUniform("cameraPos");
 	g_opengl.glUniform3f(uniform, cameraPos.x, cameraPos.y, cameraPos.z);
 }
 
 
-void SceneObject::render(Camera* camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const
+void SceneObject::render(const Camera &camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const
 {
-	if(m_shd == nullptr || m_geo == nullptr)
+	if(m_shd == nullptr || m_model == nullptr)
 	{
 		return;
 	}
@@ -206,90 +150,24 @@ void SceneObject::render(Camera* camera, const std::vector<std::reference_wrappe
 	glm::mat4 view			= glm::mat4(1.f);
 	glm::mat4 projection	= glm::mat4(1.f);
 
-	// Model (World's location)
-	model = glm::translate(model, m_geo->getPosition());
+	// World's location
+	model = glm::translate(model, m_position);
 	
-	// View (camera's location)
-	view = camera->getSpaceMat();
+	// Camera's location
+	view = camera.getSpaceMat();
 
-	// Projection (camera's settings)
-	projection = glm::perspective(glm::radians(camera->getFov()), 600.f / 400.f, camera->getNearPlan(), camera->getFarPlan());
+	// Camera's settings)
+	projection = glm::perspective(glm::radians(camera.getFov()), 600.f / 400.f, camera.getNearPlan(), camera.getFarPlan());
 	
-	// Clip (combination of previous matrices)
+	// Combination of previous views
 	m_shd->setTransformation(model, view, projection);
 
 	// Lights calculations
 	if(m_type != SceneObjectType::Light)
 	{
 		setUpLights(camera, lights);
+		// Final render
+		m_model->Draw(*m_shd);
 	}
 
-	// Render
-	g_opengl.glBindVertexArray(m_vao);
-	g_opengl.glDrawElements(GL_TRIANGLES, m_geo->getVerticesLink().size(), GL_UNSIGNED_INT, 0);
-}
-
-
-void SceneObject::generateRender()
-{
-	// Pretests
-
-	if(m_geo == nullptr || m_shd == nullptr) 
-	{
-		qWarning() << "Geometry and shader must be specify to render a scene object";
-		return;
-	}
-
-	// Buffer generation
-
-	g_opengl.glGenVertexArrays(1, &m_vao);
-	g_opengl.glGenBuffers(1, &m_vbo);
-	g_opengl.glGenBuffers(1, &m_ebo);
-	
-	// Bind VAO before anything else
-	
-	g_opengl.glBindVertexArray(m_vao);
-
-	// Send data to graphic card
-
-	std::vector<float> floatVertices = m_geo->getFloatVertices();
-	g_opengl.glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	g_opengl.glBufferData(GL_ARRAY_BUFFER, sizeof(float) * floatVertices.size(), floatVertices.data(), GL_STATIC_DRAW);
-
-	// EBO management
-
-	g_opengl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-	g_opengl.glBufferData(GL_ELEMENT_ARRAY_BUFFER, VERTICE_LINK_SIZEOF * m_geo->getVerticesLink().size(), m_geo->getVerticesLink().data(), GL_STATIC_DRAW);
-
-	// Handle data between shaders and CPU
-
-	std::vector<unsigned int> attributesPositions = m_geo->getAttributesPositions();
-	unsigned int currentAttributePosition = 0;
-	unsigned int stride = std::accumulate(attributesPositions.begin(), attributesPositions.end(), 0);
-
-	// Generate all attributes per vertex
-
-	for (size_t i = 0; i < attributesPositions.size(); i++)
-	{
-		g_opengl.glVertexAttribPointer(i, attributesPositions[i], GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(currentAttributePosition * sizeof(float)));
-		currentAttributePosition += attributesPositions[i];
-		g_opengl.glEnableVertexAttribArray(i);
-	}
-}
-
-
-
-void SceneObject::deleteBuffers() {
-
-	g_opengl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	g_opengl.glDeleteBuffers(1, &m_ebo);
-	m_ebo = 0;
-
-	g_opengl.glBindVertexArray(0);
-	g_opengl.glDeleteVertexArrays(1, &m_vao);
-	m_vao = 0;
-
-	g_opengl.glBindBuffer(GL_ARRAY_BUFFER, 0);
-	g_opengl.glDeleteBuffers(1, &m_vbo);
-	m_vbo = 0;
 }

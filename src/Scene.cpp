@@ -12,60 +12,31 @@ void scene::initializeScene()
 {
 	m_camera = { std::make_unique<Camera>(SpaceCoord(0.0, 0.0, 3.0)) };
 
-	Geometry* refCube = new Geometry(GeometryType::Cube, 0.5);
-	refCube->setNormals();
-	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(refCube)));
+	Model *backpack_mdl = new Model("resources/models/backpack/backpack.obj");
+	m_models.push_back(std::unique_ptr<Model>(std::move(backpack_mdl)));
 
-	Geometry* refCube2 = new Geometry(GeometryType::Cube, 0.5);
-	refCube2->setNormals();
-	refCube2->translate(0, 0, -4);
-	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(refCube2)));
+	Model* light_mdl = new Model("resources/models/backpack/backpack.obj");
+	m_models.push_back(std::unique_ptr<Model>(std::move(light_mdl)));
 
-	Geometry* refCube3 = new Geometry(GeometryType::Cube, 0.5);
-	refCube3->setNormals();
-	refCube3->translate(0, 0, -2);
-	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(refCube3)));
+	Shader *backpack_shd = new Shader(ShaderType::Texture);
+	backpack_shd->addTexture("resources/models/backpack/diffuse.jpg");
+	backpack_shd->addTexture("resources/models/backpack/specular.jpg");
+	m_shaders.push_back(std::unique_ptr<Shader>(std::move(backpack_shd)));
 
-	Geometry* lightCube = new Geometry(GeometryType::Cube, 0.3);
-	lightCube->translate(0.1, 2.0, 0.2);
-	lightCube->setPivot(0.15, 0.15, 0.15);
-	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(lightCube)));
+	Shader *light_shd = new Shader(ShaderType::Light);
+	light_shd->setLight();
+	m_shaders.push_back(std::unique_ptr<Shader>(std::move(light_shd)));
 
-	Geometry* lightCube2 = new Geometry(GeometryType::Cube, 0.3);
-	lightCube2->translate(0, 1.0, -4);
-	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(lightCube2)));
+	SceneObject *backpack = new SceneObject(backpack_mdl, backpack_shd);
+	backpack->debugName = "backpack";
+	SceneObject *light = new SceneObject(light_mdl, light_shd, SceneObjectType::Light);
+	light->debugName = "light";
 
-	Geometry* lightCube3 = new Geometry(GeometryType::Cube, 0.3);
-	lightCube3->translate(0, -1, 0);
-	m_geometries.push_back(std::unique_ptr<Geometry>(std::move(lightCube3)));
+	m_sceneObjects.push_back(std::unique_ptr<SceneObject>(std::move(backpack)));
+	m_sceneObjects.push_back(std::unique_ptr<SceneObject>(std::move(light)));
 
-	Shader* color = new Shader(ShaderType::Texture);
-	color->addTexture("textures/container2.png");
-	color->addTexture("textures/container2_specular.png");
-	m_shaders.push_back(std::unique_ptr<Shader>(std::move(color)));
-
-	Shader* lightShd = new Shader(ShaderType::Light);
-	lightShd->setLight();
-	m_shaders.push_back(std::unique_ptr<Shader>(std::move(lightShd)));
-
-	HUD* hud = new HUD("arial");
-	m_huds.push_back(std::unique_ptr<HUD>(std::move(hud)));
-
-	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[0].get(), m_shaders[0].get()));
-	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[1].get(), m_shaders[0].get()));
-	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[2].get(), m_shaders[0].get()));
-	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[3].get(), m_shaders[1].get(), SceneObjectType::Light));
-	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[4].get(), m_shaders[1].get(), SceneObjectType::Light));
-	m_sceneObjects.push_back(std::make_unique<SceneObject>(m_geometries[5].get(), m_shaders[1].get(), SceneObjectType::Light));
-
-	m_lights.push_back(*m_sceneObjects[3]);
-	m_lights[0].get().setSpotLight({0, -1, 0}, 12, 14);
-
-	m_lights.push_back(*m_sceneObjects[4]);
-	m_lights[1].get().setPointLight(0.35, 0.44);
-
-	m_lights.push_back(*m_sceneObjects[5]);
-	m_lights[2].get().setDirectionalLight({1.0, 1.0, 1.0});
+	m_lights.push_back(*m_sceneObjects[1]);
+	m_lights[0].get().setDirectionalLight({1, 1, 1});
 }
 
 
@@ -75,15 +46,18 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 	static unsigned int i = 0;
 	static std::string smoothDT = "";
 
-	for (auto& sceneObject : m_sceneObjects) {
+	for (auto& sceneObject : m_sceneObjects)
+	{
 		m_camera->move(inputsBeingPressed, deltaTime);
-		//m_manager->getGeometries()[1]->rotate(i * 0.01, 0, 1, 0);
-		sceneObject->render(m_camera.get(), getLights());
+		sceneObject->render(*m_camera, getLights());
 	}
 
-	for (auto& hud : m_huds) {
+	for (auto& hud : m_huds)
+	{
 		if (!(i % 4))
+		{
 			smoothDT = std::to_string(int(1000 / deltaTime));
+		}
 		hud->RenderText(smoothDT, 1, 1, { 255, 255, 255 }, 0.5);
 	}
 	i++;
@@ -121,8 +95,8 @@ std::unique_ptr<Camera>& scene::getCamera()
 	return m_camera;
 }
 
-std::vector<std::unique_ptr<Geometry>>& scene::getGeometries() {
-	return m_geometries;
+std::vector<std::unique_ptr<Model>>& scene::getModels() {
+	return m_models;
 }
 
 std::vector<std::reference_wrapper<SceneObject>>& scene::getLights()

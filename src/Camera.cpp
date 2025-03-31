@@ -40,7 +40,7 @@ void Camera::setTarget(SpaceCoord target) {
 }
 
 
-glm::mat4 Camera::getSpaceMat() {
+glm::mat4 Camera::getSpaceMat() const {
     glm::mat4 view = glm::mat4(1.);
 	return glm::lookAt(m_position, m_target, {0.0, 1.0, 0.0});
 }
