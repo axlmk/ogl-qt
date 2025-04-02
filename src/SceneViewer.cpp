@@ -8,9 +8,6 @@ void SceneViewer::paintGL()
 	m_deltaTime = QDateTime::currentMSecsSinceEpoch() - m_currentTime;
 	m_currentTime = QDateTime::currentMSecsSinceEpoch();
 
-	g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	m_manager->renderLoop(m_inputsBeingPressed, m_deltaTime);
 }
 
@@ -41,6 +38,7 @@ void SceneViewer::initializeGL()
 	g_opengl.initializeOpenGLFunctions();
 	
 	g_opengl.glEnable(GL_DEPTH_TEST);
+	g_opengl.glEnable(GL_STENCIL_TEST);
 	g_opengl.glEnable(GL_BLEND);
 	g_opengl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

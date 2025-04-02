@@ -39,7 +39,7 @@ public:
 	SceneObject(SceneObjectType type = SceneObjectType::Normal);
 	SceneObject(Model* geometry, Shader* shader, SceneObjectType type = SceneObjectType::Normal);
 
-	Mesh*	getGeometry() const;
+	Model*	getModel() const;
 	Shader*	getShader() const;
 
 	void linkShader(Shader *shader);

@@ -39,8 +39,6 @@ public:
 	Shader(ShaderType shaderType, bool isFont=false);
 	~Shader();
 
-	ShaderType getShaderType() const;
-
 	void setColor(RGBColor color);
 	void setColor(std::string color);
 	void setLight();
@@ -49,6 +47,7 @@ public:
 	
 	void setTransformation(glm::mat4 model, glm::mat4 view, glm::mat4 projection);
 	int getUniform(std::string) const;
+	ShaderType getType() const;
 
 	void compile(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath);
 	void use() const;

@@ -19,6 +19,11 @@ SceneObject::SceneObject(Model* model, Shader* shader, SceneObjectType type) : S
 }
 
 
+Model* SceneObject::getModel() const
+{
+	return m_model;
+}
+
 
 Shader* SceneObject::getShader() const
 {
@@ -151,7 +156,7 @@ void SceneObject::render(const Camera &camera, const std::vector<std::reference_
 	glm::mat4 projection	= glm::mat4(1.f);
 
 	// World's location
-	model = glm::translate(model, m_position);
+	model = m_model->getTransforms();
 	
 	// Camera's location
 	view = camera.getSpaceMat();
@@ -165,9 +170,10 @@ void SceneObject::render(const Camera &camera, const std::vector<std::reference_
 	// Lights calculations
 	if(m_type != SceneObjectType::Light)
 	{
-		setUpLights(camera, lights);
+		if(m_shd->getType() == ShaderType::Texture)
+			setUpLights(camera, lights);
 		// Final render
-		m_model->Draw(*m_shd);
+		m_model->Draw(*m_shd); // temporary
 	}
 
 }

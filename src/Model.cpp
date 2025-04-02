@@ -1,6 +1,6 @@
 #include "Model.hpp"
 
-Model::Model(const std::filesystem::path& path) : m_directory { path.parent_path() }
+Model::Model(const std::filesystem::path& path) : m_directory{ path.parent_path() }, m_scale{ glm::vec3(1.0f) }
 {
 	if(!std::filesystem::exists(path))
 	{
@@ -110,4 +110,18 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 		textures.push_back(texture);
 	}
 	return textures;
+}
+
+
+void Model::scale(float scale) {
+	m_scale = glm::vec3(scale);
+}
+
+void Model::scale(glm::vec3 scale) {
+	m_scale = scale;
+}
+
+glm::mat4 Model::getTransforms(void) const
+{
+	return glm::scale(glm::mat4(1.0f), m_scale);
 }

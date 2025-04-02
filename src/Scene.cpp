@@ -23,6 +23,10 @@ void scene::initializeScene()
 	backpack_shd->addTexture("resources/models/backpack/specular.jpg");
 	m_shaders.push_back(std::unique_ptr<Shader>(std::move(backpack_shd)));
 
+	Shader *red = new Shader(ShaderType::Unicolor);
+	red->setColor("#CC0000");
+	m_shaders.push_back(std::unique_ptr<Shader>(std::move(red)));
+
 	Shader *light_shd = new Shader(ShaderType::Light);
 	light_shd->setLight();
 	m_shaders.push_back(std::unique_ptr<Shader>(std::move(light_shd)));
@@ -46,11 +50,38 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 	static unsigned int i = 0;
 	static std::string smoothDT = "";
 
-	for (auto& sceneObject : m_sceneObjects)
-	{
+
+	g_opengl.glEnable(GL_DEPTH_TEST);
+	g_opengl.glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	auto sceneObject = m_sceneObjects[0].get();
+
+	/*for (auto& sceneObject : m_sceneObjects)
+	{*/
+		sceneObject->linkShader(m_shaders[0].get());
 		m_camera->move(inputsBeingPressed, deltaTime);
+
+		g_opengl.glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		g_opengl.glStencilMask(0xFF);
+
 		sceneObject->render(*m_camera, getLights());
-	}
+
+		g_opengl.glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		g_opengl.glStencilMask(0x00);
+		g_opengl.glDisable(GL_DEPTH_TEST);
+
+		sceneObject->getModel()->scale(1.01f);
+		sceneObject->linkShader(m_shaders[1].get());
+		sceneObject->render(*m_camera, getLights());
+		sceneObject->getModel()->scale(1 / 1.01);
+
+		g_opengl.glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		g_opengl.glStencilMask(0xFF);
+		g_opengl.glEnable(GL_DEPTH_TEST);
+
+	//}
 
 	for (auto& hud : m_huds)
 	{

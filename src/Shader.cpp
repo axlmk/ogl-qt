@@ -29,12 +29,6 @@ Shader::~Shader()
 
 
 
-ShaderType Shader::getShaderType() const {
-	return m_shaderType;
-}
-
-
-
 void Shader::setCustom(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath) {
 	if (m_shaderType != ShaderType::Custom) {
 		std::string err_msg = "Shader type must be 'custom' to use setCustomShaders() function";
@@ -250,14 +244,6 @@ void Shader::use() const
 			break;
 		case ShaderType::Unicolor:
 		{
-			int uniform = getUniform("material.diffuse");
-			g_opengl.glUniform3f(uniform, m_color.x, m_color.y, m_color.z);
-
-			uniform = getUniform("material.specular");
-			g_opengl.glUniform3f(uniform, m_color.x * 0.5, m_color.y * 0.5, m_color.z * 0.5);
-
-			uniform = getUniform("material.shininess");
-			g_opengl.glUniform1f(uniform, 32.0);
 		}
 			break;
 		case ShaderType::Light:
@@ -446,4 +432,9 @@ int TextureFromFile(const std::filesystem::path &texturePath, TextureType type)
 	g_loadedTextures[texturePath] = {buffer, type};
 
 	return buffer;
+}
+
+ShaderType Shader::getType(void) const
+{
+	return m_shaderType;
 }
