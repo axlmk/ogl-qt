@@ -1,6 +1,6 @@
 #include "SceneObject.hpp"
 
-SceneObject::SceneObject(SceneObjectType type) : m_model{ nullptr }, m_shd{ nullptr }
+SceneObject::SceneObject(const Selection& selection, SceneObjectType type) : m_model{ nullptr }, m_shd{ nullptr }, m_selectionData { selection }
 {
 	m_type = type;
 
@@ -12,7 +12,7 @@ SceneObject::SceneObject(SceneObjectType type) : m_model{ nullptr }, m_shd{ null
 
 
 
-SceneObject::SceneObject(Model* model, Shader* shader, SceneObjectType type) : SceneObject(type)
+SceneObject::SceneObject(Model* model, Shader* shader, const Selection &selection, SceneObjectType type) : SceneObject(selection, type)
 {
 	linkModel(model);
 	linkShader(shader);
@@ -143,17 +143,26 @@ void SceneObject::setUpLights(const Camera &camera, const std::vector<std::refer
 
 void SceneObject::render(const Camera &camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const
 {
-	if(m_shd == nullptr || m_model == nullptr)
+	if(m_shd == nullptr || m_model == nullptr || m_type == SceneObjectType::Light)
 	{
 		return;
 	}
-	
-	// Shader's application
-	m_shd->use();
 
 	glm::mat4 model			= glm::mat4(1.f);
 	glm::mat4 view			= glm::mat4(1.f);
 	glm::mat4 projection	= glm::mat4(1.f);
+
+	if(m_isSelected)
+	{
+		g_opengl.glStencilMask(0xFF);
+		g_opengl.glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	}
+	else
+	{
+		g_opengl.glStencilMask(0x00);
+	}
+
+	m_shd->use();
 
 	// World's location
 	model = m_model->getTransforms();
@@ -168,12 +177,39 @@ void SceneObject::render(const Camera &camera, const std::vector<std::reference_
 	m_shd->setTransformation(model, view, projection);
 
 	// Lights calculations
-	if(m_type != SceneObjectType::Light)
-	{
-		if(m_shd->getType() == ShaderType::Texture)
-			setUpLights(camera, lights);
-		// Final render
-		m_model->Draw(*m_shd); // temporary
-	}
+	if(m_shd->getType() == ShaderType::Texture)
+		setUpLights(camera, lights);
 
+	// Final render
+	m_model->Draw(*m_shd);
+
+	// Selection handling
+	if(m_isSelected)
+	{
+		g_opengl.glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		g_opengl.glStencilMask(0x00);
+		g_opengl.glDisable(GL_DEPTH_TEST);
+
+		m_selectionData.color->use();
+
+		m_model->scale(m_selectionData.scale);
+		model = m_model->getTransforms();
+		m_selectionData.color->setTransformation(model, view, projection);
+		m_model->Draw(*m_selectionData.color);
+		m_model->scale(1.0f);
+
+		g_opengl.glStencilMask(0xFF);
+		g_opengl.glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		g_opengl.glEnable(GL_DEPTH_TEST);
+	}
+}
+
+void SceneObject::select()
+{
+	m_isSelected = true;
+}
+
+void SceneObject::unselect()
+{
+	m_isSelected = false;
 }

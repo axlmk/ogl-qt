@@ -19,31 +19,32 @@ enum LightType
 
 struct LightProperties
 {
-	LightType type;
+	LightType	type;
+	float		linear;
+	float		quadratic;
+	glm::vec3	direction;
+	float		cutoff;
+	float		outerCutoff;
+};
 
-	// Point light
-	float linear;
-	float quadratic;
-
-	// Spot light;
-	float cutoff;
-	float outerCutoff;
-
-	// Directional light & Spot
-	glm::vec3 direction;
+struct Selection
+{
+	Shader	*color;
+	float	scale;
 };
 
 class SceneObject {
 public:
-	std::string debugName;
-	SceneObject(SceneObjectType type = SceneObjectType::Normal);
-	SceneObject(Model* geometry, Shader* shader, SceneObjectType type = SceneObjectType::Normal);
 
-	Model*	getModel() const;
-	Shader*	getShader() const;
+	std::string debugName;
+	SceneObject(const Selection& selection, SceneObjectType type = SceneObjectType::Normal);
+	SceneObject(Model* geometry, Shader* shader, const Selection& selection, SceneObjectType type = SceneObjectType::Normal);
 
 	void linkShader(Shader *shader);
 	void linkModel(Model *model);
+
+	Model*	getModel() const;
+	Shader*	getShader() const;
 	
 	void setDirectionalLight(glm::vec3 direction);
 	void setPointLight(float linear, float quadratic);
@@ -51,6 +52,8 @@ public:
 	void setUpLights(const Camera &camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const;
 	
 	void render(const Camera &camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const;
+	void select();
+	void unselect();
 
 private:
 
@@ -60,6 +63,9 @@ private:
 	glm::vec3 m_position;
 	glm::vec3 m_direction;
 
-	Model* m_model;
-	Shader* m_shd;
+	Model	*m_model;
+	Shader	*m_shd;
+
+	bool		m_isSelected;
+	const Selection	&m_selectionData;
 };
