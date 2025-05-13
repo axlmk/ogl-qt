@@ -45,6 +45,8 @@ public:
 
 	Model*	getModel() const;
 	Shader*	getShader() const;
+
+	glm::vec3 getPosition() const;
 	
 	void setDirectionalLight(glm::vec3 direction);
 	void setPointLight(float linear, float quadratic);
@@ -59,10 +61,7 @@ private:
 
 	SceneObjectType m_type;
 	LightProperties m_lightProperties;
-
-	glm::vec3 m_position;
-	glm::vec3 m_direction;
-
+	
 	Model	*m_model;
 	Shader	*m_shd;
 

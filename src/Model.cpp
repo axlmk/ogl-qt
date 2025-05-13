@@ -121,7 +121,20 @@ void Model::scale(glm::vec3 scale) {
 	m_scale = scale;
 }
 
+
+void Model::translate(const glm::vec3 &translation)
+{
+	m_position += translation;
+}
+
+
+glm::vec3 Model::getPosition() const
+{
+	return m_position;
+}
+
 glm::mat4 Model::getTransforms(void) const
 {
-	return glm::scale(glm::mat4(1.0f), m_scale);
+	auto scl = glm::scale(glm::mat4(1.0f), m_scale);
+	return glm::translate(scl, m_position);
 }

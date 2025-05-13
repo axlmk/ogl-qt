@@ -19,6 +19,10 @@ class Model
 		
 		void Draw(Shader &shader);
 
+		void translate(const glm::vec3 &translation);
+
+		glm::vec3 getPosition() const;
+
 		void scale(float scale);
 		void scale(glm::vec3 scale);
 
@@ -30,6 +34,7 @@ class Model
 		std::filesystem::path m_directory;
 
 		glm::vec3 m_scale;
+		glm::vec3 m_position;
 
 		void loadModel(const std::filesystem::path &path);
 		// Change them to references?

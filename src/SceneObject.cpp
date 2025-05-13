@@ -7,6 +7,9 @@ SceneObject::SceneObject(const Selection& selection, SceneObjectType type) : m_m
 	if(m_type == SceneObjectType::Light)
 	{
 		m_lightProperties.type = LightType::Directional;
+		m_model = new Model("resources/models/sphere/sphere.obj");
+		m_shd = new Shader(ShaderType::Light);
+		m_shd->setLight();
 	}
 }
 
@@ -65,7 +68,7 @@ void SceneObject::setPointLight(float linear, float quadratic)
 
 void SceneObject::setDirectionalLight(glm::vec3 direction)
 {
-	m_lightProperties.type = LightType::Directional;
+	m_lightProperties.type = LightType::Point;
 	m_lightProperties.direction = direction;
 }
 
@@ -91,7 +94,7 @@ void SceneObject::setUpLights(const Camera &camera, const std::vector<std::refer
 			{
 
 				uniform = m_shd->getUniform("lights[" + iStr + "].position");
-				g_opengl.glUniform3f(uniform, light.m_position.x, light.m_position.y, light.m_position.z);
+				g_opengl.glUniform3f(uniform, light.getPosition().x, light.getPosition().y, light.getPosition().z);
 
 				uniform = m_shd->getUniform("lights[" + iStr + "].linear");
 				g_opengl.glUniform1f(uniform, light.m_lightProperties.linear);
@@ -109,7 +112,7 @@ void SceneObject::setUpLights(const Camera &camera, const std::vector<std::refer
 				g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light.m_lightProperties.outerCutoff)));
 
 				uniform = m_shd->getUniform("lights[" + iStr + "].position");
-				g_opengl.glUniform3f(uniform, light.m_position.x, light.m_position.y, light.m_position.z);
+				g_opengl.glUniform3f(uniform, light.getPosition().x, light.getPosition().y, light.getPosition().z);
 
 				// On purpose fallthrough
 			}
@@ -140,10 +143,14 @@ void SceneObject::setUpLights(const Camera &camera, const std::vector<std::refer
 	g_opengl.glUniform3f(uniform, cameraPos.x, cameraPos.y, cameraPos.z);
 }
 
+glm::vec3 SceneObject::getPosition() const 
+{
+	return m_model->getPosition();
+}
 
 void SceneObject::render(const Camera &camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const
 {
-	if(m_shd == nullptr || m_model == nullptr || m_type == SceneObjectType::Light)
+	if(m_shd == nullptr || m_model == nullptr)
 	{
 		return;
 	}

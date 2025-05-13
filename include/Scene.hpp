@@ -23,10 +23,11 @@ class scene
 	public:
 		scene();
 
-		std::unique_ptr<Camera>&				getCamera();
-		std::vector<std::unique_ptr<Model>>&		getModels();
-		std::vector<std::unique_ptr<Shader>>&	getShaders();
-		std::vector<std::reference_wrapper<SceneObject>>&					getLights();
+		std::unique_ptr<Camera>&							getCamera();
+		std::vector<std::unique_ptr<Model>>&				getModels();
+		std::vector<std::unique_ptr<Shader>>&				getShaders();
+		std::vector<std::reference_wrapper<SceneObject>>	getLights();
+
 		void setSceneViewer(SceneViewer* sceneViewer);
 	
 		void initializeScene();
