@@ -201,6 +201,7 @@ void SceneObject::render(const Camera &camera, const std::vector<std::reference_
 		g_opengl.glStencilMask(0xFF);
 		g_opengl.glStencilFunc(GL_ALWAYS, 1, 0xFF);
 		g_opengl.glEnable(GL_DEPTH_TEST);
+		g_opengl.glClear(GL_STENCIL_BUFFER_BIT);
 	}
 }
 
