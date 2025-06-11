@@ -142,6 +142,5 @@
     <Library Include="lib\freetype.lib">
       <Filter>Dependencies</Filter>
     </Library>
-    <Library Include="lib\assimp-vc143-mtd.lib" />
   </ItemGroup>
 </Project>

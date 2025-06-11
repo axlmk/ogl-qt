@@ -55,7 +55,6 @@
     <Image Include="textures\container2.png" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="lib\assimp-vc143-mtd.lib" />
     <Library Include="lib\freetype.lib" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -110,12 +109,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <ExecutablePath>$(VC_ExecutablePath_x64);$(CommonExecutablePath)</ExecutablePath>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)/include;$(SolutionDir)/lib/include;</IncludePath>
-    <LibraryPath>$(SolutionDir)/lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)/lib;$(SolutionDir)lib\src\assimp\lib\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <ExecutablePath>$(VC_ExecutablePath_x64);$(CommonExecutablePath)</ExecutablePath>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)/include;$(SolutionDir)/lib/include;</IncludePath>
-    <LibraryPath>$(SolutionDir)/lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)/lib;$(SolutionDir)lib\src\assimp\lib\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -124,8 +123,11 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);OpenGL32.Lib;assimp-vc143-mtd.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\a.gauthier\MyFolder\ogl-qt\lib\assimp\bin\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\dlls;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y /D "$(ProjectDir)lib\src\assimp\bin\Debug\assimp-vc143-mtd.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -134,8 +136,11 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);OpenGL32.Lib;assimp-vc143-mtd.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\a.gauthier\MyFolder\ogl-qt\lib\assimp\bin\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\dlls;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y /D "$(ProjectDir)lib\src\assimp\bin\Debug\assimp-vc143-mtd.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>

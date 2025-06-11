@@ -30,6 +30,7 @@ public:
 	void keyPressEvent(QKeyEvent* event) override;
 	void keyReleaseEvent(QKeyEvent* event) override;
 	void mouseMoveEvent(QMouseEvent* event) override;
+	void getMouseCoordinates(QPoint coordinates);
 
 private:
 
@@ -42,4 +43,6 @@ private:
 	qint64 m_currentTime;
 	qint64 m_deltaTime;
 	std::unique_ptr<QTimer> m_timer;
+	
+	glm::vec3 mouse_coordinates;
 };
