@@ -27,7 +27,6 @@ void scene::initializeScene()
 
 	SceneObject* backpack = new SceneObject(backpack_mdl, backpack_shd, m_selection);
 	backpack->debugName = "backpack";
-	backpack->select();
 
 	SceneObject* light = new SceneObject(m_selection, SceneObjectType::Light);
 	light->setPointLight(0.22, 0.20);
@@ -35,10 +34,10 @@ void scene::initializeScene()
 	light->debugName = "light";
 
 	m_sceneObjects.push_back(std::unique_ptr<SceneObject>(std::move(backpack)));
-	m_sceneObjects.push_back(std::unique_ptr<SceneObject>(std::move(light)));
+	//m_sceneObjects.push_back(std::unique_ptr<SceneObject>(std::move(light)));
 
-	m_lights.push_back(*m_sceneObjects[1]);
-	m_lights[0].get().setDirectionalLight({ 1, 1, 1 });
+	//m_lights.push_back(*m_sceneObjects[1]);
+	//m_lights[0].get().setDirectionalLight({ 1, 1, 1 });
 }
 
 
@@ -54,7 +53,7 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 	g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	m_sceneObjects[1]->getModel()->translate({ 0.01, 0, 0 });
+	//m_sceneObjects[1]->getModel()->translate({ 0.01, 0, 0 });
 	for (auto& sceneObject : m_sceneObjects)
 	{
 		m_camera->move(inputsBeingPressed, deltaTime);
@@ -115,26 +114,53 @@ std::vector<std::reference_wrapper<SceneObject>> scene::getLights()
 
 void scene::tryToSelect(glm::vec2 mouseCoords, int viewportWidth, int viewportHeight) {
 	auto worldMouseVec = getMouseWorldVector(mouseCoords, viewportWidth, viewportHeight);
-
+	auto hitObjects = getObjectsHit(worldMouseVec);
+	if (hitObjects.empty()) {
+		/*m_selectedObject->unselect();
+		m_selectedObject = nullptr;*/
+		return;
+	}
+	hitObjects[0].get().select();
+	m_selectedObject = &hitObjects[0].get();
 }
 
 glm::vec3 scene::getMouseWorldVector(glm::vec2 mouseCoords, int viewportWidth, int viewportHeight) {
-	float widgetWidth = geometry().width();
-	float widgetHeight = geometry().height();
-	float x = 2.0f * coordinates.x() / widgetWidth - 1.0f;
-	float y = 1.0f - (2.0f * coordinates.y()) / widgetHeight;
+	float widgetWidth = viewportWidth;
+	float widgetHeight = viewportHeight;
+	float x = 2.0f * mouseCoords.x / widgetWidth - 2.0f;
+	float y = 1.0f - (2.0f * mouseCoords.y) / widgetHeight;
 
 	glm::vec4 normalizedRay{ x, y, -1.0f, 1.0f };
 
 	glm::vec4 rayEye = glm::inverse(glm::perspective(glm::radians(m_camera->getFov()), 600.f / 400.f, m_camera->getNearPlan(), m_camera->getFarPlan())) * normalizedRay;
 	glm::vec3 rayWorld = (glm::inverse(m_camera->getSpaceMat()) * rayEye);
 	rayWorld = glm::normalize(rayWorld);
-	qDebug() << rayWorld.x << rayWorld.y << rayWorld.z;
+	return rayWorld;
 }
 
-//selectObject() {
-//	getMouseVector()
-//	getHitObjects()
-//	getCloserObject()
-//	selectObject()
-//}
+std::vector <std::reference_wrapper<SceneObject>> scene::getObjectsHit(glm::vec3 ray)
+{
+	std::vector<std::reference_wrapper<SceneObject>> hitObjects;
+	glm::vec3 camLoc = m_camera->getPosition();
+	for (auto& obj : m_sceneObjects) {	
+		if (doesRayIntersects(camLoc, ray, obj->getPosition(), 1.0f)) {
+			hitObjects.push_back(*obj);
+		}
+	}
+	return hitObjects;
+}
+
+bool scene::doesRayIntersects(glm::vec3 rayLocation, glm::vec3 rayDirection, glm::vec3 objectLocation, float objectRadius)
+{
+	glm::vec3 sphereToOrigin = -rayLocation - objectLocation;
+	qDebug() << rayDirection.x << rayDirection.y << rayDirection.z;
+	qDebug() << rayLocation.x << rayLocation.y << rayLocation.z;
+	float b = 2.0f * glm::dot(sphereToOrigin, rayDirection);
+	qDebug() << b;
+	float c = glm::dot(sphereToOrigin, sphereToOrigin) - objectRadius * objectRadius;
+
+	float disc = b * b - 4.0f * c;
+	qDebug() << disc;
+	qDebug() << "- - - - -";
+	return disc >= 0.0f;
+}

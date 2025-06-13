@@ -101,7 +101,9 @@ void SceneViewer::mousePressEvent(QMouseEvent* event) {
 	switch (event->button()) {
 		case Qt::LeftButton:
 			m_inputsBeingPressed["left"] = true;
-			m_manager->tryToSelect({ event->pos().x(), event->pos().y() });
+			if (!m_inputsBeingPressed["alt"]) {
+				m_manager->tryToSelect({ event->pos().x(), event->pos().y() }, geometry().width(), geometry().height());
+			}
 			break;
 		case Qt::MiddleButton:
 			m_inputsBeingPressed["middle"] = true;

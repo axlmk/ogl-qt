@@ -38,7 +38,9 @@ public:
 
 private:
 
+	std::vector<std::reference_wrapper<SceneObject>> getObjectsHit(glm::vec3 ray);
 	glm::vec3 getMouseWorldVector(glm::vec2 mouseCoords, int viewportWidth, int viewportHeight);
+	bool doesRayIntersects(glm::vec3 rayLocation, glm::vec3 rayDirection, glm::vec3 objectLocation, float objectRadius);
 
 	bool m_cameraDirection[4];
 	std::vector<std::unique_ptr<HUD>>					m_huds;
@@ -46,6 +48,8 @@ private:
 	std::vector<std::unique_ptr<Shader>>				m_shaders;
 	std::vector<std::unique_ptr<SceneObject>>			m_sceneObjects;
 	std::vector<std::reference_wrapper<SceneObject>>	m_lights;
+
+	SceneObject* m_selectedObject;
 
 	std::unique_ptr<Camera> m_camera;
 	SceneViewer* m_viewer;
