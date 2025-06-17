@@ -46,7 +46,7 @@ void Shader::setCustom(const std::filesystem::path& vtxShdPath, const std::files
 
 void Shader::setLight()
 {
-	compile("resources/shaders/unicolor.vs", "resources/shaders/light.fs");
+	compile("resources/shaders/unicolor.vs", "resources/shaders/unicolor.fs");
 }
 
 
@@ -244,11 +244,13 @@ void Shader::use() const
 			break;
 		case ShaderType::Unicolor:
 		{
+			int uniform = getUniform("outColor");
+			g_opengl.glUniform3f(uniform, m_color.x, m_color.y, m_color.z);
 		}
 			break;
 		case ShaderType::Light:
 		{
-			int uniform = getUniform("color");
+			int uniform = getUniform("outColor");
 			g_opengl.glUniform3f(uniform, 1.0, 1.0, 1.0);
 		}
 			break;

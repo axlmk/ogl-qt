@@ -34,10 +34,10 @@ void scene::initializeScene()
 	light->debugName = "light";
 
 	m_sceneObjects.push_back(std::unique_ptr<SceneObject>(std::move(backpack)));
-	//m_sceneObjects.push_back(std::unique_ptr<SceneObject>(std::move(light)));
+	m_sceneObjects.push_back(std::unique_ptr<SceneObject>(std::move(light)));
 
-	//m_lights.push_back(*m_sceneObjects[1]);
-	//m_lights[0].get().setDirectionalLight({ 1, 1, 1 });
+	m_lights.push_back(*m_sceneObjects[1]);
+	m_lights[0].get().setDirectionalLight({ 1, 1, 1 });
 }
 
 
@@ -53,11 +53,23 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 	g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	//m_sceneObjects[1]->getModel()->translate({ 0.01, 0, 0 });
+	m_sceneObjects[1]->getModel()->translate({ 0.01, 0, 0 });
+	
+	bool hasSelected = false;
+	bool hasPicked = false;
+
+	m_camera->move(inputsBeingPressed, deltaTime);
 	for (auto& sceneObject : m_sceneObjects)
 	{
-		m_camera->move(inputsBeingPressed, deltaTime);
+		picking(sceneObject.get(), &hasSelected, &hasPicked);
 		sceneObject->render(*m_camera, getLights());
+	}
+	m_isPicking = false;
+
+
+	if (hasPicked && !hasSelected && m_selectedObject != nullptr) {
+		m_selectedObject->unselect();
+		m_selectedObject = nullptr;
 	}
 
 	for (auto& hud : m_huds)
@@ -112,55 +124,35 @@ std::vector<std::reference_wrapper<SceneObject>> scene::getLights()
 	return m_lights;
 }
 
-void scene::tryToSelect(glm::vec2 mouseCoords, int viewportWidth, int viewportHeight) {
-	auto worldMouseVec = getMouseWorldVector(mouseCoords, viewportWidth, viewportHeight);
-	auto hitObjects = getObjectsHit(worldMouseVec);
-	if (hitObjects.empty()) {
-		/*m_selectedObject->unselect();
-		m_selectedObject = nullptr;*/
-		return;
-	}
-	hitObjects[0].get().select();
-	m_selectedObject = &hitObjects[0].get();
-}
 
-glm::vec3 scene::getMouseWorldVector(glm::vec2 mouseCoords, int viewportWidth, int viewportHeight) {
-	float widgetWidth = viewportWidth;
-	float widgetHeight = viewportHeight;
-	float x = 2.0f * mouseCoords.x / widgetWidth - 2.0f;
-	float y = 1.0f - (2.0f * mouseCoords.y) / widgetHeight;
-
-	glm::vec4 normalizedRay{ x, y, -1.0f, 1.0f };
-
-	glm::vec4 rayEye = glm::inverse(glm::perspective(glm::radians(m_camera->getFov()), 600.f / 400.f, m_camera->getNearPlan(), m_camera->getFarPlan())) * normalizedRay;
-	glm::vec3 rayWorld = (glm::inverse(m_camera->getSpaceMat()) * rayEye);
-	rayWorld = glm::normalize(rayWorld);
-	return rayWorld;
-}
-
-std::vector <std::reference_wrapper<SceneObject>> scene::getObjectsHit(glm::vec3 ray)
+void scene::tryToSelect(glm::ivec2 mouseCoords, int viewportWidth, int viewportHeight)
 {
-	std::vector<std::reference_wrapper<SceneObject>> hitObjects;
-	glm::vec3 camLoc = m_camera->getPosition();
-	for (auto& obj : m_sceneObjects) {	
-		if (doesRayIntersects(camLoc, ray, obj->getPosition(), 1.0f)) {
-			hitObjects.push_back(*obj);
+	if (!m_pickingTex)
+	{
+		m_pickingTex = std::make_unique<PickingTexture>(viewportWidth, viewportHeight);
+	}
+	m_isPicking = true;
+	m_mouseCoords = mouseCoords;
+}
+
+void scene::picking(SceneObject* sceneObject, bool *hasSelected, bool *hasPicked)
+{
+	if (m_isPicking && !*hasSelected)
+	{
+		*hasPicked = true;
+		m_pickingTex->enableWriting();
+		g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		sceneObject->renderPicking(*m_camera);
+		m_pickingTex->disableWriting();
+		auto id = m_pickingTex->readPixel(m_mouseCoords.x, m_mouseCoords.y);
+		if (sceneObject->isId(id)) {
+			if (m_selectedObject != nullptr) {
+				m_selectedObject->unselect();
+			}
+			m_selectedObject = sceneObject;
+			sceneObject->select();
+			*hasSelected = true;
 		}
 	}
-	return hitObjects;
-}
-
-bool scene::doesRayIntersects(glm::vec3 rayLocation, glm::vec3 rayDirection, glm::vec3 objectLocation, float objectRadius)
-{
-	glm::vec3 sphereToOrigin = -rayLocation - objectLocation;
-	qDebug() << rayDirection.x << rayDirection.y << rayDirection.z;
-	qDebug() << rayLocation.x << rayLocation.y << rayLocation.z;
-	float b = 2.0f * glm::dot(sphereToOrigin, rayDirection);
-	qDebug() << b;
-	float c = glm::dot(sphereToOrigin, sphereToOrigin) - objectRadius * objectRadius;
-
-	float disc = b * b - 4.0f * c;
-	qDebug() << disc;
-	qDebug() << "- - - - -";
-	return disc >= 0.0f;
 }

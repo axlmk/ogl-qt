@@ -7,6 +7,7 @@
 #include "Camera.hpp"
 #include "SceneObject.hpp"
 #include "HUD.hpp"
+#include "PickingTexture.hpp"
 
 // Forward declaration
 class SceneViewer;
@@ -28,19 +29,19 @@ public:
 	std::vector<std::unique_ptr<Shader>>& getShaders();
 	std::vector<std::reference_wrapper<SceneObject>>	getLights();
 
-	void tryToSelect(glm::vec2 mouseCoords, int viewportWidth, int viewportHeight);
+	void tryToSelect(glm::ivec2 mouseCoords, int viewportWidth, int viewportHeight);
 
 	void setSceneViewer(SceneViewer* sceneViewer);
 
 	void initializeScene();
 	void renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed, qint64 deltaTime);
-	void walkCamera(Mouvement mouvement, bool active);
+	void walkCamera(Mouvement mouvsement, bool active);
+
+	bool m_isPicking = false;
 
 private:
 
-	std::vector<std::reference_wrapper<SceneObject>> getObjectsHit(glm::vec3 ray);
-	glm::vec3 getMouseWorldVector(glm::vec2 mouseCoords, int viewportWidth, int viewportHeight);
-	bool doesRayIntersects(glm::vec3 rayLocation, glm::vec3 rayDirection, glm::vec3 objectLocation, float objectRadius);
+	void picking(SceneObject* sceneObject, bool *hasSelected, bool *hasPicked);
 
 	bool m_cameraDirection[4];
 	std::vector<std::unique_ptr<HUD>>					m_huds;
@@ -50,6 +51,8 @@ private:
 	std::vector<std::reference_wrapper<SceneObject>>	m_lights;
 
 	SceneObject* m_selectedObject;
+	std::unique_ptr<PickingTexture> m_pickingTex = nullptr;
+	glm::ivec2 m_mouseCoords;
 
 	std::unique_ptr<Camera> m_camera;
 	SceneViewer* m_viewer;

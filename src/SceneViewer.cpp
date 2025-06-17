@@ -120,6 +120,7 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent* event) {
 	switch (event->button()) {
 		case Qt::LeftButton:
 			m_inputsBeingPressed["left"] = false;
+			m_manager->m_isPicking = false;
 			break;
 		case Qt::MiddleButton:
 			m_inputsBeingPressed["middle"] = false;

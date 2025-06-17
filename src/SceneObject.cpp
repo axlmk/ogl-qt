@@ -1,6 +1,6 @@
 #include "SceneObject.hpp"
 
-SceneObject::SceneObject(const Selection& selection, SceneObjectType type) : m_model{ nullptr }, m_shd{ nullptr }, m_selectionData { selection }
+SceneObject::SceneObject(const Selection& selection, SceneObjectType type) : m_model{ nullptr }, m_shd{ nullptr }, m_selectionData{ selection }, m_pick{ new Shader(ShaderType::Unicolor) }
 {
 	m_type = type;
 
@@ -186,7 +186,7 @@ void SceneObject::render(const Camera &camera, const std::vector<std::reference_
 	// Lights calculations
 	if(m_shd->getType() == ShaderType::Texture)
 		setUpLights(camera, lights);
-
+	
 	// Final render
 	m_model->Draw(*m_shd);
 
@@ -212,6 +212,33 @@ void SceneObject::render(const Camera &camera, const std::vector<std::reference_
 	}
 }
 
+void SceneObject::renderPicking(const Camera& camera)
+{
+	if (!m_model)
+	{
+		return;
+	}
+
+	glm::mat4 model = glm::mat4(1.f);
+	glm::mat4 view = glm::mat4(1.f);
+	glm::mat4 projection = glm::mat4(1.f);
+
+	auto idColor = nameToColor();
+	m_pick->setColor(idColor);
+	m_pick->use();
+	// World's location
+	model = m_model->getTransforms();
+	// Camera's location
+	view = camera.getSpaceMat();
+	// Camera's settings)
+	projection = glm::perspective(glm::radians(camera.getFov()), 600.f / 400.f, camera.getNearPlan(), camera.getFarPlan());
+	// Combination of previous views
+	m_pick->setTransformation(model, view, projection);
+
+	// Final render
+	m_model->Draw(*m_pick);
+}
+
 void SceneObject::select()
 {
 	m_isSelected = true;
@@ -220,4 +247,19 @@ void SceneObject::select()
 void SceneObject::unselect()
 {
 	m_isSelected = false;
+}
+
+glm::vec3 SceneObject::nameToColor() {
+	std::hash<std::string> hasher;
+	int32_t id = static_cast<int32_t>(hasher(debugName));
+
+	m_colorId.x = id & 0xFF;
+	m_colorId.y = (id >> 8) & 0xFF;
+	m_colorId.z = (id >> 16) & 0xFF;
+
+	return { m_colorId.x / 255.0, m_colorId.y / 255.0, m_colorId.z / 255.0};
+}
+
+bool SceneObject::isId(glm::ivec3 id) const {
+	return id == m_colorId;
 }
