@@ -35,6 +35,7 @@ SceneViewer::~SceneViewer() {
 
 void SceneViewer::initializeGL()
 {
+	this->requestActivate();
 	g_opengl.initializeOpenGLFunctions();
 	
 	g_opengl.glEnable(GL_DEPTH_TEST);
@@ -47,8 +48,9 @@ void SceneViewer::initializeGL()
 
 
 
-void SceneViewer::keyPressEvent(QKeyEvent* event) {
-	
+void SceneViewer::keyPressEvent(QKeyEvent* event)
+{
+
 	if(event->text() == "z")
 		m_inputsBeingPressed["z"] = true;
 
@@ -91,9 +93,11 @@ void SceneViewer::keyReleaseEvent(QKeyEvent * event) {
 
 	if(event->key() == Qt::Key_Alt)
 	{
-		m_inputsBeingPressed["alt"] = false;
-		setCursor(QCursor(Qt::BitmapCursor));
-		cursor().setPos({m_lastMousePos.x, m_lastMousePos.y});
+		if (m_inputsBeingPressed["alt"]) {
+			m_inputsBeingPressed["alt"] = false;
+			setCursor(QCursor(Qt::BitmapCursor));
+			cursor().setPos({m_lastMousePos.x, m_lastMousePos.y});
+		}
 	}
 }
 

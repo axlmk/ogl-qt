@@ -21,7 +21,6 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
 	// Cursor management
 	
 	auto globalCenter = m_mainWindow->mapToGlobal(m_sceneViewer->geometry().center());
-	m_mainWindow->cursor().setPos(globalCenter.x(), globalCenter.y());
 
 	// Container widget
 	
