@@ -12,7 +12,7 @@ void scene::initializeScene()
 {
 	m_camera = { std::make_unique<Camera>(SpaceCoord(0.0, 0.0, 3.0)) };
 
-	Model* backpack_mdl = new Model("resources/models/backpack/backpack.obj");
+	Model* backpack_mdl = new Model("resources/models/backpack/backpack2.obj");
 	m_models.push_back(std::unique_ptr<Model>(std::move(backpack_mdl)));
 
 	Shader* backpack_shd = new Shader(ShaderType::Texture);

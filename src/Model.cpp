@@ -135,6 +135,6 @@ glm::vec3 Model::getPosition() const
 
 glm::mat4 Model::getTransforms(void) const
 {
-	auto scl = glm::scale(glm::mat4(1.0f), m_scale);
-	return glm::translate(scl, m_position);
+	auto scl = glm::translate(glm::mat4(1.0f), m_position);
+	return glm::scale(scl, m_scale);
 }
