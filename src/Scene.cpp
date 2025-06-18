@@ -49,7 +49,7 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 
 	g_opengl.glEnable(GL_DEPTH_TEST);
 	g_opengl.glEnable(GL_LINE_SMOOTH);
-	g_opengl.glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	g_opengl.glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
 	g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -58,16 +58,16 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 	picking();
 
 	m_camera->move(inputsBeingPressed, deltaTime);
-	if (m_selectedObject != nullptr)
-	{
-		m_selectedObject->render(*m_camera, getLights());
-	}
 	
 	for (auto& sceneObject : m_sceneObjects)
 	{
 		if (m_selectedObject != sceneObject.get()) {
 			sceneObject->render(*m_camera, getLights());
 		}
+	}
+	if (m_selectedObject != nullptr)
+	{
+		m_selectedObject->render(*m_camera, getLights());
 	}
 
 	for (auto& hud : m_huds)
