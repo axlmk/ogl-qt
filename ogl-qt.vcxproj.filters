@@ -108,42 +108,43 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\texture.vs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="shaders\texture.fs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="shaders\unicolor.fs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="shaders\font.fs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="shaders\font.vs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="shaders\light.fs">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="lib\dlls\assimp-vc143-mtd.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="textures\container.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="textures\container2.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="shaders\unicolor.vs">
+    <None Include="resources\shaders\font.fs">
       <Filter>Shaders</Filter>
-    </Text>
+    </None>
+    <None Include="resources\shaders\font.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="resources\shaders\texture.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="resources\shaders\texture.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="resources\shaders\unicolor.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="resources\shaders\unicolor.vs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\freetype.lib">
       <Filter>Dependencies</Filter>
     </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\textures\arial.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\container.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\container2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\container2_specular.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

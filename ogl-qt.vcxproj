@@ -41,22 +41,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="lib\dlls\assimp-vc143-mtd.dll" />
-    <None Include="shaders\font.fs" />
-    <None Include="shaders\font.vs" />
-    <None Include="shaders\light.fs" />
-    <None Include="shaders\texture.fs" />
-    <None Include="shaders\texture.vs" />
-    <None Include="shaders\unicolor.fs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="shaders\unicolor.vs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="textures\container.jpg" />
-    <Image Include="textures\container2.png" />
+    <None Include="resources\shaders\font.fs" />
+    <None Include="resources\shaders\font.vs" />
+    <None Include="resources\shaders\texture.fs" />
+    <None Include="resources\shaders\texture.vs" />
+    <None Include="resources\shaders\unicolor.fs" />
+    <None Include="resources\shaders\unicolor.vs" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\freetype.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\textures\arial.png" />
+    <Image Include="resources\textures\container.jpg" />
+    <Image Include="resources\textures\container2.png" />
+    <Image Include="resources\textures\container2_specular.png" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6F8E86F3-9D4B-47C1-8897-77F952FE7C58}</ProjectGuid>
