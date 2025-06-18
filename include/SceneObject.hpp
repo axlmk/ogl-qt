@@ -38,8 +38,8 @@ class SceneObject {
 public:
 
 	std::string debugName;
-	SceneObject(const Selection& selection, SceneObjectType type = SceneObjectType::Normal);
-	SceneObject(Model* geometry, Shader* shader, const Selection& selection, SceneObjectType type = SceneObjectType::Normal);
+	SceneObject(Selection selection, SceneObjectType type = SceneObjectType::Normal);
+	SceneObject(Model* geometry, Shader* shader, Selection selection, SceneObjectType type = SceneObjectType::Normal);
 
 	void linkShader(Shader *shader);
 	void linkModel(Model *model);
@@ -74,5 +74,5 @@ private:
 	Shader* m_pick;
 
 	bool		m_isSelected;
-	const Selection	&m_selectionData;
+	Selection	m_selectionData;
 };

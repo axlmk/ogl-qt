@@ -23,11 +23,11 @@ void scene::initializeScene()
 	Shader* red = new Shader(ShaderType::Unicolor);
 	red->setColor("#CC0000");
 	m_shaders.push_back(std::unique_ptr<Shader>(std::move(red)));
-	m_selection = { red, 1.04f };
+	Selection m_selection = { red, 1.04f };
 
 	SceneObject* backpack = new SceneObject(backpack_mdl, backpack_shd, m_selection);
 	backpack->debugName = "backpack";
-
+	m_selection.scale = 1.15;
 	SceneObject* light = new SceneObject(m_selection, SceneObjectType::Light);
 	light->setPointLight(0.22, 0.20);
 	light->getModel()->translate({ -5, 1, 2 });

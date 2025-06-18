@@ -56,5 +56,4 @@ private:
 
 	std::unique_ptr<Camera> m_camera;
 	SceneViewer* m_viewer;
-	Selection m_selection;
 };
