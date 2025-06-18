@@ -54,22 +54,13 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 	g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	m_sceneObjects[1]->getModel()->translate({ 0.01, 0, 0 });
-	
-	bool hasSelected = false;
-	bool hasPicked = false;
+
+	picking();
 
 	m_camera->move(inputsBeingPressed, deltaTime);
 	for (auto& sceneObject : m_sceneObjects)
 	{
-		picking(sceneObject.get(), &hasSelected, &hasPicked);
 		sceneObject->render(*m_camera, getLights());
-	}
-	m_isPicking = false;
-
-
-	if (hasPicked && !hasSelected && m_selectedObject != nullptr) {
-		m_selectedObject->unselect();
-		m_selectedObject = nullptr;
 	}
 
 	for (auto& hud : m_huds)
@@ -135,24 +126,35 @@ void scene::tryToSelect(glm::ivec2 mouseCoords, int viewportWidth, int viewportH
 	m_mouseCoords = mouseCoords;
 }
 
-void scene::picking(SceneObject* sceneObject, bool *hasSelected, bool *hasPicked)
+void scene::picking()
 {
-	if (m_isPicking && !*hasSelected)
+	bool hasSelected = false;
+	if (m_isPicking)
 	{
-		*hasPicked = true;
 		m_pickingTex->enableWriting();
-		g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		sceneObject->renderPicking(*m_camera);
-		m_pickingTex->disableWriting();
-		auto id = m_pickingTex->readPixel(m_mouseCoords.x, m_mouseCoords.y);
-		if (sceneObject->isId(id)) {
-			if (m_selectedObject != nullptr) {
-				m_selectedObject->unselect();
+		for (auto& sceneObject : m_sceneObjects)
+		{
+			g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+			g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			sceneObject->renderPicking(*m_camera);
+			auto id = m_pickingTex->readPixel(m_mouseCoords.x, m_mouseCoords.y);
+			if (sceneObject->isId(id)) {
+				if (m_selectedObject != nullptr) {
+					m_selectedObject->unselect();
+				}
+				m_selectedObject = sceneObject.get();
+				sceneObject->select();
+				hasSelected = true;
 			}
-			m_selectedObject = sceneObject;
-			sceneObject->select();
-			*hasSelected = true;
 		}
+		m_pickingTex->disableWriting();
 	}
+
+
+	if (m_isPicking && !hasSelected && m_selectedObject != nullptr) {
+		m_selectedObject->unselect();
+		m_selectedObject = nullptr;
+	}
+	m_isPicking = false;
+
 }

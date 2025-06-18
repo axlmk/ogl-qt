@@ -41,7 +41,7 @@ public:
 
 private:
 
-	void picking(SceneObject* sceneObject, bool *hasSelected, bool *hasPicked);
+	void picking();
 
 	bool m_cameraDirection[4];
 	std::vector<std::unique_ptr<HUD>>					m_huds;
