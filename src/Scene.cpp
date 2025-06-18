@@ -58,9 +58,16 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 	picking();
 
 	m_camera->move(inputsBeingPressed, deltaTime);
+	if (m_selectedObject != nullptr)
+	{
+		m_selectedObject->render(*m_camera, getLights());
+	}
+	
 	for (auto& sceneObject : m_sceneObjects)
 	{
-		sceneObject->render(*m_camera, getLights());
+		if (m_selectedObject != sceneObject.get()) {
+			sceneObject->render(*m_camera, getLights());
+		}
 	}
 
 	for (auto& hud : m_huds)
