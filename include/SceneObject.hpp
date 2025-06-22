@@ -8,7 +8,8 @@
 enum class SceneObjectType
 {
 	Normal,
-	Light
+	Light,
+	Gizmo
 };
 
 enum LightType
@@ -38,8 +39,8 @@ class SceneObject {
 public:
 
 	std::string debugName;
-	SceneObject(Selection selection, SceneObjectType type = SceneObjectType::Normal);
-	SceneObject(Model* geometry, Shader* shader, Selection selection, SceneObjectType type = SceneObjectType::Normal);
+	SceneObject(SceneObjectType type, Selection selection);
+	SceneObject(Model* geometry, Shader* shader, SceneObjectType type = SceneObjectType::Normal, Selection selection = { nullptr, 0.0 });
 
 	void linkShader(Shader *shader);
 	void linkModel(Model *model);

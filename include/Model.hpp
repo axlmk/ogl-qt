@@ -21,6 +21,8 @@ class Model
 
 		void translate(const glm::vec3 &translation);
 
+		void setPosition(const glm::vec3& position);
+
 		glm::vec3 getPosition() const;
 
 		void scale(float scale);

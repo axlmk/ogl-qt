@@ -20,17 +20,44 @@ void scene::initializeScene()
 	backpack_shd->addTexture("resources/models/backpack/specular.jpg");
 	m_shaders.push_back(std::unique_ptr<Shader>(std::move(backpack_shd)));
 
+	// Gizmo
+
+	Model* x_model = new Model("resources/models/gizmo/x.obj");
+	m_models.push_back(std::unique_ptr<Model>(std::move(x_model)));
+	Shader* x_shd = new Shader(ShaderType::Unicolor);
+	x_shd->setColor("#FF0000");
+	m_shaders.push_back(std::unique_ptr<Shader>(std::move(x_shd)));
+	std::unique_ptr<SceneObject> x = std::make_unique<SceneObject>(x_model, x_shd, SceneObjectType::Gizmo);
+
+	Model* y_model = new Model("resources/models/gizmo/y.obj");
+	m_models.push_back(std::unique_ptr<Model>(std::move(y_model)));
+	Shader* y_shd = new Shader(ShaderType::Unicolor);
+	y_shd->setColor("#00FF00");
+	m_shaders.push_back(std::unique_ptr<Shader>(std::move(y_shd)));
+	std::unique_ptr<SceneObject> y = std::make_unique<SceneObject>(y_model, y_shd, SceneObjectType::Gizmo);
+
+	Model* z_model = new Model("resources/models/gizmo/z.obj");
+	m_models.push_back(std::unique_ptr<Model>(std::move(z_model)));
+	Shader* z_shd = new Shader(ShaderType::Unicolor);
+	z_shd->setColor("#0000FF");
+	m_shaders.push_back(std::unique_ptr<Shader>(std::move(z_shd)));
+	std::unique_ptr<SceneObject> z = std::make_unique<SceneObject>(z_model, z_shd, SceneObjectType::Gizmo);
+
+	m_gizmo = std::make_unique<Gizmo>(std::move(x), std::move(y), std::move(z));
+
+	//Fin gizmo
+
 	Shader* red = new Shader(ShaderType::Unicolor);
 	red->setColor("#CC0000");
 	m_shaders.push_back(std::unique_ptr<Shader>(std::move(red)));
 	Selection m_selection = { red, 1.04f };
 
-	SceneObject* backpack = new SceneObject(backpack_mdl, backpack_shd, m_selection);
+	SceneObject* backpack = new SceneObject(backpack_mdl, backpack_shd, SceneObjectType::Normal, m_selection);
 	backpack->debugName = "backpack";
-	m_selection.scale = 1.15;
-	SceneObject* light = new SceneObject(m_selection, SceneObjectType::Light);
-	light->setPointLight(0.22, 0.20);
-	light->getModel()->translate({ -5, 1, 2 });
+	m_selection.scale = 1.15f;
+	SceneObject* light = new SceneObject(SceneObjectType::Light, m_selection);
+	light->setPointLight(0.22f, 0.20f);
+	light->getModel()->translate({ -5.0f, 1.0f, 2.0f });
 	light->debugName = "light";
 
 	m_sceneObjects.push_back(std::unique_ptr<SceneObject>(std::move(backpack)));
@@ -65,8 +92,12 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 			sceneObject->render(*m_camera, getLights());
 		}
 	}
+
+
 	if (m_selectedObject != nullptr)
 	{
+		m_gizmo->setPosition(m_selectedObject->getPosition());
+		m_gizmo->render(*m_camera, getLights());
 		m_selectedObject->render(*m_camera, getLights());
 	}
 

@@ -8,6 +8,7 @@
 #include "SceneObject.hpp"
 #include "HUD.hpp"
 #include "PickingTexture.hpp"
+#include "Gizmo.hpp"
 
 // Forward declaration
 class SceneViewer;
@@ -43,17 +44,18 @@ private:
 
 	void picking();
 
-	bool m_cameraDirection[4];
 	std::vector<std::unique_ptr<HUD>>					m_huds;
 	std::vector<std::unique_ptr<Model>>					m_models;
 	std::vector<std::unique_ptr<Shader>>				m_shaders;
 	std::vector<std::unique_ptr<SceneObject>>			m_sceneObjects;
 	std::vector<std::reference_wrapper<SceneObject>>	m_lights;
+	std::unique_ptr<Camera>			m_camera;
+	std::unique_ptr<PickingTexture> m_pickingTex = nullptr;
+	std::unique_ptr<Gizmo>			m_gizmo;
 
 	SceneObject* m_selectedObject;
-	std::unique_ptr<PickingTexture> m_pickingTex = nullptr;
-	glm::ivec2 m_mouseCoords;
 
-	std::unique_ptr<Camera> m_camera;
+	bool m_cameraDirection[4];
+	glm::ivec2 m_mouseCoords;
 	SceneViewer* m_viewer;
 };

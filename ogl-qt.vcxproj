@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Gizmo.cpp" />
     <ClCompile Include="lib\src\stb_loader.cpp" />
     <ClCompile Include="src\App3D.cpp" />
     <ClCompile Include="src\App3DViewer.cpp" />
@@ -27,6 +28,7 @@
     <ClCompile Include="src\SceneViewer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Gizmo.hpp" />
     <ClInclude Include="include\App3D.hpp" />
     <ClInclude Include="include\App3DViewer.hpp" />
     <ClInclude Include="include\Camera.hpp" />

@@ -44,6 +44,10 @@ void Model::processNode(aiNode *node, const aiScene *scene)
 	}
 }
 
+void Model::setPosition(const glm::vec3& position) {
+	m_position = position;
+}
+
 Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 {
 	std::vector<Vertex>			vertices;

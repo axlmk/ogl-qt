@@ -1,6 +1,6 @@
 #include "SceneObject.hpp"
 
-SceneObject::SceneObject(Selection selection, SceneObjectType type) : m_model{ nullptr }, m_shd{ nullptr }, m_selectionData{ selection }, m_pick{ new Shader(ShaderType::Unicolor) }
+SceneObject::SceneObject(SceneObjectType type, Selection selection) : m_model{ nullptr }, m_shd{ nullptr }, m_selectionData{ selection }, m_pick{ new Shader(ShaderType::Unicolor) }, m_type { type }
 {
 	m_type = type;
 
@@ -15,7 +15,7 @@ SceneObject::SceneObject(Selection selection, SceneObjectType type) : m_model{ n
 
 
 
-SceneObject::SceneObject(Model* model, Shader* shader, Selection selection, SceneObjectType type) : SceneObject(selection, type)
+SceneObject::SceneObject(Model* model, Shader* shader, SceneObjectType type, Selection selection) : SceneObject(type, selection)
 {
 	linkModel(model);
 	linkShader(shader);
