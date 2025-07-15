@@ -250,14 +250,28 @@ void SceneObject::unselect()
 }
 
 glm::vec3 SceneObject::nameToColor() {
-	std::hash<std::string> hasher;
-	int32_t id = static_cast<int32_t>(hasher(debugName));
+	if (debugName == "r") {
+		m_colorId = { 255.0, 0.0, 0.0 };
+		return {1.0, 0.0, 0.0};
+	}
+	else if (debugName == "v") {
+		m_colorId = { 0.0, 255.0, 0.0 };
+		return { 0.0, 1.0, 0.0 };
+	}
+	else if (debugName == "b") {
+		m_colorId = { 0.0, 0.0, 255.0 };
+		return { 0.0, 0.0, 1.0 };
+	}
+	else {
+		std::hash<std::string> hasher;
+		int32_t id = static_cast<int32_t>(hasher(debugName));
 
-	m_colorId.x = id & 0xFF;
-	m_colorId.y = (id >> 8) & 0xFF;
-	m_colorId.z = (id >> 16) & 0xFF;
+		m_colorId.x = id & 0xFF;
+		m_colorId.y = (id >> 8) & 0xFF;
+		m_colorId.z = (id >> 16) & 0xFF;
 
-	return { m_colorId.x / 255.0, m_colorId.y / 255.0, m_colorId.z / 255.0};
+		return { m_colorId.x / 255.0, m_colorId.y / 255.0, m_colorId.z / 255.0};
+	}
 }
 
 bool SceneObject::isId(glm::ivec3 id) const {

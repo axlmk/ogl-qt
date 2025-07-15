@@ -28,6 +28,7 @@ void scene::initializeScene()
 	x_shd->setColor("#FF0000");
 	m_shaders.push_back(std::unique_ptr<Shader>(std::move(x_shd)));
 	std::unique_ptr<SceneObject> x = std::make_unique<SceneObject>(x_model, x_shd, SceneObjectType::Gizmo);
+	x->debugName = "r";
 
 	Model* y_model = new Model("resources/models/gizmo/y.obj");
 	m_models.push_back(std::unique_ptr<Model>(std::move(y_model)));
@@ -35,6 +36,7 @@ void scene::initializeScene()
 	y_shd->setColor("#00FF00");
 	m_shaders.push_back(std::unique_ptr<Shader>(std::move(y_shd)));
 	std::unique_ptr<SceneObject> y = std::make_unique<SceneObject>(y_model, y_shd, SceneObjectType::Gizmo);
+	y->debugName = "v";
 
 	Model* z_model = new Model("resources/models/gizmo/z.obj");
 	m_models.push_back(std::unique_ptr<Model>(std::move(z_model)));
@@ -42,6 +44,7 @@ void scene::initializeScene()
 	z_shd->setColor("#0000FF");
 	m_shaders.push_back(std::unique_ptr<Shader>(std::move(z_shd)));
 	std::unique_ptr<SceneObject> z = std::make_unique<SceneObject>(z_model, z_shd, SceneObjectType::Gizmo);
+	z->debugName = "b";
 
 	m_gizmo = std::make_unique<Gizmo>(std::move(x), std::move(y), std::move(z));
 
@@ -82,10 +85,10 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 
 	m_sceneObjects[1]->getModel()->translate({ 0.01, 0, 0 });
 
-	picking();
-
 	m_camera->move(inputsBeingPressed, deltaTime);
 	
+	picking();
+
 	for (auto& sceneObject : m_sceneObjects)
 	{
 		if (m_selectedObject != sceneObject.get()) {
@@ -96,7 +99,10 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 
 	if (m_selectedObject != nullptr)
 	{
-		m_gizmo->setPosition(m_selectedObject->getPosition());
+		if (m_selectedObject->debugName != "r" && m_selectedObject->debugName != "b" && m_selectedObject->debugName != "v")
+		{
+			m_gizmo->setPosition(m_selectedObject->getPosition());
+		}
 		m_gizmo->render(*m_camera, getLights());
 		m_selectedObject->render(*m_camera, getLights());
 	}
@@ -167,22 +173,36 @@ void scene::tryToSelect(glm::ivec2 mouseCoords, int viewportWidth, int viewportH
 void scene::picking()
 {
 	bool hasSelected = false;
+	bool gizmoSelected = false;
 	if (m_isPicking)
 	{
 		m_pickingTex->enableWriting();
-		for (auto& sceneObject : m_sceneObjects)
-		{
+		if (m_selectedObject) {
 			g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 			g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			sceneObject->renderPicking(*m_camera);
+			m_gizmo->renderPicking(*m_camera);
 			auto id = m_pickingTex->readPixel(m_mouseCoords.x, m_mouseCoords.y);
-			if (sceneObject->isId(id)) {
-				if (m_selectedObject != nullptr) {
-					m_selectedObject->unselect();
+			if (m_gizmo->isId(id)) {
+				qDebug() << "hit arrow";
+				gizmoSelected = true;
+			}
+		}
+
+		if (!gizmoSelected) {
+			for (auto& sceneObject : m_sceneObjects)
+			{
+				g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+				g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				sceneObject->renderPicking(*m_camera);
+				auto id = m_pickingTex->readPixel(m_mouseCoords.x, m_mouseCoords.y);
+				if (sceneObject->isId(id)) {
+					if (m_selectedObject != nullptr) {
+						m_selectedObject->unselect();
+					}
+					m_selectedObject = sceneObject.get();
+					sceneObject->select();
+					hasSelected = true;
 				}
-				m_selectedObject = sceneObject.get();
-				sceneObject->select();
-				hasSelected = true;
 			}
 		}
 		m_pickingTex->disableWriting();
@@ -194,5 +214,4 @@ void scene::picking()
 		m_selectedObject = nullptr;
 	}
 	m_isPicking = false;
-
 }

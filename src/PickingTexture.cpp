@@ -45,6 +45,6 @@ glm::ivec3 PickingTexture::readPixel(uint mouseX, uint mouseY) const
 	g_opengl.glReadPixels(mouseX, static_cast<int>(m_windowDim.y) - mouseY, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, color);
 	g_opengl.glReadBuffer(GL_NONE);
 	g_opengl.glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-	qDebug() << static_cast<int>(color[0]) << static_cast<int>(color[1]) << static_cast<int>(color[2]);
+	//qDebug() << static_cast<int>(color[0]) << static_cast<int>(color[1]) << static_cast<int>(color[2]);
 	return { static_cast<int>(color[0]), static_cast<int>(color[1]) , static_cast<int>(color[2]) };
 }
