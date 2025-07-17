@@ -12,6 +12,8 @@ class Gizmo {
 
 		void setPosition(const glm::vec3 &position);
 
+		bool isSelected(void) const;
+
 		SceneObject* getSelectedArrow(void) const;
 
 	private:

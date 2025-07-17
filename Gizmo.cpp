@@ -49,3 +49,7 @@ SceneObject* Gizmo::getSelectedArrow(void) const {
 	}
 	return nullptr;
 }
+
+bool Gizmo::isSelected(void) const {
+	return m_selectedArrow != -1;
+}
