@@ -215,3 +215,9 @@ void scene::picking()
 	}
 	m_isPicking = false;
 }
+
+void scene::tryMoveObject(void) {
+	if (m_gizmo->isSelected()) {
+		qDebug() << "je deplace un object";
+	}
+}

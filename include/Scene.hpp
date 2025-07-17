@@ -37,6 +37,8 @@ public:
 	void initializeScene();
 	void renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed, qint64 deltaTime);
 	void walkCamera(Mouvement mouvsement, bool active);
+	void tryMoveObject(void);
+
 
 	bool m_isPicking = false;
 

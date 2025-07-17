@@ -157,4 +157,7 @@ void SceneViewer::mouseMoveEvent(QMouseEvent* event) {
 
 		cursor().setPos(centeredCursor.x, centeredCursor.y);
 	}
+	else if(m_inputsBeingPressed["left"]) {
+		m_manager->tryMoveObject();
+	}
 }
