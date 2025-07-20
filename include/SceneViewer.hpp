@@ -38,6 +38,7 @@ private:
 	std::unordered_map<std::string, bool> m_inputsBeingPressed;
 	
 	glm::ivec2 m_lastMousePos;
+	glm::ivec2 m_lastFrameMousePos;
 
 	qint64 m_currentTime;
 	qint64 m_deltaTime;

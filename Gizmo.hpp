@@ -14,6 +14,8 @@ class Gizmo {
 
 		bool isSelected(void) const;
 
+		int getSelectedIndex(void) const;
+
 		SceneObject* getSelectedArrow(void) const;
 
 	private:

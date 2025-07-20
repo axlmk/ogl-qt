@@ -17,6 +17,7 @@ SceneViewer::SceneViewer(scene* scene) :
 	m_inputsBeingPressed	{ },
 	m_deltaTime			{ 0 },
 	m_lastMousePos		{ 0.0, 0.0 },
+	m_lastFrameMousePos{ 0.0, 0.0 },
 	m_manager			{ scene },
 	m_timer				{ std::make_unique<QTimer>(this) },
 	m_currentTime		{ QDateTime::currentMSecsSinceEpoch() }
@@ -107,6 +108,7 @@ void SceneViewer::mousePressEvent(QMouseEvent* event) {
 			m_inputsBeingPressed["left"] = true;
 			if (!m_inputsBeingPressed["alt"]) {
 				m_manager->tryToSelect({ event->pos().x(), event->pos().y() }, geometry().width(), geometry().height());
+				m_lastFrameMousePos = glm::ivec2(event->pos().x(), event->pos().y());
 			}
 			break;
 		case Qt::MiddleButton:
@@ -158,6 +160,9 @@ void SceneViewer::mouseMoveEvent(QMouseEvent* event) {
 		cursor().setPos(centeredCursor.x, centeredCursor.y);
 	}
 	else if(m_inputsBeingPressed["left"]) {
-		m_manager->tryMoveObject();
+		auto currentMousePos = glm::ivec2(event->pos().x(), event->pos().y());
+		glm::ivec2 mouseDiff = m_lastFrameMousePos - currentMousePos;
+		m_manager->tryMoveObject(mouseDiff);
+		m_lastFrameMousePos = currentMousePos;
 	}
 }

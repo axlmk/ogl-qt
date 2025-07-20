@@ -1,7 +1,7 @@
 #include "gizmo.hpp"
 
 Gizmo::Gizmo(std::unique_ptr<SceneObject> red, std::unique_ptr<SceneObject> green, std::unique_ptr<SceneObject> blue) :
-	m_arrows{std::move(red), std::move(blue), std::move(green)}
+	m_arrows{std::move(red), std::move(green), std::move(blue)}
 	, m_selectedArrow{ -1 }
 {
 
@@ -52,4 +52,8 @@ SceneObject* Gizmo::getSelectedArrow(void) const {
 
 bool Gizmo::isSelected(void) const {
 	return m_selectedArrow != -1;
+}
+
+int Gizmo::getSelectedIndex(void) const {
+	return m_selectedArrow;
 }

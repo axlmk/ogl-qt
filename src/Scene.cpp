@@ -60,14 +60,13 @@ void scene::initializeScene()
 	m_selection.scale = 1.15f;
 	SceneObject* light = new SceneObject(SceneObjectType::Light, m_selection);
 	light->setPointLight(0.22f, 0.20f);
-	light->getModel()->translate({ -5.0f, 1.0f, 2.0f });
+	light->getModel()->translate({ 0, 1.0f, 2.0f });
 	light->debugName = "light";
 
 	m_sceneObjects.push_back(std::unique_ptr<SceneObject>(std::move(backpack)));
 	m_sceneObjects.push_back(std::unique_ptr<SceneObject>(std::move(light)));
 
 	m_lights.push_back(*m_sceneObjects[1]);
-	m_lights[0].get().setDirectionalLight({ 1, 1, 1 });
 }
 
 
@@ -83,7 +82,7 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 	g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	m_sceneObjects[1]->getModel()->translate({ 0.01, 0, 0 });
+	//m_sceneObjects[1]->getModel()->translate({ 0.01, 0, 0 });
 
 	m_camera->move(inputsBeingPressed, deltaTime);
 	
@@ -216,8 +215,13 @@ void scene::picking()
 	m_isPicking = false;
 }
 
-void scene::tryMoveObject(void) {
+void scene::tryMoveObject(const glm::ivec2 &mouseDiff) {
 	if (m_gizmo->isSelected()) {
-		qDebug() << "je deplace un object";
+		qDebug() << "je deplace un object" << mouseDiff.x << mouseDiff.y;
+		static const float translatingFactor = 0.002f;
+		if (m_gizmo->getSelectedIndex() == 1) {
+			auto translation = translatingFactor * mouseDiff.y * glm::length(m_selectedObject->getPosition() - m_camera->getPosition());
+			m_selectedObject->getModel()->translate({ 0, translation, 0 });
+		}
 	}
 }

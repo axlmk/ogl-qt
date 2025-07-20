@@ -37,7 +37,7 @@ public:
 	void initializeScene();
 	void renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed, qint64 deltaTime);
 	void walkCamera(Mouvement mouvsement, bool active);
-	void tryMoveObject(void);
+	void tryMoveObject(const glm::ivec2 &mouseDiff);
 
 
 	bool m_isPicking = false;
