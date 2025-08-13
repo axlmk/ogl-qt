@@ -102,7 +102,7 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 		{
 			m_gizmo->setPosition(m_selectedObject->getPosition());
 		}
-		m_gizmo->render(*m_camera, getLights());
+		m_gizmo->render(*m_camera, m_selectedObject, getLights());
 		m_selectedObject->render(*m_camera, getLights());
 	}
 
@@ -179,10 +179,9 @@ void scene::picking()
 		if (m_selectedObject) {
 			g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 			g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			m_gizmo->renderPicking(*m_camera);
+			m_gizmo->renderPicking(*m_camera, m_selectedObject);
 			auto id = m_pickingTex->readPixel(m_mouseCoords.x, m_mouseCoords.y);
 			if (m_gizmo->isId(id)) {
-				qDebug() << "hit arrow";
 				gizmoSelected = true;
 			}
 		}

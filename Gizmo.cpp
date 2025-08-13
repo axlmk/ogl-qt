@@ -7,10 +7,26 @@ Gizmo::Gizmo(std::unique_ptr<SceneObject> red, std::unique_ptr<SceneObject> gree
 
 }
 
-void Gizmo::render(const Camera& camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const {
-	m_arrows[0]->render(camera, lights);
+void Gizmo::render(const Camera& camera, const SceneObject* selectedObject, const std::vector<std::reference_wrapper<SceneObject>>& lights) const {
+
+	const float threshold = 0.25;
+	const glm::vec3 A{ 0., 0., 1. };
+	const glm::vec3 C{ 1., 0., 0. };
+	const glm::vec3 D{ 0., 1., 0. };
+	const auto B = camera.getDirection();
+	const auto xCos = (glm::dot(A, B)) / (glm::length(A) * glm::length(B));
+	const auto zCos = (glm::dot(C, B)) / (glm::length(C) * glm::length(B));
+	const auto YCos = (glm::dot(D, B)) / (glm::length(D) * glm::length(B));
+
+	if (std::abs(xCos) > threshold || std::abs(YCos) > threshold) {
+		m_arrows[0]->render(camera, lights);
+	}
+
 	m_arrows[1]->render(camera, lights);
-	m_arrows[2]->render(camera, lights);
+
+	if (std::abs(zCos) > threshold || std::abs(YCos) > threshold) {
+		m_arrows[2]->render(camera, lights);
+	}
 }
 
 void Gizmo::setPosition(const glm::vec3& position) {
@@ -19,7 +35,7 @@ void Gizmo::setPosition(const glm::vec3& position) {
 	m_arrows[2]->getModel()->setPosition(position);
 }
 
-void Gizmo::renderPicking(const Camera& camera) {
+void Gizmo::renderPicking(const Camera& camera, const SceneObject* selectedObject) {
 	m_arrows[0]->renderPicking(camera);
 	m_arrows[1]->renderPicking(camera);
 	m_arrows[2]->renderPicking(camera);
