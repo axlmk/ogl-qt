@@ -39,6 +39,10 @@ void Camera::setTarget(SpaceCoord target) {
 	m_target = target;
 }
 
+SpaceCoord Camera::getDirection(void) const {
+	return m_position - m_target;
+}
+
 
 glm::mat4 Camera::getSpaceMat() const {
     glm::mat4 view = glm::mat4(1.);

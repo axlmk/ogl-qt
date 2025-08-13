@@ -27,6 +27,7 @@ public:
 	float		getNearPlan()	const;
 	glm::mat4	getSpaceMat()	const;
 	SpaceCoord	getPosition()	const;
+	SpaceCoord getDirection()	const;
 
 	void setTarget(SpaceCoord targ0et);
 	void setPosition(SpaceCoord pos);

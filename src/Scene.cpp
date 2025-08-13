@@ -217,11 +217,26 @@ void scene::picking()
 
 void scene::tryMoveObject(const glm::ivec2 &mouseDiff) {
 	if (m_gizmo->isSelected()) {
-		qDebug() << "je deplace un object" << mouseDiff.x << mouseDiff.y;
-		static const float translatingFactor = 0.002f;
-		if (m_gizmo->getSelectedIndex() == 1) {
-			auto translation = translatingFactor * mouseDiff.y * glm::length(m_selectedObject->getPosition() - m_camera->getPosition());
+		static const float translatingUpFactor = 0.002f;
+		if (m_gizmo->getSelectedIndex() == 1) { // up and down
+			auto translation = translatingUpFactor * mouseDiff.y * glm::length(m_selectedObject->getPosition() - m_camera->getPosition());
 			m_selectedObject->getModel()->translate({ 0, translation, 0 });
+		}
+		else if (m_gizmo->getSelectedIndex() == 0) {
+			static const float translatingXFactor = -0.002f;
+			const glm::vec3 A{ 0., 0., 1. };
+			const auto B = m_camera->getDirection();
+			const auto cosTheta = (glm::dot(A, B)) / (glm::length(A) * glm::length(B));
+			const auto translation = translatingXFactor * cosTheta * mouseDiff.x * glm::length(m_selectedObject->getPosition() - m_camera->getPosition());
+			m_selectedObject->getModel()->translate({translation,  0, 0 });
+		}
+		else {
+			static const float translatingYFactor = 0.002f;
+			const glm::vec3 A{ 1., 0., 0. };
+			const auto B = m_camera->getDirection();
+			const auto cosTheta = (glm::dot(A, B)) / (glm::length(A) * glm::length(B));
+			const auto translation = translatingYFactor * cosTheta * mouseDiff.x * glm::length(m_selectedObject->getPosition() - m_camera->getPosition());
+			m_selectedObject->getModel()->translate({ 0,  0, translation });
 		}
 	}
 }
