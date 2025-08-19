@@ -239,3 +239,13 @@ void scene::tryMoveObject(const glm::ivec2 &mouseDiff) {
 		}
 	}
 }
+
+void scene::focusCameraOnSelectedObject(void) {
+	if (m_selectedObject != nullptr) {
+		const auto selectedObjectPosition = m_selectedObject->getPosition();
+		auto newCamPos = m_camera->getPosition() + selectedObjectPosition - m_camera->getTarget();
+		newCamPos = glm::normalize(newCamPos);
+		m_camera->setPosition(newCamPos * 5.0f);
+		m_camera->setTarget(selectedObjectPosition);
+	}
+}

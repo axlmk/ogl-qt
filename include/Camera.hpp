@@ -28,6 +28,7 @@ public:
 	glm::mat4	getSpaceMat()	const;
 	SpaceCoord	getPosition()	const;
 	SpaceCoord getDirection()	const;
+	SpaceCoord getTarget(void)	const;
 
 	void setTarget(SpaceCoord targ0et);
 	void setPosition(SpaceCoord pos);

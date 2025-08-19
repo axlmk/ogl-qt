@@ -126,3 +126,7 @@ void Camera::zoom(glm::vec2 lastPos, glm::vec2 currentPos)
 		m_position -= mouvement;
 	}
 }
+
+SpaceCoord Camera::getTarget(void) const {
+	return m_target;
+}

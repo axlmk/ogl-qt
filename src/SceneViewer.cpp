@@ -92,6 +92,9 @@ void SceneViewer::keyReleaseEvent(QKeyEvent * event) {
 	if (event->text() == "s")
 		m_inputsBeingPressed["s"] = false;
 
+	if (event->text() == "f")
+		m_manager->focusCameraOnSelectedObject();
+
 	if(event->key() == Qt::Key_Alt)
 	{
 		if (m_inputsBeingPressed["alt"]) {
