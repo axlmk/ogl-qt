@@ -102,8 +102,10 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 		{
 			m_gizmo->setPosition(m_selectedObject->getPosition());
 		}
-		m_gizmo->render(*m_camera, m_selectedObject, getLights());
 		m_selectedObject->render(*m_camera, getLights());
+		g_opengl.glDisable(GL_DEPTH_TEST);
+		m_gizmo->render(*m_camera, m_selectedObject, getLights());
+		g_opengl.glEnable(GL_DEPTH_TEST);
 	}
 
 	for (auto& hud : m_huds)

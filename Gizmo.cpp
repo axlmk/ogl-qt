@@ -9,7 +9,7 @@ Gizmo::Gizmo(std::unique_ptr<SceneObject> red, std::unique_ptr<SceneObject> gree
 
 void Gizmo::render(const Camera& camera, const SceneObject* selectedObject, const std::vector<std::reference_wrapper<SceneObject>>& lights) const {
 
-	const float threshold = 0.25;
+	const static float threshold = 0.25;
 	const glm::vec3 A{ 0., 0., 1. };
 	const glm::vec3 C{ 1., 0., 0. };
 	const glm::vec3 D{ 0., 1., 0. };
@@ -18,13 +18,21 @@ void Gizmo::render(const Camera& camera, const SceneObject* selectedObject, cons
 	const auto zCos = (glm::dot(C, B)) / (glm::length(C) * glm::length(B));
 	const auto YCos = (glm::dot(D, B)) / (glm::length(D) * glm::length(B));
 
+	const static float scalingFactor = 0.1f;
+
 	if (std::abs(xCos) > threshold || std::abs(YCos) > threshold) {
+		const auto lenCamArrow = glm::length(camera.getPosition() - m_arrows[0]->getPosition());
+		m_arrows[0]->getModel()->scale(lenCamArrow * scalingFactor);
 		m_arrows[0]->render(camera, lights);
 	}
 
+	const auto lenCamArrow = glm::length(camera.getPosition() - m_arrows[1]->getPosition());
+	m_arrows[1]->getModel()->scale(lenCamArrow * scalingFactor);
 	m_arrows[1]->render(camera, lights);
 
 	if (std::abs(zCos) > threshold || std::abs(YCos) > threshold) {
+		const auto lenCamArrow = glm::length(camera.getPosition() - m_arrows[2]->getPosition());
+		m_arrows[2]->getModel()->scale(lenCamArrow * scalingFactor);
 		m_arrows[2]->render(camera, lights);
 	}
 }
