@@ -27,6 +27,7 @@ public:
 	float		getNearPlan()	const;
 	glm::mat4	getSpaceMat()	const;
 	SpaceCoord	getPosition()	const;
+	std::string getPositionStr(void) const;
 	SpaceCoord getDirection()	const;
 	SpaceCoord getTarget(void)	const;
 

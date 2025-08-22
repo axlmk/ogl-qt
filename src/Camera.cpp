@@ -130,3 +130,7 @@ void Camera::zoom(glm::vec2 lastPos, glm::vec2 currentPos)
 SpaceCoord Camera::getTarget(void) const {
 	return m_target;
 }
+
+std::string Camera::getPositionStr(void) const {
+	return "Camera: " + std::to_string(m_position.x) + "x " + std::to_string(m_position.y) + "y " + std::to_string(m_position.z) + "z ";
+}

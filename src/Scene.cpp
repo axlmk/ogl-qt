@@ -66,6 +66,14 @@ void scene::initializeScene()
 	m_sceneObjects.push_back(std::unique_ptr<SceneObject>(std::move(backpack)));
 	m_sceneObjects.push_back(std::unique_ptr<SceneObject>(std::move(light)));
 
+	HUD* hud = new HUD("arial");
+	m_huds.push_back(std::unique_ptr<HUD>(hud));
+	hud->setText(std::bind(&Camera::getPositionStr, m_camera.get()));
+
+	HUD* hud2 = new HUD("arial");
+	m_huds.push_back(std::unique_ptr<HUD>(hud2));
+	hud2->setText(std::bind(&scene::getSelectedObjectCoordinateStr, this));
+
 	m_lights.push_back(*m_sceneObjects[1]);
 }
 
@@ -108,13 +116,15 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 		g_opengl.glEnable(GL_DEPTH_TEST);
 	}
 
+	int j = 0;
 	for (auto& hud : m_huds)
 	{
 		if (!(i % 4))
 		{
 			smoothDT = std::to_string(int(1000 / deltaTime));
 		}
-		hud->RenderText(smoothDT, 1, 1, { 255, 255, 255 }, 0.5);
+		hud->RenderText(1, j * -20, { 255, 255, 255 }, 0.3);
+		j++;
 	}
 	i++;
 }
@@ -252,4 +262,13 @@ void scene::focusCameraOnSelectedObject(void)
 		m_camera->setPosition(selectedObjectPosition + newCamPos);
 		m_camera->setTarget(selectedObjectPosition);
 	}
+}
+
+std::string scene::getSelectedObjectCoordinateStr(void) const
+{
+	if (m_selectedObject == nullptr)
+	{
+		return "";
+	}
+	return "Selected object: " + std::to_string(m_selectedObject->getPosition().x) + "x " + std::to_string(m_selectedObject->getPosition().y) + "y " + std::to_string(m_selectedObject->getPosition().z) + "z ";
 }

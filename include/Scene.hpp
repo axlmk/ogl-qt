@@ -40,6 +40,8 @@ public:
 	void focusCameraOnSelectedObject(void);
 	void tryMoveObject(const glm::ivec2 &mouseDiff);
 
+	std::string getSelectedObjectCoordinateStr(void) const;
+
 
 	bool m_isPicking = false;
 

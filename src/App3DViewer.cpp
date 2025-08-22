@@ -26,7 +26,7 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
 	// Container widget
 	
 	QWidget* container = QWidget::createWindowContainer(&(*m_sceneViewer));
-	container->setMinimumSize(QSize(600, 400));
+	container->setMinimumSize(QSize(800, 600));
 
 	// Layout and widget container
 	

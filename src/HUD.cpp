@@ -1,7 +1,63 @@
 #include "HUD.hpp"
 
+HUD::HUD(std::string font)
+{
+    FT_Library ft;
+    FT_Face face;
+    if (FT_Init_FreeType(&ft))
+    {
+        std::string err_msg = "FREETYPE: Could not init FreeType Library";
+        qCritical() << err_msg;
+        throw std::invalid_argument(err_msg);
+    }
+
+    if (FT_New_Face(ft, ("resources/font/" + font + ".ttf").c_str(), 0, &face))
+    {
+        std::string err_msg = "FREETYPE: Failed to load font " + font; 
+        qCritical() << err_msg;
+        throw std::invalid_argument(err_msg);
+    }
+    FT_Set_Pixel_Sizes(face, 0, 48);
+    
+    generateCharacters(face);
+
+    generateAtlas(font);
+
+    generateOGLBuffers();
+
+    Shader* s = new Shader(ShaderType::Texture, true);
+    s->addTexture("resources/textures/arial.png");
+    m_shd = std::unique_ptr<Shader>(s);
+
+
+    FT_Done_Face(face);
+    FT_Done_FreeType(ft);
+}
+
+HUD::~HUD()
+{
+    g_opengl.glDeleteBuffers(1, &m_vbo);
+    g_opengl.glDeleteVertexArrays(1, &m_vao);
+}
+
+void HUD::generateOGLBuffers()
+{
+    g_opengl.glGenVertexArrays(1, &m_vao);
+    g_opengl.glGenBuffers(1, &m_vbo);
+
+    g_opengl.glBindVertexArray(m_vao);
+    g_opengl.glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+
+    g_opengl.glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+    g_opengl.glEnableVertexAttribArray(0);
+    g_opengl.glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+
+    g_opengl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+    g_opengl.glBindVertexArray(0);
+}
+
 void HUD::generateCharacters(FT_Face face)
-{    
+{
     for (unsigned char c = 32; c < 128; c++)
     {
         if (FT_Load_Char(face, c, FT_LOAD_RENDER))
@@ -71,63 +127,7 @@ void HUD::generateAtlas(std::string font)
     }
 }
 
-void HUD::generateOGLBuffers()
-{
-    g_opengl.glGenVertexArrays(1, &m_vao);
-    g_opengl.glGenBuffers(1, &m_vbo);
-
-    g_opengl.glBindVertexArray(m_vao);
-    g_opengl.glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-
-    g_opengl.glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
-    g_opengl.glEnableVertexAttribArray(0);
-    g_opengl.glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-
-    g_opengl.glBindBuffer(GL_ARRAY_BUFFER, 0);
-    g_opengl.glBindVertexArray(0);
-}
-
-HUD::HUD(std::string font)
-{
-    FT_Library ft;
-    FT_Face face;
-    if (FT_Init_FreeType(&ft))
-    {
-        std::string err_msg = "FREETYPE: Could not init FreeType Library";
-        qCritical() << err_msg;
-        throw std::invalid_argument(err_msg);
-    }
-
-    if (FT_New_Face(ft, ("resources/font/" + font + ".ttf").c_str(), 0, &face))
-    {
-        std::string err_msg = "FREETYPE: Failed to load font " + font; 
-        qCritical() << err_msg;
-        throw std::invalid_argument(err_msg);
-    }
-    FT_Set_Pixel_Sizes(face, 0, 48);
-    
-    generateCharacters(face);
-
-    generateAtlas(font);
-
-    generateOGLBuffers();
-
-    Shader* s = new Shader(ShaderType::Texture, true);
-    s->addTexture("resources/textures/arial.png");
-    m_shd = std::unique_ptr<Shader>(s);
-
-
-    FT_Done_Face(face);
-    FT_Done_FreeType(ft);
-}
-
-HUD::~HUD()
-{
-    g_opengl.glDeleteBuffers(1, &m_vbo);
-    g_opengl.glDeleteVertexArrays(1, &m_vao);
-}
-
-void HUD::RenderText(std::string text, float x, float y, glm::vec3 color, float scale)
+void HUD::RenderText(float x, float y, glm::vec3 color, float scale)
 {
     m_shd->use();
     glm::mat4 ortho = glm::ortho(0.0, 800.0, 0.0, 600.0);
@@ -135,6 +135,16 @@ void HUD::RenderText(std::string text, float x, float y, glm::vec3 color, float 
 
     g_opengl.glUniform3f(m_shd->getUniform("textColor"), color.x, color.y, color.z);
     g_opengl.glBindVertexArray(m_vao);
+
+    std::string text{};
+    if (m_isMutable)
+    {
+        text = m_mutableText();
+    }
+    else
+    {
+        text = m_text;
+    }
 
     for (unsigned char c : text)
     {
@@ -162,4 +172,16 @@ void HUD::RenderText(std::string text, float x, float y, glm::vec3 color, float 
     }
     g_opengl.glBindVertexArray(0);
     g_opengl.glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void HUD::setText(std::string text)
+{
+    m_text = text;
+    m_isMutable = false;
+}
+
+void HUD::setText(const std::function<std::string(void)>& text)
+{
+    m_mutableText = text;
+    m_isMutable = true;
 }

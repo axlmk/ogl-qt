@@ -28,15 +28,20 @@ public:
 
 	HUD(std::string font);
     ~HUD();
-    void RenderText(std::string text, float x, float y, glm::vec3 color, float scale = 1);
+    void RenderText(float x, float y, glm::vec3 color, float scale = 1);
+    void setText(std::string text);
+    void setText(const std::function<std::string(void)>& text);
 
 private:
-
     void generateCharacters(FT_Face face);
     void generateAtlas(std::string font);
     void generateOGLBuffers();
 
     std::map<char, Character> m_characters;
+
+    std::string m_text = "Default";
+    std::function<std::string(void)> m_mutableText;
+    bool m_isMutable = false;
 
     unsigned int m_vao;
     unsigned int m_vbo;

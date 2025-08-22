@@ -106,6 +106,9 @@ void Shader::addTexture(const std::filesystem::path &texturePath)
 	}
 
 	int width, height, nrChannels;
+	if (m_font) {
+		stbi_set_flip_vertically_on_load(false);
+	}
 	unsigned char* data = stbi_load(texturePath.string().c_str(), &width, &height, &nrChannels, 0);
 
 	if (!data)
@@ -115,8 +118,11 @@ void Shader::addTexture(const std::filesystem::path &texturePath)
 	
 	m_texturesInfo.push_back({ data, width, height, nrChannels, 0, texturePath });
 
-	if(m_font)
+	if (m_font)
+	{
+		stbi_set_flip_vertically_on_load(true);
 		compile("resources/shaders/font.vs", "resources/shaders/font.fs");
+	}
 	else
 		compile("resources/shaders/texture.vs", "resources/shaders/texture.fs");
 }
