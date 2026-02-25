@@ -20,6 +20,17 @@ void scene::initializeScene()
 	backpack_shd->addTexture("resources/models/backpack/specular.jpg");
 	m_shaders.push_back(std::unique_ptr<Shader>(std::move(backpack_shd)));
 
+
+	Model* ground_mdl = new Model("resources/models/ground/ground.obj");
+	m_models.push_back(std::unique_ptr<Model>(std::move(ground_mdl)));
+	ground_mdl->scale(0.5);
+	ground_mdl->setPosition({ 0, -2, 0 });
+
+	Shader* ground_shd = new Shader(ShaderType::Texture);
+	ground_shd->addTexture("resources/models/ground/diffuse.png");
+	ground_shd->addTexture("resources/models/ground/specular.png");
+	m_shaders.push_back(std::unique_ptr<Shader>(std::move(ground_shd)));
+
 	// Gizmo
 
 	Model* x_model = new Model("resources/models/gizmo/x.obj");
@@ -57,13 +68,18 @@ void scene::initializeScene()
 
 	SceneObject* backpack = new SceneObject(backpack_mdl, backpack_shd, SceneObjectType::Normal, m_selection);
 	backpack->debugName = "backpack";
+
+	SceneObject* ground = new SceneObject(ground_mdl, ground_shd, SceneObjectType::Normal, m_selection);
+	ground->debugName = "ground";
+
 	m_selection.scale = 1.15f;
 	SceneObject* light = new SceneObject(SceneObjectType::Light, m_selection);
-	light->setPointLight(0.22f, 0.20f);
+	light->setPointLight(0.09f, 0.032f);
 	light->getModel()->translate({ 0, 1.0f, 2.0f });
 	light->debugName = "light";
 
 	m_sceneObjects.push_back(std::unique_ptr<SceneObject>(std::move(backpack)));
+	m_sceneObjects.push_back(std::unique_ptr<SceneObject>(std::move(ground)));
 	m_sceneObjects.push_back(std::unique_ptr<SceneObject>(std::move(light)));
 
 	HUD* hud = new HUD("arial");
@@ -74,7 +90,7 @@ void scene::initializeScene()
 	m_huds.push_back(std::unique_ptr<HUD>(hud2));
 	hud2->setText(std::bind(&scene::getSelectedObjectCoordinateStr, this));
 
-	m_lights.push_back(*m_sceneObjects[1]);
+	m_lights.push_back(*m_sceneObjects[2]);
 }
 
 

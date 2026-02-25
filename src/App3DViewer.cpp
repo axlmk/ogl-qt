@@ -26,11 +26,20 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
 	// Container widget
 	
 	QWidget* container = QWidget::createWindowContainer(&(*m_sceneViewer));
-	container->setMinimumSize(QSize(800, 600));
+	container->setMinimumSize(QSize(1200, 800));
 
 	// Layout and widget container
 	
-	QVBoxLayout* vlay = new QVBoxLayout;
+	std::unique_ptr<QHBoxLayout> globalLayout = std::make_unique<QHBoxLayout>();
+	std::unique_ptr<QVBoxLayout> catalogLayout = std::make_unique<QVBoxLayout>();
+	QLabel* titreCatalogue = new QLabel("List of imported models");
+	QSpacerItem* spacer = new QSpacerItem(100, 1000);
+	QPushButton *importModels = new QPushButton("Import model");
+	catalogLayout->addWidget(titreCatalogue);
+	//catalogLayout->addItem(spacer);
+	catalogLayout->addWidget(importModels);
+
+	QVBoxLayout* mainLayout = new QVBoxLayout;
 	QWidget* tips = new QWidget();
 	QLabel *title = new QLabel("Controls");
 	QLabel* controls = new QLabel("Us ethis for that and this for that");
@@ -40,11 +49,14 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
 	vlayTips->addWidget(title);
 	vlayTips->addWidget(controls);
 
-	vlay->setSpacing(0);
-	vlay->addWidget(container);
-	vlay->addWidget(tips);
+	mainLayout->setSpacing(0);
+	mainLayout->addWidget(container);
+	mainLayout->addWidget(tips);
 
-	m_mainWindow->setLayout(vlay);
+	globalLayout->addLayout(mainLayout);
+	globalLayout->addLayout(catalogLayout.get());
+
+	m_mainWindow->setLayout(globalLayout.get());
 	m_mainWindow->show();
 }
 
