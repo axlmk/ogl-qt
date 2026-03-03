@@ -1,0 +1,14 @@
+{
+    "version": 6,
+    "configurePresets": [
+        {
+            "name": "win_debug",
+            "displayName": "Windows debug",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        }
+    ]
+}

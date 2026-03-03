@@ -1,49 +1,47 @@
 #include <App3DViewer.hpp>
 #include <QLabel>
 
-
-App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
+App3DViewer::App3DViewer(int argc, char *argv[]) //, scene* scene)
 {
 	// Minimal required components
 
 	m_app = std::make_unique<QApplication>(argc, argv);
 	m_mainWindow = std::make_unique<QDialog>(nullptr, Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
-	m_sceneViewer = std::make_unique<SceneViewer>(scene);
+	// m_sceneViewer = std::make_unique<SceneViewer>(scene);
 
-	
 	// Format management
 
-	QSurfaceFormat format;
-	format.setRenderableType(QSurfaceFormat::OpenGL);
-	format.setProfile(QSurfaceFormat::CoreProfile);
-	format.setVersion(3, 3);
-	m_sceneViewer->setFormat(format);
+	// QSurfaceFormat format;
+	// format.setRenderableType(QSurfaceFormat::OpenGL);
+	// format.setProfile(QSurfaceFormat::CoreProfile);
+	// format.setVersion(3, 3);
+	// m_sceneViewer->setFormat(format);
 
 	// Cursor management
-	
-	auto globalCenter = m_mainWindow->mapToGlobal(m_sceneViewer->geometry().center());
+
+	// auto globalCenter = m_mainWindow->mapToGlobal(m_sceneViewer->geometry().center());
 
 	// Container widget
-	
-	QWidget* container = QWidget::createWindowContainer(&(*m_sceneViewer));
+
+	QWidget *container = new QWidget(); // QWidget::createWindowContainer(&(*m_sceneViewer));
 	container->setMinimumSize(QSize(1200, 800));
 
 	// Layout and widget container
-	
+
 	std::unique_ptr<QHBoxLayout> globalLayout = std::make_unique<QHBoxLayout>();
 	std::unique_ptr<QVBoxLayout> catalogLayout = std::make_unique<QVBoxLayout>();
-	QLabel* titreCatalogue = new QLabel("List of imported models");
-	QSpacerItem* spacer = new QSpacerItem(100, 1000);
+	QLabel *titreCatalogue = new QLabel("List of imported models");
+	QSpacerItem *spacer = new QSpacerItem(100, 1000);
 	QPushButton *importModels = new QPushButton("Import model");
 	catalogLayout->addWidget(titreCatalogue);
-	//catalogLayout->addItem(spacer);
+	// catalogLayout->addItem(spacer);
 	catalogLayout->addWidget(importModels);
 
-	QVBoxLayout* mainLayout = new QVBoxLayout;
-	QWidget* tips = new QWidget();
+	QVBoxLayout *mainLayout = new QVBoxLayout;
+	QWidget *tips = new QWidget();
 	QLabel *title = new QLabel("Controls");
-	QLabel* controls = new QLabel("Us ethis for that and this for that");
-	QVBoxLayout* vlayTips = new QVBoxLayout;
+	QLabel *controls = new QLabel("Us ethis for that and this for that");
+	QVBoxLayout *vlayTips = new QVBoxLayout;
 	tips->setLayout(vlayTips);
 	vlayTips->setSpacing(5);
 	vlayTips->addWidget(title);
@@ -60,8 +58,7 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
 	m_mainWindow->show();
 }
 
-
-
-int App3DViewer::run() {
+int App3DViewer::run()
+{
 	return m_mainWindow->exec();
 }
