@@ -2,17 +2,16 @@
 
 #include <memory>
 
-#include <App3DViewer.hpp>
-// #include <Scene.hpp>
+#include "App3DViewer.hpp"
+#include "Scene.hpp"
 
-class App3D
-{
-public:
-	App3D(int argc, char *argv[]);
-	int run();
-	// scene* getscene() const;
+class App3D {
+   public:
+	App3D(int argc, char* argv[]);
+	int run(void);
+	scene* getscene(void) const;
 
-private:
+   private:
 	std::unique_ptr<App3DViewer> m_app3DViewer;
-	// std::unique_ptr<scene> m_scene;
+	std::unique_ptr<scene> m_scene;
 };

@@ -1,30 +1,35 @@
 #include <App3DViewer.hpp>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QObject>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <Scene.hpp>
 
-App3DViewer::App3DViewer(int argc, char* argv[])  //, scene* scene)
-{
+App3DViewer::App3DViewer(int argc, char* argv[], scene* scene) {
 	// Minimal required components
 
 	m_app = std::make_unique<QApplication>(argc, argv);
 	m_mainWindow = std::make_unique<QDialog>(
 		nullptr, Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
-	// m_sceneViewer = std::make_unique<SceneViewer>(scene);
+	m_sceneViewer = std::make_unique<SceneViewer>(scene);
 
 	// Format management
 
-	// QSurfaceFormat format;
-	// format.setRenderableType(QSurfaceFormat::OpenGL);
-	// format.setProfile(QSurfaceFormat::CoreProfile);
-	// format.setVersion(3, 3);
-	// m_sceneViewer->setFormat(format);
+	QSurfaceFormat format;
+	format.setRenderableType(QSurfaceFormat::OpenGL);
+	format.setProfile(QSurfaceFormat::CoreProfile);
+	format.setVersion(3, 3);
+	m_sceneViewer->setFormat(format);
 
 	// Cursor management
 
-	// auto globalCenter = m_mainWindow->mapToGlobal(m_sceneViewer->geometry().center());
+	auto globalCenter = m_mainWindow->mapToGlobal(m_sceneViewer->geometry().center());
 
 	// Container widget
 
-	QWidget* container = new QWidget();	 // QWidget::createWindowContainer(&(*m_sceneViewer));
+	QWidget* container = QWidget::createWindowContainer(&(*m_sceneViewer));
 	container->setMinimumSize(QSize(1200, 800));
 
 	// Layout and widget container
@@ -59,6 +64,6 @@ App3DViewer::App3DViewer(int argc, char* argv[])  //, scene* scene)
 	m_mainWindow->show();
 }
 
-int App3DViewer::run() {
+int App3DViewer::run(void) {
 	return m_mainWindow->exec();
 }
