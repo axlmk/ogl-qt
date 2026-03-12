@@ -7,7 +7,8 @@
 #include <QWidget>
 #include <Scene.hpp>
 
-App3DViewer::App3DViewer(int argc, char* argv[], scene* scene) {
+App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
+{
 	// Minimal required components
 
 	m_app = std::make_unique<QApplication>(argc, argv);
@@ -40,7 +41,6 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene) {
 	QSpacerItem* spacer = new QSpacerItem(100, 1000);
 	QPushButton* importModels = new QPushButton("Import model");
 	catalogLayout->addWidget(titreCatalogue);
-	// catalogLayout->addItem(spacer);
 	catalogLayout->addWidget(importModels);
 
 	QVBoxLayout* mainLayout = new QVBoxLayout;
@@ -64,6 +64,7 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene) {
 	m_mainWindow->show();
 }
 
-int App3DViewer::run(void) {
+int App3DViewer::run(void)
+{
 	return m_mainWindow->exec();
 }

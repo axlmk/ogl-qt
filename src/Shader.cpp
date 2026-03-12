@@ -2,35 +2,24 @@
 
 std::map<std::filesystem::path, LoadedTextures> g_loadedTextures;
 
-Shader::Shader() : Shader(ShaderType::Custom) {
-}
+Shader::Shader() : Shader(ShaderType::Custom) {}
 
-
-
-Shader::Shader(ShaderType shaderType, bool isFont) :
-	m_shaderType { shaderType },
-	m_shdPrgId { },
-	m_font { isFont },
-	m_color { }
-{
-
-}
-
-
+Shader::Shader(ShaderType shaderType, bool isFont) : m_shaderType{shaderType}, m_shdPrgId{}, m_font{isFont}, m_color{}
+{}
 
 Shader::~Shader()
 {
-	if(m_shdPrgId)
+	if (m_shdPrgId)
 	{
 		g_opengl.glDeleteProgram(m_shdPrgId);
 		m_shdPrgId = 0;
 	}
 }
 
-
-
-void Shader::setCustom(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath) {
-	if (m_shaderType != ShaderType::Custom) {
+void Shader::setCustom(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath)
+{
+	if (m_shaderType != ShaderType::Custom)
+	{
 		std::string err_msg = "Shader type must be 'custom' to use setCustomShaders() function";
 		qCritical() << err_msg;
 		throw std::invalid_argument(err_msg);
@@ -42,13 +31,10 @@ void Shader::setCustom(const std::filesystem::path& vtxShdPath, const std::files
 	compile(vtxShdPath, frgShdPath);
 }
 
-
-
 void Shader::setLight()
 {
 	compile("resources/shaders/unicolor.vs", "resources/shaders/unicolor.fs");
 }
-
 
 void Shader::setColor(RGBColor color)
 {
@@ -61,10 +47,8 @@ void Shader::setColor(RGBColor color)
 	compile("resources/shaders/unicolor.vs", "resources/shaders/unicolor.fs");
 }
 
-
-
 void Shader::setColor(std::string color)
-{	
+{
 	if (m_shaderType != ShaderType::Unicolor)
 	{
 		throw std::invalid_argument("Shader type must be 'unicolor' to use setColor() function");
@@ -72,28 +56,29 @@ void Shader::setColor(std::string color)
 
 	// Basic string parsing test
 
-	if(color.size() != 7 || color[0] != '#') {
+	if (color.size() != 7 || color[0] != '#')
+	{
 		std::string err_msg = "Hex color is between #000000 and #ffffff";
 		qCritical() << err_msg;
 		throw std::invalid_argument(err_msg);
 	}
 
-	try {
+	try
+	{
 		m_color.x = std::stoi(color.substr(1, 2), nullptr, 16) / 255.0;
 		m_color.y = std::stoi(color.substr(3, 2), nullptr, 16) / 255.0;
 		m_color.z = std::stoi(color.substr(5, 2), nullptr, 16) / 255.0;
-	} catch (...) {
+	} catch (...)
+	{
 		std::string err_msg = "Color hex code has unvalid format and must be #abc0123";
 		qCritical() << err_msg;
 		throw std::invalid_argument(err_msg);
 	}
-	
+
 	compile("resources/shaders/unicolor.vs", "resources/shaders/unicolor.fs");
 }
 
-
-
-void Shader::addTexture(const std::filesystem::path &texturePath)
+void Shader::addTexture(const std::filesystem::path& texturePath)
 {
 	if (m_shaderType != ShaderType::Texture)
 	{
@@ -106,7 +91,8 @@ void Shader::addTexture(const std::filesystem::path &texturePath)
 	}
 
 	int width, height, nrChannels;
-	if (m_font) {
+	if (m_font)
+	{
 		stbi_set_flip_vertically_on_load(false);
 	}
 	unsigned char* data = stbi_load(texturePath.string().c_str(), &width, &height, &nrChannels, 0);
@@ -115,8 +101,8 @@ void Shader::addTexture(const std::filesystem::path &texturePath)
 	{
 		throw std::runtime_error("Texture [" + texturePath.string() + "] failed to load");
 	}
-	
-	m_texturesInfo.push_back({ data, width, height, nrChannels, 0, texturePath });
+
+	m_texturesInfo.push_back({data, width, height, nrChannels, 0, texturePath});
 
 	if (m_font)
 	{
@@ -127,10 +113,8 @@ void Shader::addTexture(const std::filesystem::path &texturePath)
 		compile("resources/shaders/texture.vs", "resources/shaders/texture.fs");
 }
 
-
-
 void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath)
-{	
+{
 	int success;
 	unsigned int vtxShd = 0, frgShd = 0;
 	m_name = vtxShdPath.string();
@@ -142,7 +126,7 @@ void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::file
 	{
 		throw std::invalid_argument("Vertex shader [" + vtxShdPath.string() + "]content could not be loaded");
 	}
-	
+
 	const char* vertexShaderContentChar = vertexShaderContent.c_str();
 	vtxShd = g_opengl.glCreateShader(GL_VERTEX_SHADER);
 	g_opengl.glShaderSource(vtxShd, 1, &vertexShaderContentChar, NULL);
@@ -169,7 +153,7 @@ void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::file
 	frgShd = g_opengl.glCreateShader(GL_FRAGMENT_SHADER);
 	g_opengl.glShaderSource(frgShd, 1, &fragmentShaderContentChar, NULL);
 	g_opengl.glCompileShader(frgShd);
-	
+
 	g_opengl.glGetShaderiv(frgShd, GL_COMPILE_STATUS, &success);
 	if (success == GL_FALSE)
 	{
@@ -185,7 +169,7 @@ void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::file
 	g_opengl.glAttachShader(m_shdPrgId, frgShd);
 	g_opengl.glLinkProgram(m_shdPrgId);
 	g_opengl.glGetProgramiv(m_shdPrgId, GL_LINK_STATUS, &success);
-	
+
 	deleteShaders(vtxShd, frgShd);
 	if (success == GL_FALSE)
 	{
@@ -193,8 +177,6 @@ void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::file
 		throw std::invalid_argument("Error linking the shaders to the program: " + std::string(g_infoLog));
 	}
 }
-
-
 
 void Shader::setTransformation(glm::mat4 model, glm::mat4 view, glm::mat4 projection)
 {
@@ -208,14 +190,13 @@ void Shader::setTransformation(glm::mat4 model, glm::mat4 view, glm::mat4 projec
 	g_opengl.glUniformMatrix4fv(projectionUni, 1, GL_FALSE, glm::value_ptr(projection));
 }
 
-
-
 void Shader::use() const
 {
 	GLint isValid = GL_FALSE;
 	g_opengl.glValidateProgram(m_shdPrgId);
 	g_opengl.glGetProgramiv(m_shdPrgId, GL_VALIDATE_STATUS, &isValid);
-	if (isValid == GL_FALSE) {
+	if (isValid == GL_FALSE)
+	{
 		std::string err_msg = "Program ID " + std::to_string(m_shdPrgId) + " is unvalid";
 		qCritical() << err_msg;
 		throw std::invalid_argument(err_msg);
@@ -223,11 +204,11 @@ void Shader::use() const
 
 	g_opengl.glUseProgram(m_shdPrgId);
 
-	switch (m_shaderType) {
-		case ShaderType::Texture:
-		{
+	switch (m_shaderType)
+	{
+		case ShaderType::Texture: {
 			int uniform = 0;
-			if(m_font)
+			if (m_font)
 				uniform = getUniform("atlas");
 			else
 				uniform = getUniform("material.diffuse_1");
@@ -235,7 +216,7 @@ void Shader::use() const
 			g_opengl.glActiveTexture(GL_TEXTURE0);
 			g_opengl.glBindTexture(GL_TEXTURE_2D, m_texturesInfo[0].buffer);
 
-			if(m_font)
+			if (m_font)
 				break;
 
 			uniform = getUniform("material.specular_1");
@@ -245,38 +226,36 @@ void Shader::use() const
 
 			uniform = getUniform("material.shininess");
 			g_opengl.glUniform1f(uniform, 32);
-
 		}
-			break;
-		case ShaderType::Unicolor:
-		{
+		break;
+		case ShaderType::Unicolor: {
 			int uniform = getUniform("outColor");
 			g_opengl.glUniform3f(uniform, m_color.x, m_color.y, m_color.z);
 		}
-			break;
-		case ShaderType::Light:
-		{
+		break;
+		case ShaderType::Light: {
 			int uniform = getUniform("outColor");
 			g_opengl.glUniform3f(uniform, 1.0, 1.0, 1.0);
 		}
-			break;
+		break;
 		case ShaderType::Custom:
 		default:
 			break;
 	}
 }
 
+std::string Shader::getFileContent(const std::filesystem::path& path)
+{
 
-
-std::string Shader::getFileContent(const std::filesystem::path &path) {
-
-	if (!std::filesystem::exists(path)) {
+	if (!std::filesystem::exists(path))
+	{
 		qCritical() << "Path [" << path.string() << "] doesn't not exist";
 		return "";
 	}
 
 	std::ifstream file(path);
-	if (!file) {
+	if (!file)
+	{
 		qCritical() << "Path [" << path.string() << "] could not be opened";
 		return "";
 	}
@@ -287,43 +266,37 @@ std::string Shader::getFileContent(const std::filesystem::path &path) {
 	return buffer.str();
 }
 
-
-
 void Shader::deleteShaders(unsigned int vtx, unsigned frg)
 {
-	if(vtx)
+	if (vtx)
 		g_opengl.glDeleteShader(vtx);
-	if(frg)
+	if (frg)
 		g_opengl.glDeleteShader(frg);
 }
 
-
-
-void Shader::deleteTexture() {
+void Shader::deleteTexture()
+{
 	g_opengl.glBindTexture(GL_TEXTURE_2D, 0);
 	g_opengl.glDeleteTextures(1, &m_texturesInfo.back().buffer);
 	m_texturesInfo.back().buffer = 0;
 }
 
-
-
-void Shader::deleteProgram() {
+void Shader::deleteProgram()
+{
 	g_opengl.glUseProgram(0);
 	g_opengl.glDeleteProgram(m_shdPrgId);
 	m_shdPrgId = 0;
 }
 
-
 int Shader::getUniform(std::string uniform) const
 {
 	int ret = g_opengl.glGetUniformLocation(m_shdPrgId, uniform.c_str());
-	if(ret == -1)
+	if (ret == -1)
 	{
 		throw std::runtime_error("Uniform [" + uniform + "] doesn't exist");
 	}
 	return ret;
 }
-
 
 void Shader::compile(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath)
 {
@@ -332,11 +305,12 @@ void Shader::compile(const std::filesystem::path& vtxShdPath, const std::filesys
 		throw std::invalid_argument("Vertex and fragment shaders have not been specified before compilation");
 	}
 
-	switch (m_shaderType) {
-		case ShaderType::Texture:
-		{
+	switch (m_shaderType)
+	{
+		case ShaderType::Texture: {
 			// No need to set the shaders if a texture has already been added
-			if (m_texturesInfo.size() > 1) {
+			if (m_texturesInfo.size() > 1)
+			{
 				return;
 			}
 
@@ -348,7 +322,8 @@ void Shader::compile(const std::filesystem::path& vtxShdPath, const std::filesys
 
 			GLenum format;
 
-			switch (textInfo.nrChannels) {
+			switch (textInfo.nrChannels)
+			{
 				case 1:
 					format = GL_RED;
 					break;
@@ -373,12 +348,13 @@ void Shader::compile(const std::filesystem::path& vtxShdPath, const std::filesys
 			g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-			g_opengl.glTexImage2D(GL_TEXTURE_2D, 0, format, textInfo.width, textInfo.height, 0, format, GL_UNSIGNED_BYTE, textInfo.data);
+			g_opengl.glTexImage2D(GL_TEXTURE_2D, 0, format, textInfo.width, textInfo.height, 0, format,
+								  GL_UNSIGNED_BYTE, textInfo.data);
 			g_opengl.glGenerateMipmap(GL_TEXTURE_2D);
 
 			stbi_image_free(textInfo.data);
 		}
-			break;
+		break;
 		default:
 			break;
 	}
@@ -386,9 +362,9 @@ void Shader::compile(const std::filesystem::path& vtxShdPath, const std::filesys
 	setShaders(vtxShdPath, frgShdPath);
 }
 
-int TextureFromFile(const std::filesystem::path &texturePath, TextureType type)
+int TextureFromFile(const std::filesystem::path& texturePath, TextureType type)
 {
-	if(g_loadedTextures.find(texturePath) != g_loadedTextures.end())
+	if (g_loadedTextures.find(texturePath) != g_loadedTextures.end())
 	{
 		return g_loadedTextures[texturePath].oglID;
 	}
@@ -409,7 +385,8 @@ int TextureFromFile(const std::filesystem::path &texturePath, TextureType type)
 
 	GLenum format;
 
-	switch (nrChannels) {
+	switch (nrChannels)
+	{
 		case 1:
 			format = GL_RED;
 			break;

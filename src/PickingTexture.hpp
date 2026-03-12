@@ -1,24 +1,24 @@
 #pragma once
-#include "Utils.hpp"
 #include <glm/glm.hpp>
 
-class PickingTexture {
+#include "Utils.hpp"
+
+class PickingTexture
+{
 
 	using uint = unsigned int;
 
-	public:
+   public:
+	PickingTexture(int windowWidth, int windowHeight);
 
-		PickingTexture(int windowWidth, int windowHeight);
+	void enableWriting();
+	void disableWriting();
 
-		void enableWriting();
-		void disableWriting();
+	glm::ivec3 readPixel(uint mouseX, uint mouseY) const;
 
-		glm::ivec3 readPixel(uint mouseX, uint mouseY) const;
-
-	private:
-
-		uint m_fbo;
-		uint m_pickingTex;
-		uint m_depthTex;
-		glm::uvec2 m_windowDim;
+   private:
+	uint m_fbo;
+	uint m_pickingTex;
+	uint m_depthTex;
+	glm::uvec2 m_windowDim;
 };

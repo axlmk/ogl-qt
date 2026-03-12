@@ -9,11 +9,12 @@
 #include "Scene.hpp"
 #include "Utils.hpp"
 
-void SceneViewer::paintGL() {
-	// 	m_deltaTime = QDateTime::currentMSecsSinceEpoch() - m_currentTime;
-	// 	m_currentTime = QDateTime::currentMSecsSinceEpoch();
+void SceneViewer::paintGL()
+{
+	m_deltaTime = QDateTime::currentMSecsSinceEpoch() - m_currentTime;
+	m_currentTime = QDateTime::currentMSecsSinceEpoch();
 
-	// 	m_manager->renderLoop(m_inputsBeingPressed, m_deltaTime);
+	m_manager->renderLoop(m_inputsBeingPressed, m_deltaTime);
 }
 
 SceneViewer::SceneViewer(scene* scene)
@@ -23,14 +24,16 @@ SceneViewer::SceneViewer(scene* scene)
 	  m_lastFrameMousePos{0.0, 0.0},
 	  m_manager{scene},
 	  m_timer{std::make_unique<QTimer>(this)},
-	  m_currentTime{QDateTime::currentMSecsSinceEpoch()} {
+	  m_currentTime{QDateTime::currentMSecsSinceEpoch()}
+{
 	connect(&(*m_timer), &QTimer::timeout, this, QOverload<>::of(&SceneViewer::update));
 	m_timer->start(16);
 }
 
 SceneViewer::~SceneViewer() {}
 
-void SceneViewer::initializeGL() {
+void SceneViewer::initializeGL()
+{
 	this->requestActivate();
 	g_opengl.initializeOpenGLFunctions();
 
@@ -42,7 +45,8 @@ void SceneViewer::initializeGL() {
 	m_manager->initializeScene();
 }
 
-void SceneViewer::keyPressEvent(QKeyEvent* event) {
+void SceneViewer::keyPressEvent(QKeyEvent* event)
+{
 
 	if (event->text() == "z")
 		m_inputsBeingPressed["z"] = true;
@@ -56,7 +60,8 @@ void SceneViewer::keyPressEvent(QKeyEvent* event) {
 	if (event->text() == "s")
 		m_inputsBeingPressed["s"] = true;
 
-	if (event->key() == Qt::Key_Alt) {
+	if (event->key() == Qt::Key_Alt)
+	{
 		m_inputsBeingPressed["alt"] = true;
 
 		// Reset cursor
@@ -68,7 +73,8 @@ void SceneViewer::keyPressEvent(QKeyEvent* event) {
 	}
 }
 
-void SceneViewer::keyReleaseEvent(QKeyEvent* event) {
+void SceneViewer::keyReleaseEvent(QKeyEvent* event)
+{
 	if (event->text() == "z")
 		m_inputsBeingPressed["z"] = false;
 
@@ -84,8 +90,10 @@ void SceneViewer::keyReleaseEvent(QKeyEvent* event) {
 	if (event->text() == "f")
 		m_manager->focusCameraOnSelectedObject();
 
-	if (event->key() == Qt::Key_Alt) {
-		if (m_inputsBeingPressed["alt"]) {
+	if (event->key() == Qt::Key_Alt)
+	{
+		if (m_inputsBeingPressed["alt"])
+		{
 			m_inputsBeingPressed["alt"] = false;
 			setCursor(QCursor(Qt::BitmapCursor));
 			cursor().setPos({m_lastMousePos.x, m_lastMousePos.y});
@@ -93,11 +101,14 @@ void SceneViewer::keyReleaseEvent(QKeyEvent* event) {
 	}
 }
 
-void SceneViewer::mousePressEvent(QMouseEvent* event) {
-	switch (event->button()) {
+void SceneViewer::mousePressEvent(QMouseEvent* event)
+{
+	switch (event->button())
+	{
 		case Qt::LeftButton:
 			m_inputsBeingPressed["left"] = true;
-			if (!m_inputsBeingPressed["alt"]) {
+			if (!m_inputsBeingPressed["alt"])
+			{
 				m_manager->tryToSelect({event->pos().x(), event->pos().y()}, geometry().width(), geometry().height());
 				m_lastFrameMousePos = glm::ivec2(event->pos().x(), event->pos().y());
 			}
@@ -113,8 +124,10 @@ void SceneViewer::mousePressEvent(QMouseEvent* event) {
 	}
 }
 
-void SceneViewer::mouseReleaseEvent(QMouseEvent* event) {
-	switch (event->button()) {
+void SceneViewer::mouseReleaseEvent(QMouseEvent* event)
+{
+	switch (event->button())
+	{
 		case Qt::LeftButton:
 			m_inputsBeingPressed["left"] = false;
 			m_manager->m_isPicking = false;
@@ -130,27 +143,30 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent* event) {
 	}
 }
 
-void SceneViewer::mouseMoveEvent(QMouseEvent* event) {
+void SceneViewer::mouseMoveEvent(QMouseEvent* event)
+{
+	if (m_inputsBeingPressed["alt"])
+	{
+		// Viewing Mode
+		auto centered = mapToGlobal(geometry().center());
+		auto current = mapToGlobal(event->pos());
+		glm::vec2 centeredCursor{centered.x(), centered.y()};
+		glm::vec2 currentCursor{current.x(), current.y()};
 
-	// if (m_inputsBeingPressed["alt"]) {
-	// 	// Viewing Mode
-	// 	auto centered = mapToGlobal(geometry().center());
-	// 	auto current = mapToGlobal(event->pos());
-	// 	glm::vec2 centeredCursor{centered.x(), centered.y()};
-	// 	glm::vec2 currentCursor{current.x(), current.y()};
+		if (m_inputsBeingPressed["left"])
+			m_manager->getCamera()->rotate(centeredCursor, currentCursor);
+		else if (m_inputsBeingPressed["middle"])
+			m_manager->getCamera()->pan(centeredCursor, currentCursor);
+		else if (m_inputsBeingPressed["right"])
+			m_manager->getCamera()->zoom(centeredCursor, currentCursor);
 
-	// 	if (m_inputsBeingPressed["left"])
-	// 		m_manager->getCamera()->rotate(centeredCursor, currentCursor);
-	// 	else if (m_inputsBeingPressed["middle"])
-	// 		m_manager->getCamera()->pan(centeredCursor, currentCursor);
-	// 	else if (m_inputsBeingPressed["right"])
-	// 		m_manager->getCamera()->zoom(centeredCursor, currentCursor);
-
-	// 	cursor().setPos(centeredCursor.x, centeredCursor.y);
-	// } else if (m_inputsBeingPressed["left"]) {
-	// 	auto currentMousePos = glm::ivec2(event->pos().x(), event->pos().y());
-	// 	glm::ivec2 mouseDiff = m_lastFrameMousePos - currentMousePos;
-	// 	m_manager->tryMoveObject(mouseDiff);
-	// 	m_lastFrameMousePos = currentMousePos;
-	// }
+		cursor().setPos(centeredCursor.x, centeredCursor.y);
+	}
+	else if (m_inputsBeingPressed["left"])
+	{
+		auto currentMousePos = glm::ivec2(event->pos().x(), event->pos().y());
+		glm::ivec2 mouseDiff = m_lastFrameMousePos - currentMousePos;
+		m_manager->tryMoveObject(mouseDiff);
+		m_lastFrameMousePos = currentMousePos;
+	}
 }

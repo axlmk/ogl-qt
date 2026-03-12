@@ -23,16 +23,16 @@ BinPackArguments: true
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterCaseLabel: false
-  AfterClass: false
-  AfterStruct: false
-  AfterControlStatement: Never
+  AfterClass: true
+  AfterStruct: true
+  AfterControlStatement: Always
   AfterEnum: false
-  AfterFunction: false
+  AfterFunction: true
   AfterNamespace: false
   AfterUnion: false
   AfterExternBlock: false
   BeforeCatch: false
-  BeforeElse: false
+  BeforeElse: true
   BeforeLambdaBody: false
   IndentBraces: false
   SplitEmptyFunction: false

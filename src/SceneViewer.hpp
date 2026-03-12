@@ -8,7 +8,8 @@
 
 class scene;
 
-class SceneViewer : public QOpenGLWindow {
+class SceneViewer : public QOpenGLWindow
+{
    public:
 	SceneViewer(scene* scene);
 	~SceneViewer() Q_DECL_OVERRIDE;

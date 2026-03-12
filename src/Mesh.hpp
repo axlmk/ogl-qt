@@ -1,9 +1,8 @@
 #pragma once
 
-#include <vector>
 #include <exception>
-
 #include <glm/glm.hpp>
+#include <vector>
 
 #include "Shader.hpp"
 
@@ -31,16 +30,16 @@ inline std::string to_string(TextureType t)
 
 class Mesh
 {
-	public:
-		// See if they can be private
-		std::vector<Vertex> vertices;
-		std::vector<unsigned int> indices;
-		std::vector<Texture> textures;
+   public:
+	// See if they can be private
+	std::vector<Vertex> vertices;
+	std::vector<unsigned int> indices;
+	std::vector<Texture> textures;
 
-		Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
-		void Draw(Shader& shader);
+	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
+	void Draw(Shader& shader);
 
-	private:
-		unsigned int m_vao, m_ebo, m_vbo;
-		void setupMesh();
+   private:
+	unsigned int m_vao, m_ebo, m_vbo;
+	void setupMesh();
 };

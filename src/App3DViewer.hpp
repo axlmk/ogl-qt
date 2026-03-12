@@ -7,7 +7,8 @@
 
 class scene;
 
-class App3DViewer {
+class App3DViewer
+{
    public:
 	App3DViewer(int argc, char* argv[], scene* scene);
 	int run(void);

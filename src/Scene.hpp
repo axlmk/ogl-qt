@@ -4,27 +4,28 @@
 #include <memory>
 #include <unordered_map>
 
+#include "Camera.hpp"
+#include "Gizmo.hpp"
+#include "HUD.hpp"
+#include "Model.hpp"
+#include "PickingTexture.hpp"
+#include "SceneObject.hpp"
+#include "Shader.hpp"
 #include "glm/glm.hpp"
-// #include "Camera.hpp"
-// #include "Gizmo.hpp"
-// #include "HUD.hpp"
-// #include "Model.hpp"
-// #include "PickingTexture.hpp"
-// #include "SceneObject.hpp"
-// #include "Shader.hpp"
 
 class SceneViewer;
 
 enum class Mouvement { Forward, Backward, Left, Right };
 
-class scene {
+class scene
+{
    public:
 	scene();
 
-	// std::unique_ptr<Camera>& getCamera();
-	// std::vector<std::unique_ptr<Model>>& getModels();
-	// std::vector<std::unique_ptr<Shader>>& getShaders();
-	// std::vector<std::reference_wrapper<SceneObject>> getLights();
+	std::unique_ptr<Camera>& getCamera();
+	std::vector<std::unique_ptr<Model>>& getModels();
+	std::vector<std::unique_ptr<Shader>>& getShaders();
+	std::vector<std::reference_wrapper<SceneObject>> getLights();
 
 	void tryToSelect(glm::ivec2 mouseCoords, int viewportWidth, int viewportHeight);
 
@@ -43,16 +44,16 @@ class scene {
    private:
 	void picking();
 
-	// std::vector<std::unique_ptr<HUD>> m_huds;
-	// std::vector<std::unique_ptr<Model>> m_models;
-	// std::vector<std::unique_ptr<Shader>> m_shaders;
-	// std::vector<std::unique_ptr<SceneObject>> m_sceneObjects;
-	// std::vector<std::reference_wrapper<SceneObject>> m_lights;
-	// std::unique_ptr<Camera> m_camera;
-	// std::unique_ptr<PickingTexture> m_pickingTex = nullptr;
-	// std::unique_ptr<Gizmo> m_gizmo;
+	std::vector<std::unique_ptr<HUD>> m_huds;
+	std::vector<std::unique_ptr<Model>> m_models;
+	std::vector<std::unique_ptr<Shader>> m_shaders;
+	std::vector<std::unique_ptr<SceneObject>> m_sceneObjects;
+	std::vector<std::reference_wrapper<SceneObject>> m_lights;
+	std::unique_ptr<Camera> m_camera;
+	std::unique_ptr<PickingTexture> m_pickingTex = nullptr;
+	std::unique_ptr<Gizmo> m_gizmo;
 
-	// SceneObject* m_selectedObject;
+	SceneObject* m_selectedObject;
 
 	bool m_cameraDirection[4];
 	glm::ivec2 m_mouseCoords;

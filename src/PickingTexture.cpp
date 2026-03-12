@@ -1,6 +1,7 @@
 #include "PickingTexture.hpp"
 
-PickingTexture::PickingTexture(int windowWidth, int windowHeight) {
+PickingTexture::PickingTexture(int windowWidth, int windowHeight)
+{
 	g_opengl.glGenFramebuffers(1, &m_fbo);
 	g_opengl.glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
@@ -13,11 +14,13 @@ PickingTexture::PickingTexture(int windowWidth, int windowHeight) {
 
 	g_opengl.glGenTextures(1, &m_depthTex);
 	g_opengl.glBindTexture(GL_TEXTURE_2D, m_depthTex);
-	g_opengl.glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, windowWidth, windowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	g_opengl.glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, windowWidth, windowHeight, 0, GL_DEPTH_COMPONENT,
+						  GL_FLOAT, NULL);
 	g_opengl.glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTex, 0);
 
 	GLenum status = g_opengl.glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (status != GL_FRAMEBUFFER_COMPLETE) {
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
 		qDebug() << "Erreur chef" << status;
 		exit(1);
 	}
@@ -28,11 +31,13 @@ PickingTexture::PickingTexture(int windowWidth, int windowHeight) {
 	m_windowDim.y = windowHeight;
 }
 
-void PickingTexture::enableWriting() {
+void PickingTexture::enableWriting()
+{
 	g_opengl.glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
 }
 
-void PickingTexture::disableWriting() {
+void PickingTexture::disableWriting()
+{
 	g_opengl.glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
@@ -45,6 +50,5 @@ glm::ivec3 PickingTexture::readPixel(uint mouseX, uint mouseY) const
 	g_opengl.glReadPixels(mouseX, static_cast<int>(m_windowDim.y) - mouseY, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, color);
 	g_opengl.glReadBuffer(GL_NONE);
 	g_opengl.glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-	//qDebug() << static_cast<int>(color[0]) << static_cast<int>(color[1]) << static_cast<int>(color[2]);
-	return { static_cast<int>(color[0]), static_cast<int>(color[1]) , static_cast<int>(color[2]) };
+	return {static_cast<int>(color[0]), static_cast<int>(color[1]), static_cast<int>(color[2])};
 }

@@ -5,7 +5,8 @@
 #include "App3DViewer.hpp"
 #include "Scene.hpp"
 
-class App3D {
+class App3D
+{
    public:
 	App3D(int argc, char* argv[]);
 	int run(void);

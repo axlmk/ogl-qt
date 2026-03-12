@@ -2,9 +2,9 @@
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures)
 {
-	this->vertices	= vertices;
-	this->indices	= indices;
-	this->textures	= textures;
+	this->vertices = vertices;
+	this->indices = indices;
+	this->textures = textures;
 
 	setupMesh();
 }
@@ -14,13 +14,13 @@ void Mesh::setupMesh()
 	g_opengl.glGenVertexArrays(1, &m_vao);
 	g_opengl.glGenBuffers(1, &m_vbo);
 	g_opengl.glGenBuffers(1, &m_ebo);
-	
+
 	g_opengl.glBindVertexArray(m_vao);
 	g_opengl.glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	g_opengl.glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 	g_opengl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
 	g_opengl.glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-	
+
 	g_opengl.glEnableVertexAttribArray(0);
 	g_opengl.glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 	g_opengl.glEnableVertexAttribArray(1);
@@ -31,10 +31,10 @@ void Mesh::setupMesh()
 	g_opengl.glBindVertexArray(0);
 }
 
-void Mesh::Draw(Shader &shader)
+void Mesh::Draw(Shader& shader)
 {
 
-	if(shader.getType() == ShaderType::Texture)
+	if (shader.getType() == ShaderType::Texture)
 	{
 		unsigned int diffuse = 1;
 		unsigned int specular = 1;
@@ -59,5 +59,4 @@ void Mesh::Draw(Shader &shader)
 	g_opengl.glBindVertexArray(m_vao);
 	g_opengl.glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	g_opengl.glBindVertexArray(0);
-
 }

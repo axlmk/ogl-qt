@@ -1,10 +1,15 @@
 #include "SceneObject.hpp"
 
-SceneObject::SceneObject(SceneObjectType type, Selection selection) : m_model{ nullptr }, m_shd{ nullptr }, m_selectionData{ selection }, m_pick{ new Shader(ShaderType::Unicolor) }, m_type { type }
+SceneObject::SceneObject(SceneObjectType type, Selection selection)
+	: m_model{nullptr},
+	  m_shd{nullptr},
+	  m_selectionData{selection},
+	  m_pick{new Shader(ShaderType::Unicolor)},
+	  m_type{type}
 {
 	m_type = type;
 
-	if(m_type == SceneObjectType::Light)
+	if (m_type == SceneObjectType::Light)
 	{
 		m_lightProperties.type = LightType::Directional;
 		m_model = new Model("resources/models/sphere/sphere.obj");
@@ -13,29 +18,24 @@ SceneObject::SceneObject(SceneObjectType type, Selection selection) : m_model{ n
 	}
 }
 
-
-
-SceneObject::SceneObject(Model* model, Shader* shader, SceneObjectType type, Selection selection) : SceneObject(type, selection)
+SceneObject::SceneObject(Model* model, Shader* shader, SceneObjectType type, Selection selection)
+	: SceneObject(type, selection)
 {
 	linkModel(model);
 	linkShader(shader);
 }
-
 
 Model* SceneObject::getModel() const
 {
 	return m_model;
 }
 
-
 Shader* SceneObject::getShader() const
 {
 	return m_shd;
 }
 
-
-
-void SceneObject::linkModel(Model *model)
+void SceneObject::linkModel(Model* model)
 {
 	m_model = model;
 }
@@ -45,8 +45,6 @@ void SceneObject::linkShader(Shader* shader)
 	m_shd = shader;
 }
 
-
-
 void SceneObject::setSpotLight(glm::vec3 direction, float cutoff, float outerCutoff)
 {
 	m_lightProperties.type = LightType::Spot;
@@ -55,8 +53,6 @@ void SceneObject::setSpotLight(glm::vec3 direction, float cutoff, float outerCut
 	m_lightProperties.outerCutoff = outerCutoff;
 }
 
-
-
 void SceneObject::setPointLight(float linear, float quadratic)
 {
 	m_lightProperties.type = LightType::Point;
@@ -64,23 +60,21 @@ void SceneObject::setPointLight(float linear, float quadratic)
 	m_lightProperties.quadratic = quadratic;
 }
 
-
-
 void SceneObject::setDirectionalLight(glm::vec3 direction)
 {
 	m_lightProperties.type = LightType::Point;
 	m_lightProperties.direction = direction;
 }
 
-
-
-void SceneObject::setUpLights(const Camera &camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const
+void SceneObject::setUpLights(const Camera& camera,
+							  const std::vector<std::reference_wrapper<SceneObject>>& lights) const
 {
 	size_t n = lights.size();
-	int uniform = m_shd->getUniform("nLights");;
+	int uniform = m_shd->getUniform("nLights");
+	;
 	g_opengl.glUniform1i(uniform, (int)n);
 
-	for(size_t i = 0; i < n; i++)
+	for (size_t i = 0; i < n; i++)
 	{
 		auto& light = lights[i].get();
 		std::string iStr = std::to_string(i);
@@ -90,8 +84,7 @@ void SceneObject::setUpLights(const Camera &camera, const std::vector<std::refer
 
 		switch (light.m_lightProperties.type)
 		{
-			case LightType::Point:
-			{
+			case LightType::Point: {
 
 				uniform = m_shd->getUniform("lights[" + iStr + "].position");
 				g_opengl.glUniform3f(uniform, light.getPosition().x, light.getPosition().y, light.getPosition().z);
@@ -103,8 +96,7 @@ void SceneObject::setUpLights(const Camera &camera, const std::vector<std::refer
 				g_opengl.glUniform1f(uniform, light.m_lightProperties.quadratic);
 				break;
 			}
-			case LightType::Spot:
-			{
+			case LightType::Spot: {
 				uniform = m_shd->getUniform("lights[" + iStr + "].cutoff");
 				g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light.m_lightProperties.cutoff)));
 
@@ -116,14 +108,13 @@ void SceneObject::setUpLights(const Camera &camera, const std::vector<std::refer
 
 				// On purpose fallthrough
 			}
-			case LightType::Directional:
-			{
+			case LightType::Directional: {
 				uniform = m_shd->getUniform("lights[" + iStr + "].direction");
-				g_opengl.glUniform3f(uniform, light.m_lightProperties.direction.x, light.m_lightProperties.direction.y, light.m_lightProperties.direction.z);
+				g_opengl.glUniform3f(uniform, light.m_lightProperties.direction.x, light.m_lightProperties.direction.y,
+									 light.m_lightProperties.direction.z);
 				break;
 			}
-			default:
-			{
+			default: {
 				break;
 			}
 		}
@@ -143,23 +134,23 @@ void SceneObject::setUpLights(const Camera &camera, const std::vector<std::refer
 	g_opengl.glUniform3f(uniform, cameraPos.x, cameraPos.y, cameraPos.z);
 }
 
-glm::vec3 SceneObject::getPosition() const 
+glm::vec3 SceneObject::getPosition() const
 {
 	return m_model->getPosition();
 }
 
-void SceneObject::render(const Camera &camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const
+void SceneObject::render(const Camera& camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const
 {
-	if(m_shd == nullptr || m_model == nullptr)
+	if (m_shd == nullptr || m_model == nullptr)
 	{
 		return;
 	}
 
-	glm::mat4 model			= glm::mat4(1.f);
-	glm::mat4 view			= glm::mat4(1.f);
-	glm::mat4 projection	= glm::mat4(1.f);
+	glm::mat4 model = glm::mat4(1.f);
+	glm::mat4 view = glm::mat4(1.f);
+	glm::mat4 projection = glm::mat4(1.f);
 
-	if(m_isSelected)
+	if (m_isSelected)
 	{
 		g_opengl.glStencilMask(0xFF);
 		g_opengl.glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -173,25 +164,26 @@ void SceneObject::render(const Camera &camera, const std::vector<std::reference_
 
 	// World's location
 	model = m_model->getTransforms();
-	
+
 	// Camera's location
 	view = camera.getSpaceMat();
 
 	// Camera's settings)
-	projection = glm::perspective(glm::radians(camera.getFov()), 600.f / 400.f, camera.getNearPlan(), camera.getFarPlan());
-	
+	projection =
+		glm::perspective(glm::radians(camera.getFov()), 600.f / 400.f, camera.getNearPlan(), camera.getFarPlan());
+
 	// Combination of previous views
 	m_shd->setTransformation(model, view, projection);
 
 	// Lights calculations
-	if(m_shd->getType() == ShaderType::Texture)
+	if (m_shd->getType() == ShaderType::Texture)
 		setUpLights(camera, lights);
-	
+
 	// Final render
 	m_model->Draw(*m_shd);
 
 	// Selection handling
-	if(m_isSelected)
+	if (m_isSelected)
 	{
 		g_opengl.glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 		g_opengl.glStencilMask(0x00);
@@ -231,7 +223,8 @@ void SceneObject::renderPicking(const Camera& camera)
 	// Camera's location
 	view = camera.getSpaceMat();
 	// Camera's settings)
-	projection = glm::perspective(glm::radians(camera.getFov()), 600.f / 400.f, camera.getNearPlan(), camera.getFarPlan());
+	projection =
+		glm::perspective(glm::radians(camera.getFov()), 600.f / 400.f, camera.getNearPlan(), camera.getFarPlan());
 	// Combination of previous views
 	m_pick->setTransformation(model, view, projection);
 
@@ -249,20 +242,25 @@ void SceneObject::unselect()
 	m_isSelected = false;
 }
 
-glm::vec3 SceneObject::nameToColor() {
-	if (debugName == "r") {
-		m_colorId = { 255.0, 0.0, 0.0 };
+glm::vec3 SceneObject::nameToColor()
+{
+	if (debugName == "r")
+	{
+		m_colorId = {255.0, 0.0, 0.0};
 		return {1.0, 0.0, 0.0};
 	}
-	else if (debugName == "v") {
-		m_colorId = { 0.0, 255.0, 0.0 };
-		return { 0.0, 1.0, 0.0 };
+	else if (debugName == "v")
+	{
+		m_colorId = {0.0, 255.0, 0.0};
+		return {0.0, 1.0, 0.0};
 	}
-	else if (debugName == "b") {
-		m_colorId = { 0.0, 0.0, 255.0 };
-		return { 0.0, 0.0, 1.0 };
+	else if (debugName == "b")
+	{
+		m_colorId = {0.0, 0.0, 255.0};
+		return {0.0, 0.0, 1.0};
 	}
-	else {
+	else
+	{
 		std::hash<std::string> hasher;
 		int32_t id = static_cast<int32_t>(hasher(debugName));
 
@@ -270,10 +268,11 @@ glm::vec3 SceneObject::nameToColor() {
 		m_colorId.y = (id >> 8) & 0xFF;
 		m_colorId.z = (id >> 16) & 0xFF;
 
-		return { m_colorId.x / 255.0, m_colorId.y / 255.0, m_colorId.z / 255.0};
+		return {m_colorId.x / 255.0, m_colorId.y / 255.0, m_colorId.z / 255.0};
 	}
 }
 
-bool SceneObject::isId(glm::ivec3 id) const {
+bool SceneObject::isId(glm::ivec3 id) const
+{
 	return id == m_colorId;
 }
