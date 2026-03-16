@@ -18,13 +18,13 @@ void SceneViewer::paintGL()
 }
 
 SceneViewer::SceneViewer(scene* scene)
-	: m_inputsBeingPressed{},
-	  m_deltaTime{0},
+	: m_manager{scene},
+	  m_inputsBeingPressed{},
 	  m_lastMousePos{0.0, 0.0},
 	  m_lastFrameMousePos{0.0, 0.0},
-	  m_manager{scene},
-	  m_timer{std::make_unique<QTimer>(this)},
-	  m_currentTime{QDateTime::currentMSecsSinceEpoch()}
+	  m_currentTime{QDateTime::currentMSecsSinceEpoch()},
+	  m_deltaTime{0},
+	  m_timer{std::make_unique<QTimer>(this)}
 {
 	connect(&(*m_timer), &QTimer::timeout, this, QOverload<>::of(&SceneViewer::update));
 	m_timer->start(16);

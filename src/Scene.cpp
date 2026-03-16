@@ -1,7 +1,7 @@
 #include <Scene.hpp>
 #include <SceneViewer.hpp>
 
-scene::scene() : m_cameraDirection{false, false, false, false}, m_viewer{nullptr} {}
+scene::scene() : m_selectedObject{nullptr}, m_cameraDirection{false, false, false, false}, m_viewer{nullptr} {}
 
 void scene::initializeScene()
 {
@@ -121,7 +121,7 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 		}
 		m_selectedObject->render(*m_camera, getLights());
 		g_opengl.glDisable(GL_DEPTH_TEST);
-		m_gizmo->render(*m_camera, m_selectedObject, getLights());
+		m_gizmo->render(*m_camera, getLights());
 		g_opengl.glEnable(GL_DEPTH_TEST);
 	}
 
@@ -200,7 +200,7 @@ void scene::picking()
 		{
 			g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 			g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			m_gizmo->renderPicking(*m_camera, m_selectedObject);
+			m_gizmo->renderPicking(*m_camera);
 			auto id = m_pickingTex->readPixel(m_mouseCoords.x, m_mouseCoords.y);
 			if (m_gizmo->isId(id))
 			{

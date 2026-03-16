@@ -1,11 +1,13 @@
 #include "SceneObject.hpp"
 
 SceneObject::SceneObject(SceneObjectType type, Selection selection)
-	: m_model{nullptr},
+	: debugName{},
+	  m_type{type},
+	  m_model{nullptr},
 	  m_shd{nullptr},
-	  m_selectionData{selection},
 	  m_pick{new Shader(ShaderType::Unicolor)},
-	  m_type{type}
+	  m_isSelected{false},
+	  m_selectionData{selection}
 {
 	m_type = type;
 
@@ -105,8 +107,7 @@ void SceneObject::setUpLights(const Camera& camera,
 
 				uniform = m_shd->getUniform("lights[" + iStr + "].position");
 				g_opengl.glUniform3f(uniform, light.getPosition().x, light.getPosition().y, light.getPosition().z);
-
-				// On purpose fallthrough
+				[[fallthrough]];
 			}
 			case LightType::Directional: {
 				uniform = m_shd->getUniform("lights[" + iStr + "].direction");

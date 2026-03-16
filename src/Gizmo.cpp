@@ -1,11 +1,10 @@
 #include "gizmo.hpp"
 
 Gizmo::Gizmo(std::unique_ptr<SceneObject> red, std::unique_ptr<SceneObject> green, std::unique_ptr<SceneObject> blue)
-	: m_arrows{std::move(red), std::move(green), std::move(blue)}, m_selectedArrow{-1}
+	: m_selectedArrow{-1}, m_arrows{std::move(red), std::move(green), std::move(blue)}
 {}
 
-void Gizmo::render(const Camera& camera, const SceneObject* selectedObject,
-				   const std::vector<std::reference_wrapper<SceneObject>>& lights) const
+void Gizmo::render(const Camera& camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const
 {
 
 	const static float threshold = 0.25;
@@ -45,7 +44,7 @@ void Gizmo::setPosition(const glm::vec3& position)
 	m_arrows[2]->getModel()->setPosition(position);
 }
 
-void Gizmo::renderPicking(const Camera& camera, const SceneObject* selectedObject)
+void Gizmo::renderPicking(const Camera& camera)
 {
 	m_arrows[0]->renderPicking(camera);
 	m_arrows[1]->renderPicking(camera);

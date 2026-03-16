@@ -1,14 +1,14 @@
 #include "Camera.hpp"
 
 Camera::Camera(const SpaceCoord& position, float fov)
-	: m_fov{fov},
-	  m_upVec{0.0f, 1.0f, 0.0f},
+	: m_position{position},
 	  m_target{0.0f, 0.0f, 0.0f},
-	  m_farPlan{100.f},
-	  m_nearPlan{0.1f},
 	  m_rightVec{glm::cross(glm::normalize(position), {0.0, 1.0, 0.0})},
-	  m_position{position},
-	  m_projection{CameraProjection::Perspective}
+	  m_upVec{0.0f, 1.0f, 0.0f},
+	  m_projection{CameraProjection::Perspective},
+	  m_fov{fov},
+	  m_nearPlan{0.1f},
+	  m_farPlan{100.f}
 {
 	m_upVec = glm::cross(glm::normalize(position), m_rightVec);
 }
@@ -50,7 +50,6 @@ SpaceCoord Camera::getDirection(void) const
 
 glm::mat4 Camera::getSpaceMat() const
 {
-	glm::mat4 view = glm::mat4(1.);
 	return glm::lookAt(m_position, m_target, {0.0, 1.0, 0.0});
 }
 

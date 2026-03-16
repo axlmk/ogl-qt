@@ -4,7 +4,7 @@ std::map<std::filesystem::path, LoadedTextures> g_loadedTextures;
 
 Shader::Shader() : Shader(ShaderType::Custom) {}
 
-Shader::Shader(ShaderType shaderType, bool isFont) : m_shaderType{shaderType}, m_shdPrgId{}, m_font{isFont}, m_color{}
+Shader::Shader(ShaderType shaderType, bool isFont) : m_font{isFont}, m_color{}, m_shaderType{shaderType}, m_shdPrgId{}
 {}
 
 Shader::~Shader()

@@ -38,7 +38,7 @@ void Mesh::Draw(Shader& shader)
 	{
 		unsigned int diffuse = 1;
 		unsigned int specular = 1;
-		for (auto i = 0; i < textures.size(); i++)
+		for (size_t i = 0; i < textures.size(); i++)
 		{
 			g_opengl.glActiveTexture(GL_TEXTURE0 + i);
 			std::string number;

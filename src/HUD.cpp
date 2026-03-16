@@ -67,8 +67,10 @@ void HUD::generateCharacters(FT_Face face)
 		}
 
 		Character character = {glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-							   glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top), glm::ivec2(0, 0),
-							   face->glyph->advance.x};
+							   glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+							   glm::ivec2(0, 0),
+							   static_cast<unsigned int>(face->glyph->advance.x),
+							   {}};
 
 		character.bitmap.resize(character.size.x * character.size.y);
 		for (int y = 0; y < character.size.y; ++y)
