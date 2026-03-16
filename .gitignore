@@ -1,4 +1,5 @@
 build
 .vscode
+.vs
 libs/dlls
 CMakeUserPresets.json
