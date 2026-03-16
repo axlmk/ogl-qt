@@ -41,7 +41,7 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
 	QVBoxLayout* mainLayout = new QVBoxLayout;
 	QWidget* tips = new QWidget();
 	QLabel* title = new QLabel("Controls");
-	QLabel* controls = new QLabel("Us ethis for that and this for that");
+	QLabel* controls = new QLabel("Use this for that and this for that");
 	QVBoxLayout* vlayTips = new QVBoxLayout;
 	tips->setLayout(vlayTips);
 	vlayTips->setSpacing(5);

@@ -17,7 +17,6 @@ void scene::initializeScene()
 
 	Model* ground_mdl = new Model("resources/models/ground/ground.obj");
 	m_models.push_back(std::unique_ptr<Model>(std::move(ground_mdl)));
-	ground_mdl->scale(0.5);
 	ground_mdl->setPosition({0, -2, 0});
 
 	Shader* ground_shd = new Shader(ShaderType::Texture);

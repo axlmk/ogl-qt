@@ -1,6 +1,7 @@
 #include "Model.hpp"
 
-Model::Model(const std::filesystem::path& path) : m_directory{path.parent_path()}, m_scale{glm::vec3(1.0f)}
+Model::Model(const std::filesystem::path& path)
+	: m_directory{path.parent_path()}, m_scale{glm::vec3(1.0f)}, m_position{glm::vec3(0)}
 {
 	if (!std::filesystem::exists(path))
 	{

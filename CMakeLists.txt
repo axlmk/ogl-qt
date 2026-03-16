@@ -71,6 +71,6 @@ qt_standard_project_setup()
 add_subdirectory(src)
 
 set_target_properties(ogl-qt PROPERTIES
-    WIN32_EXECUTABLE ON
+    # WIN32_EXECUTABLE ON
     MACOSX_BUNDLE ON
 )
