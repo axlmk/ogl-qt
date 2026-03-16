@@ -26,6 +26,11 @@ add_executable(ogl-qt
 
 target_include_directories(ogl-qt PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(ogl-qt PUBLIC -Wall -Wextra -Wpedantic)
+endif()
+
 if(WIN32)
     add_custom_command(TARGET ogl-qt POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
