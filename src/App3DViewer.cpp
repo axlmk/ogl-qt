@@ -1,8 +1,10 @@
 #include <App3DViewer.hpp>
+#include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QObject>
 #include <QPushButton>
+#include <QScreen>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <Scene.hpp>
@@ -56,6 +58,14 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
 	globalLayout->addLayout(catalogLayout.get());
 
 	m_mainWindow->setLayout(globalLayout.get());
+
+	QScreen* screen = QGuiApplication::primaryScreen();
+	QRect screenGeometry = screen->availableGeometry();
+
+	QSize windowSize = m_mainWindow->sizeHint();
+	int x = screenGeometry.x() + (screenGeometry.width() - windowSize.width()) / 2;
+	int y = screenGeometry.y() + (screenGeometry.height() - windowSize.height()) / 2;
+	m_mainWindow->move(x, y);
 	m_mainWindow->show();
 }
 
