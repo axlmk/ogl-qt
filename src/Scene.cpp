@@ -207,22 +207,25 @@ void scene::picking()
 			}
 		}
 
-		for (auto& sceneObject : m_sceneObjects)
+		if (!gizmoSelected)
 		{
 			g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 			g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			sceneObject->renderPicking(*m_camera);
-			auto id = m_pickingTex->readPixel(m_mouseCoords.x, m_mouseCoords.y);
-			if (sceneObject->isId(id))
+			for (auto& sceneObject : m_sceneObjects)
 			{
-				if (m_selectedObject != nullptr)
+				sceneObject->renderPicking(*m_camera);
+				auto id = m_pickingTex->readPixel(m_mouseCoords.x, m_mouseCoords.y);
+				if (sceneObject->isId(id))
 				{
-					m_selectedObject->unselect();
+					if (m_selectedObject != nullptr)
+					{
+						m_selectedObject->unselect();
+					}
+					m_selectedObject = sceneObject.get();
+					sceneObject->select();
+					hasSelected = true;
+					gizmoSelected = false;
 				}
-				m_selectedObject = sceneObject.get();
-				sceneObject->select();
-				hasSelected = true;
-				gizmoSelected = false;
 			}
 		}
 
