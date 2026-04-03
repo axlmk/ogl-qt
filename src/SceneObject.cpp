@@ -1,90 +1,47 @@
 #include "SceneObject.hpp"
 
-SceneObject::SceneObject(SceneObjectType type, Selection selection)
-	: debugName{},
-	  m_type{type},
-	  m_model{nullptr},
-	  m_shd{nullptr},
-	  m_pick{new Shader(ShaderType::Unicolor)},
-	  m_isSelected{false},
-	  m_selectionData{selection}
-{
-	m_type = type;
+#include "Light.hpp"
 
-	if (m_type == SceneObjectType::Light)
-	{
-		m_lightProperties.type = LightType::Directional;
-		m_model = new Model("resources/models/sphere/sphere.obj");
-		m_shd = new Shader(ShaderType::Light);
-		m_shd->setLight();
-	}
-}
+SceneObject::SceneObject(Selection selection)
+	: debugName{}, m_model{nullptr}, m_shd{nullptr}, m_pick{new Shader(ShaderType::Unicolor)}, m_isSelected{false}, m_selectionData{selection}
+{}
 
-SceneObject::SceneObject(Model* model, Shader* shader, SceneObjectType type, Selection selection)
-	: SceneObject(type, selection)
+SceneObject::SceneObject(std::unique_ptr<Model> model, std::unique_ptr<Shader> shader, Selection selection) : SceneObject(selection)
 {
-	linkModel(model);
-	linkShader(shader);
+	m_model = std::move(model);
+	m_shd = std::move(shader);
 }
 
 Model* SceneObject::getModel() const
 {
-	return m_model;
+	return m_model.get();
 }
 
-Shader* SceneObject::getShader() const
+void SceneObject::setModel(std::unique_ptr<Model> model)
 {
-	return m_shd;
+	m_model = std::move(model);
 }
 
-void SceneObject::linkModel(Model* model)
+void SceneObject::setShader(std::unique_ptr<Shader> shader)
 {
-	m_model = model;
+	m_shd = std::move(shader);
 }
 
-void SceneObject::linkShader(Shader* shader)
+void SceneObject::_setUpLights(const Camera& camera, const std::vector<Light>& lights) const
 {
-	m_shd = shader;
-}
-
-void SceneObject::setSpotLight(glm::vec3 direction, float cutoff, float outerCutoff)
-{
-	m_lightProperties.type = LightType::Spot;
-	m_lightProperties.cutoff = cutoff;
-	m_lightProperties.direction = direction;
-	m_lightProperties.outerCutoff = outerCutoff;
-}
-
-void SceneObject::setPointLight(float linear, float quadratic)
-{
-	m_lightProperties.type = LightType::Point;
-	m_lightProperties.linear = linear;
-	m_lightProperties.quadratic = quadratic;
-}
-
-void SceneObject::setDirectionalLight(glm::vec3 direction)
-{
-	m_lightProperties.type = LightType::Point;
-	m_lightProperties.direction = direction;
-}
-
-void SceneObject::setUpLights(const Camera& camera,
-							  const std::vector<std::reference_wrapper<SceneObject>>& lights) const
-{
-	size_t n = lights.size();
 	int uniform = m_shd->getUniform("nLights");
-	;
-	g_opengl.glUniform1i(uniform, (int)n);
+	g_opengl.glUniform1i(uniform, (int)lights.size());
 
-	for (size_t i = 0; i < n; i++)
+	int i = 0;
+	for (const auto& light : lights)
 	{
-		auto& light = lights[i].get();
-		std::string iStr = std::to_string(i);
+		std::string iStr = std::to_string(i++);
+		const auto properties = light.getProperties();
 
 		uniform = m_shd->getUniform("lights[" + iStr + "].type");
-		g_opengl.glUniform1i(uniform, light.m_lightProperties.type);
+		g_opengl.glUniform1i(uniform, properties.type);
 
-		switch (light.m_lightProperties.type)
+		switch (properties.type)
 		{
 			case LightType::Point: {
 
@@ -92,18 +49,18 @@ void SceneObject::setUpLights(const Camera& camera,
 				g_opengl.glUniform3f(uniform, light.getPosition().x, light.getPosition().y, light.getPosition().z);
 
 				uniform = m_shd->getUniform("lights[" + iStr + "].linear");
-				g_opengl.glUniform1f(uniform, light.m_lightProperties.linear);
+				g_opengl.glUniform1f(uniform, properties.linear);
 
 				uniform = m_shd->getUniform("lights[" + iStr + "].quadratic");
-				g_opengl.glUniform1f(uniform, light.m_lightProperties.quadratic);
+				g_opengl.glUniform1f(uniform, properties.quadratic);
 				break;
 			}
 			case LightType::Spot: {
 				uniform = m_shd->getUniform("lights[" + iStr + "].cutoff");
-				g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light.m_lightProperties.cutoff)));
+				g_opengl.glUniform1f(uniform, glm::cos(glm::radians(properties.cutoff)));
 
 				uniform = m_shd->getUniform("lights[" + iStr + "].outerCutoff");
-				g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light.m_lightProperties.outerCutoff)));
+				g_opengl.glUniform1f(uniform, glm::cos(glm::radians(properties.outerCutoff)));
 
 				uniform = m_shd->getUniform("lights[" + iStr + "].position");
 				g_opengl.glUniform3f(uniform, light.getPosition().x, light.getPosition().y, light.getPosition().z);
@@ -111,8 +68,7 @@ void SceneObject::setUpLights(const Camera& camera,
 			}
 			case LightType::Directional: {
 				uniform = m_shd->getUniform("lights[" + iStr + "].direction");
-				g_opengl.glUniform3f(uniform, light.m_lightProperties.direction.x, light.m_lightProperties.direction.y,
-									 light.m_lightProperties.direction.z);
+				g_opengl.glUniform3f(uniform, properties.direction.x, properties.direction.y, properties.direction.z);
 				break;
 			}
 			default: {
@@ -140,7 +96,7 @@ glm::vec3 SceneObject::getPosition() const
 	return m_model->getPosition();
 }
 
-void SceneObject::render(const Camera& camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const
+void SceneObject::render(const Camera& camera, const std::vector<Light>& lights) const
 {
 	if (m_shd == nullptr || m_model == nullptr)
 	{
@@ -170,15 +126,14 @@ void SceneObject::render(const Camera& camera, const std::vector<std::reference_
 	view = camera.getSpaceMat();
 
 	// Camera's settings)
-	projection =
-		glm::perspective(glm::radians(camera.getFov()), 600.f / 400.f, camera.getNearPlan(), camera.getFarPlan());
+	projection = glm::perspective(glm::radians(camera.getFov()), 600.f / 400.f, camera.getNearPlan(), camera.getFarPlan());
 
 	// Combination of previous views
 	m_shd->setTransformation(model, view, projection);
 
 	// Lights calculations
 	if (m_shd->getType() == ShaderType::Texture)
-		setUpLights(camera, lights);
+		_setUpLights(camera, lights);
 
 	// Final render
 	m_model->Draw(*m_shd);
@@ -224,8 +179,7 @@ void SceneObject::renderPicking(const Camera& camera)
 	// Camera's location
 	view = camera.getSpaceMat();
 	// Camera's settings)
-	projection =
-		glm::perspective(glm::radians(camera.getFov()), 600.f / 400.f, camera.getNearPlan(), camera.getFarPlan());
+	projection = glm::perspective(glm::radians(camera.getFov()), 600.f / 400.f, camera.getNearPlan(), camera.getFarPlan());
 	// Combination of previous views
 	m_pick->setTransformation(model, view, projection);
 

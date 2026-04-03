@@ -1,10 +1,14 @@
 #include <App3DViewer.hpp>
+#include <QFileDialog>
 #include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QListView>
+#include <QMessageBox>
 #include <QObject>
 #include <QPushButton>
 #include <QScreen>
+#include <QStandardItemModel>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <Scene.hpp>
@@ -14,8 +18,7 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
 	// Minimal required components
 
 	m_app = std::make_unique<QApplication>(argc, argv);
-	m_mainWindow = std::make_unique<QDialog>(
-		nullptr, Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
+	m_mainWindow = std::make_unique<QDialog>(nullptr, Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
 	m_sceneViewer = std::make_unique<SceneViewer>(scene);
 
 	// Format management
@@ -37,18 +40,26 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
 	std::unique_ptr<QVBoxLayout> catalogLayout = std::make_unique<QVBoxLayout>();
 	QLabel* titreCatalogue = new QLabel("List of imported models");
 	QPushButton* importModels = new QPushButton("Import model");
+	connect(importModels, &QPushButton::clicked, this, &App3DViewer::openExplorer, Qt::UniqueConnection);
+
 	catalogLayout->addWidget(titreCatalogue);
 	catalogLayout->addWidget(importModels);
 
 	QVBoxLayout* mainLayout = new QVBoxLayout;
 	QWidget* tips = new QWidget();
 	QLabel* title = new QLabel("Controls");
-	QLabel* controls = new QLabel("Use this for that and this for that");
+	QLabel* controls = new QLabel(
+		"alt + left click : rotate around\nalt + middle click : pan around\nalt + right click : zoom\nClick on object "
+		": select it\nClick on gizmo : translate selected object");
 	QVBoxLayout* vlayTips = new QVBoxLayout;
 	tips->setLayout(vlayTips);
 	vlayTips->setSpacing(5);
 	vlayTips->addWidget(title);
 	vlayTips->addWidget(controls);
+
+	m_sceneObjectView = new QListView();
+
+	catalogLayout->addWidget(m_sceneObjectView);
 
 	mainLayout->setSpacing(0);
 	mainLayout->addWidget(container);
@@ -72,4 +83,60 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
 int App3DViewer::run(void)
 {
 	return m_mainWindow->exec();
+}
+
+void App3DViewer::setSceneObjectsModel(QStandardItemModel* sceneObjectModel)
+{
+	if (sceneObjectModel != nullptr)
+	{
+		m_sceneObjectView->setModel(sceneObjectModel);
+	}
+}
+
+void App3DViewer::openExplorer([[maybe_unused]] bool checked)
+{
+	auto filePath = QFileDialog::getOpenFileName(nullptr, "Select 3D file", {}, "3D Files (*.obj);;Images (*.jpg)", {},
+												 QFileDialog::ReadOnly | QFileDialog::DontResolveSymlinks);
+	if (filePath.isNull())
+	{
+		return;
+	}
+	QFileInfo fileInfo(filePath);
+	QDir dir(fileInfo.absolutePath());
+
+	InfoObject info;
+
+	for (const auto& file : dir.entryInfoList(QDir::Files))
+	{
+		auto name = file.fileName();
+		auto extension = file.suffix();
+		if (extension == "obj")
+		{
+			info.objectPath = file.filePath();
+			info.name = file.baseName();
+		}
+		else if (name == "diffuse.jpg")
+		{
+			info.diffusePath = file.filePath();
+		}
+		else if (name == "specular.jpg")
+		{
+			info.specularPath = file.filePath();
+		}
+		else
+		{
+			QMessageBox msg(nullptr);
+			msg.setWindowTitle("Folder doesn't contain compatible 3D project");
+			msg.setText(
+				"The folder doesn't contain a compatible 3D project. Such a project is composed of:\n"
+				"1. An object file with a '.obj' extension\n"
+				"2. A diffuse texture called 'diffuse.jpg'\n"
+				"3. A specular texture called 'specular.jpg'\n" +
+				name);
+			msg.exec();
+			return;
+		}
+	}
+
+	emit newModelAdded(info);
 }

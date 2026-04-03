@@ -2,6 +2,8 @@
 #include "SceneObject.hpp"
 #include "glm/glm.hpp"
 
+// TODO a faire heriter de sceneobject
+
 class Gizmo
 {
    public:

@@ -6,61 +6,41 @@
 #include "Model.hpp"
 #include "Shader.hpp"
 
-enum class SceneObjectType { Normal, Light, Gizmo };
-
-enum LightType { Spot, Point, Directional };
-
-struct LightProperties
-{
-	LightType type;
-	float linear;
-	float quadratic;
-	glm::vec3 direction;
-	float cutoff;
-	float outerCutoff;
-};
-
 struct Selection
 {
 	Shader* color;
 	float scale;
 };
 
+class Light;
+
 class SceneObject
 {
    public:
 	std::string debugName;
-	SceneObject(SceneObjectType type, Selection selection);
-	SceneObject(Model* geometry, Shader* shader, SceneObjectType type = SceneObjectType::Normal,
-				Selection selection = {nullptr, 0.0});
 
-	void linkShader(Shader* shader);
-	void linkModel(Model* model);
+	SceneObject(Selection selection);
+	SceneObject(std::unique_ptr<Model> geometry, std::unique_ptr<Shader> shader, Selection selection = {nullptr, 0.0});
 
+	void setShader(std::unique_ptr<Shader> shader);
+	void setModel(std::unique_ptr<Model> model);
 	Model* getModel() const;
-	Shader* getShader() const;
 
 	glm::vec3 getPosition() const;
 
-	void setDirectionalLight(glm::vec3 direction);
-	void setPointLight(float linear, float quadratic);
-	void setSpotLight(glm::vec3 direction, float cutoff, float outerCutoff = 0.0);
-	void setUpLights(const Camera& camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const;
+	void render(const Camera& camera, const std::vector<Light>& lights) const;
 
-	void render(const Camera& camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const;
 	void renderPicking(const Camera& camera);
 	void select();
 	void unselect();
 	bool isId(glm::ivec3 id) const;
 
    private:
+	void _setUpLights(const Camera& camera, const std::vector<Light>& lights) const;
 	glm::vec3 nameToColor();
 
-	SceneObjectType m_type;
-	LightProperties m_lightProperties;
-
-	Model* m_model;
-	Shader* m_shd;
+	std::unique_ptr<Model> m_model;
+	std::unique_ptr<Shader> m_shd;
 	glm::ivec3 m_colorId;
 
 	Shader* m_pick;

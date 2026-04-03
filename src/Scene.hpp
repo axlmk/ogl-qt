@@ -7,6 +7,7 @@
 #include "Camera.hpp"
 #include "Gizmo.hpp"
 #include "HUD.hpp"
+#include "Light.hpp"
 #include "Model.hpp"
 #include "PickingTexture.hpp"
 #include "SceneObject.hpp"
@@ -48,7 +49,7 @@ class scene
 	std::vector<std::unique_ptr<Model>> m_models;
 	std::vector<std::unique_ptr<Shader>> m_shaders;
 	std::vector<std::unique_ptr<SceneObject>> m_sceneObjects;
-	std::vector<std::reference_wrapper<SceneObject>> m_lights;
+	std::vector<Light> m_lights;
 	std::unique_ptr<Camera> m_camera;
 	std::unique_ptr<PickingTexture> m_pickingTex = nullptr;
 	std::unique_ptr<Gizmo> m_gizmo;
