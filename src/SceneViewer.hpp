@@ -15,6 +15,13 @@ class SceneViewer : public QOpenGLWindow
 	~SceneViewer() Q_DECL_OVERRIDE;
 
 	void initializeGL() Q_DECL_OVERRIDE;
+
+	/**
+	 * @brief Called when the window is changing size or monitor
+	 * @param[in] w The new width of the window
+	 * @param[in] h The new height of the window
+	 */
+	void resizeGL(int w, int h) Q_DECL_OVERRIDE;
 	void paintGL() Q_DECL_OVERRIDE;
 
 	void mousePressEvent(QMouseEvent* event) override;

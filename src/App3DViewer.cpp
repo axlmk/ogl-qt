@@ -24,6 +24,8 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
 	// Format management
 
 	QSurfaceFormat format;
+	format.setDepthBufferSize(24);
+	format.setStencilBufferSize(8);
 	format.setRenderableType(QSurfaceFormat::OpenGL);
 	format.setProfile(QSurfaceFormat::CoreProfile);
 	format.setVersion(3, 3);
@@ -32,7 +34,7 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
 	// Container widget
 
 	QWidget* container = QWidget::createWindowContainer(&(*m_sceneViewer));
-	container->setMinimumSize(QSize(1200, 800));
+	container->setMinimumSize(QSize(900, 600));
 
 	// Layout and widget container
 
@@ -40,10 +42,10 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
 	std::unique_ptr<QVBoxLayout> catalogLayout = std::make_unique<QVBoxLayout>();
 	QLabel* titreCatalogue = new QLabel("List of imported models");
 	QPushButton* importModels = new QPushButton("Import model");
-	connect(importModels, &QPushButton::clicked, this, &App3DViewer::openExplorer, Qt::UniqueConnection);
+	connect(importModels, &QPushButton::clicked, this, &App3DViewer::_openExplorer, Qt::UniqueConnection);
 
-	catalogLayout->addWidget(titreCatalogue);
-	catalogLayout->addWidget(importModels);
+	QPushButton* loadModels = new QPushButton("Load model in Scene");
+	connect(loadModels, &QPushButton::clicked, this, &App3DViewer::_modelSelectedToLoad, Qt::UniqueConnection);
 
 	QVBoxLayout* mainLayout = new QVBoxLayout;
 	QWidget* tips = new QWidget();
@@ -52,27 +54,27 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
 		"alt + left click : rotate around\nalt + middle click : pan around\nalt + right click : zoom\nClick on object "
 		": select it\nClick on gizmo : translate selected object");
 	QVBoxLayout* vlayTips = new QVBoxLayout;
+	m_sceneObjectView = new QListView();
+
+	catalogLayout->addWidget(titreCatalogue);
+	catalogLayout->addWidget(importModels);
+	catalogLayout->addWidget(loadModels);
 	tips->setLayout(vlayTips);
 	vlayTips->setSpacing(5);
 	vlayTips->addWidget(title);
 	vlayTips->addWidget(controls);
-
-	m_sceneObjectView = new QListView();
-
 	catalogLayout->addWidget(m_sceneObjectView);
-
 	mainLayout->setSpacing(0);
 	mainLayout->addWidget(container);
 	mainLayout->addWidget(tips);
-
 	globalLayout->addLayout(mainLayout);
 	globalLayout->addLayout(catalogLayout.get());
-
 	m_mainWindow->setLayout(globalLayout.get());
 
 	QScreen* screen = QGuiApplication::primaryScreen();
 	QRect screenGeometry = screen->availableGeometry();
 
+	// Set up the application right at the center of the main screen
 	QSize windowSize = m_mainWindow->sizeHint();
 	int x = screenGeometry.x() + (screenGeometry.width() - windowSize.width()) / 2;
 	int y = screenGeometry.y() + (screenGeometry.height() - windowSize.height()) / 2;
@@ -93,7 +95,7 @@ void App3DViewer::setSceneObjectsModel(QStandardItemModel* sceneObjectModel)
 	}
 }
 
-void App3DViewer::openExplorer([[maybe_unused]] bool checked)
+void App3DViewer::_openExplorer([[maybe_unused]] bool checked)
 {
 	auto filePath = QFileDialog::getOpenFileName(nullptr, "Select 3D file", {}, "3D Files (*.obj);;Images (*.jpg)", {},
 												 QFileDialog::ReadOnly | QFileDialog::DontResolveSymlinks);
@@ -115,11 +117,11 @@ void App3DViewer::openExplorer([[maybe_unused]] bool checked)
 			info.objectPath = file.filePath();
 			info.name = file.baseName();
 		}
-		else if (name == "diffuse.jpg")
+		else if (name == "diffuse.jpg" || name == "diffuse.png")
 		{
 			info.diffusePath = file.filePath();
 		}
-		else if (name == "specular.jpg")
+		else if (name == "specular.jpg" || name == "specular.png")
 		{
 			info.specularPath = file.filePath();
 		}
@@ -139,4 +141,14 @@ void App3DViewer::openExplorer([[maybe_unused]] bool checked)
 	}
 
 	emit newModelAdded(info);
+}
+
+void App3DViewer::_modelSelectedToLoad([[maybe_unused]] bool checked)
+{
+	auto currentIndex = m_sceneObjectView->selectionModel()->currentIndex();
+	if (!currentIndex.isValid())
+	{
+		return;
+	}
+	emit modelLoaded(currentIndex.row());
 }

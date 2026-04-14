@@ -1,29 +1,74 @@
 #pragma once
+#include "Model.hpp"
 #include "SceneObject.hpp"
 #include "glm/glm.hpp"
 
-// TODO a faire heriter de sceneobject
-
-class Gizmo
+class Gizmo : public SceneObject
 {
    public:
-	Gizmo(std::unique_ptr<SceneObject> red, std::unique_ptr<SceneObject> green, std::unique_ptr<SceneObject> blue);
-	void render(const Camera& camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const;
+	enum ArrowDirection { X, Y, Z, None };
 
-	void renderPicking(const Camera& camera);
+	explicit Gizmo();
 
-	bool isId(glm::ivec3 id);
+	/**
+	 * @brief Load the gizmo's model and compile it's shader
+	 */
+	void load(void);
+
+	void render(const Camera& camera, const std::vector<LightProperties*>& lights) const override;
+
+	void renderPicking(const Camera& camera) const override;
+
+	/**
+	 * @brief Indicates if the \p id matches the Gizmo's id
+	 * @param[in] id The id of the object to compare
+	 * @return The indication
+	 */
+	bool isId(const glm::ivec3& id) const override;
 
 	void setPosition(const glm::vec3& position);
 
+	/**
+	 * @brief Select the gizmo
+	 * @param[in] id The id of the arrow to select
+	 */
+	void select(glm::ivec3 id);
+
+	/**
+	 * @brief Unselect the gizmo
+	 */
+	void unselect(void);
+
+	/**
+	 * @brief Indicates if the gizmo is selected or not
+	 * @return The selection state
+	 */
 	bool isSelected(void) const;
 
 	int getSelectedIndex(void) const;
 
-	SceneObject* getSelectedArrow(void) const;
+	/**
+	 * @brief Get the color id of the given arrow
+	 * @param[in] arrow The arrow
+	 * @return The color id
+	 */
+	glm::vec3 _getColorId(ArrowDirection arrow) const;
 
    private:
-	int m_selectedArrow;
-	std::array<std::unique_ptr<SceneObject>, 3> m_arrows;
-	glm::vec3 m_localisation;
+	/**
+ 	 * @brief Model one arrow of the gizmo
+     */
+	struct Arrow
+	{
+		Model mdl;			 ///< The model
+		Shader shd;			 ///< The Shader
+		glm::ivec3 colorId;	 ///< The color ID
+	};
+
+	ArrowDirection m_selectedArrow;	 ///< Represents the selected arrow of the gizmo
+	std::array<Arrow, 3> m_arrows;	 ///< The three arrows composing the gizmo
+	glm::vec3 m_position;			 ///< The position of the gizmo
+
+	constexpr static float m_scalingFactor = 0.5f;	///< Scaling factor of the gizmo
+	constexpr static float m_threshold = 0.25;		///< The threshold from which an arrow is seen or not
 };

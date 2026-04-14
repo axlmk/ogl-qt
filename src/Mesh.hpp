@@ -37,7 +37,7 @@ class Mesh
 	std::vector<Texture> textures;
 
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
-	void Draw(Shader& shader);
+	void Draw(const Shader& shader) const;
 
    private:
 	unsigned int m_vao, m_ebo, m_vbo;

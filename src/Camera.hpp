@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QDebug>
 #include <Utils.hpp>
 #include <cmath>
 #include <exception>

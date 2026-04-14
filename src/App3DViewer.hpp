@@ -29,9 +29,20 @@ class App3DViewer : public QObject
    signals:
 	void newModelAdded(InfoObject info);
 
+	/**
+	 * @brief Emits that a new model should be loaded
+	 */
+	void modelLoaded(uint modelIndex);
+
    private slots:
 
-	void openExplorer(bool checked);
+	void _openExplorer(bool checked);
+
+	/**
+	 * @brief Get what modelIndex should be loaded
+	 * @param[in] checked The state of the button
+	 */
+	void _modelSelectedToLoad(bool checked);
 
    private:
 	std::unique_ptr<QApplication> m_app;

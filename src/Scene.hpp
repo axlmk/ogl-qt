@@ -7,14 +7,14 @@
 #include "Camera.hpp"
 #include "Gizmo.hpp"
 #include "HUD.hpp"
-#include "Light.hpp"
+#include "LightObject.hpp"
 #include "Model.hpp"
 #include "PickingTexture.hpp"
 #include "SceneObject.hpp"
 #include "Shader.hpp"
 #include "glm/glm.hpp"
 
-class SceneViewer;
+struct LightProperties;
 
 enum class Mouvement { Forward, Backward, Left, Right };
 
@@ -23,40 +23,59 @@ class scene
    public:
 	scene();
 
-	std::unique_ptr<Camera>& getCamera();
-	std::vector<std::unique_ptr<Model>>& getModels();
-	std::vector<std::unique_ptr<Shader>>& getShaders();
-	std::vector<std::reference_wrapper<SceneObject>> getLights();
+	//ajouter la selection aux objets et garder trace de quel objet est selectionne
 
-	void tryToSelect(glm::ivec2 mouseCoords, int viewportWidth, int viewportHeight);
+	Camera& getCamera(void);
 
-	void setSceneViewer(SceneViewer* sceneViewer);
+	/**
+	 * @brief The mouse is clicked there we might try to select an object within the scene
+	 * @param[in] mouseCoords The coordinates where the mouse is clicking
+	 */
+	void enablePicking(glm::ivec2 mouseCoords);
 
-	void initializeScene();
+	/**
+	 * @brief Disable the picking state of the scene
+	 */
+	void disablePicking(void);
+
+	void initializeScene(int viewportWidth, int viewportHeight);
 	void renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed, qint64 deltaTime);
 	void walkCamera(Mouvement mouvsement, bool active);
 	void focusCameraOnSelectedObject(void);
 	void tryMoveObject(const glm::ivec2& mouseDiff);
 
+	/**
+	 * @brief Updates the viewport after a resizing of its window
+	 * @param[in] width The new width of the window
+	 * @param[in] heigth The new height of the window
+	 */
+	void updateViewport(int width, int height);
+
+	/**
+	 * @brief Add an object to the list of the scene's renderable
+	 * @param[in] renderable The object to add
+	 */
+	void addObjectToRenderables(SceneObject* renderable);
+
 	std::string getSelectedObjectCoordinateStr(void) const;
 
-	bool m_isPicking = false;
-
    private:
-	void picking();
+	void _picking();
 
-	std::vector<std::unique_ptr<HUD>> m_huds;
-	std::vector<std::unique_ptr<Model>> m_models;
-	std::vector<std::unique_ptr<Shader>> m_shaders;
-	std::vector<std::unique_ptr<SceneObject>> m_sceneObjects;
-	std::vector<Light> m_lights;
-	std::unique_ptr<Camera> m_camera;
-	std::unique_ptr<PickingTexture> m_pickingTex = nullptr;
-	std::unique_ptr<Gizmo> m_gizmo;
+	// std::vector < std::unique_ptrHUD >> m_huds;
+	std::vector<SceneObject*> m_renderedObjects;  ///< All the objects present in the scene
+	std::vector<LightProperties*> m_lights;		  ///< All the lights that illuminate the scene
+
+	Camera m_camera;
+	PickingTexture m_pickingTex;
+	Gizmo m_gizmo;	///< Gizmo places at the selected object's location
 
 	SceneObject* m_selectedObject;
 
+	Selection m_selection;	///< The selection applied to selected objects
+
 	bool m_cameraDirection[4];
 	glm::ivec2 m_mouseCoords;
-	SceneViewer* m_viewer;
+
+	bool m_isPicking = false;  ///< Indicates if the user is trying to pick an object
 };

@@ -37,11 +37,14 @@ class Shader
 	void addTexture(const std::filesystem::path& texturePath);
 	void setCustom(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath);
 
-	void setTransformation(glm::mat4 model, glm::mat4 view, glm::mat4 projection);
+	void setTransformation(glm::mat4 model, glm::mat4 view, glm::mat4 projection) const;
 	int getUniform(std::string) const;
 	ShaderType getType() const;
 
-	void compile(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath);
+	/**
+	 * @brief Compile the shader with the shader files set with the setFunctions
+	 */
+	void compile(void);
 	void use() const;
 
    private:
@@ -62,13 +65,14 @@ class Shader
 	RGBColor m_color;
 
 	ShaderType m_shaderType;
+
 	std::filesystem::path m_vtxShdPath;
 	std::filesystem::path m_frgShdPath;
 	unsigned int m_shdPrgId;
 	std::string m_name;
 
-	std::string getFileContent(const std::filesystem::path& path);
-	void setShaders(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath);
+	std::string _getFileContent(const std::filesystem::path& path);
+	void _setShaders(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath);
 
 	void deleteShaders(unsigned int vtx, unsigned frg);
 	void deleteTexture();

@@ -42,12 +42,20 @@ void SceneViewer::initializeGL()
 	g_opengl.glEnable(GL_BLEND);
 	g_opengl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	m_manager->initializeScene();
+	float dpr = devicePixelRatioF();
+	g_opengl.glViewport(0, 0, geometry().width() * dpr, geometry().height() * dpr);
+	m_manager->initializeScene(geometry().width() * dpr, geometry().height() * dpr);
+}
+
+void SceneViewer::resizeGL(int w, int h)
+{
+	float dpr = devicePixelRatioF();
+	g_opengl.glViewport(0, 0, w * dpr, h * dpr);
+	m_manager->updateViewport(w * dpr, h * dpr);
 }
 
 void SceneViewer::keyPressEvent(QKeyEvent* event)
 {
-
 	if (event->text() == "z")
 		m_inputsBeingPressed["z"] = true;
 
@@ -109,8 +117,10 @@ void SceneViewer::mousePressEvent(QMouseEvent* event)
 			m_inputsBeingPressed["left"] = true;
 			if (!m_inputsBeingPressed["alt"])
 			{
-				m_manager->tryToSelect({event->pos().x(), event->pos().y()}, geometry().width(), geometry().height());
-				m_lastFrameMousePos = glm::ivec2(event->pos().x(), event->pos().y());
+				float dpr = devicePixelRatioF();
+				glm::ivec2 mouse_coord{event->pos().x() * dpr, event->pos().y() * dpr};
+				m_manager->enablePicking(mouse_coord);
+				m_lastFrameMousePos = mouse_coord;
 			}
 			break;
 		case Qt::MiddleButton:
@@ -130,7 +140,7 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent* event)
 	{
 		case Qt::LeftButton:
 			m_inputsBeingPressed["left"] = false;
-			m_manager->m_isPicking = false;
+			m_manager->disablePicking();
 			break;
 		case Qt::MiddleButton:
 			m_inputsBeingPressed["middle"] = false;
@@ -154,17 +164,18 @@ void SceneViewer::mouseMoveEvent(QMouseEvent* event)
 		glm::vec2 currentCursor{current.x(), current.y()};
 
 		if (m_inputsBeingPressed["left"])
-			m_manager->getCamera()->rotate(centeredCursor, currentCursor);
+			m_manager->getCamera().rotate(centeredCursor, currentCursor);
 		else if (m_inputsBeingPressed["middle"])
-			m_manager->getCamera()->pan(centeredCursor, currentCursor);
+			m_manager->getCamera().pan(centeredCursor, currentCursor);
 		else if (m_inputsBeingPressed["right"])
-			m_manager->getCamera()->zoom(centeredCursor, currentCursor);
+			m_manager->getCamera().zoom(centeredCursor, currentCursor);
 
 		cursor().setPos(centeredCursor.x, centeredCursor.y);
 	}
 	else if (m_inputsBeingPressed["left"])
 	{
-		auto currentMousePos = glm::ivec2(event->pos().x(), event->pos().y());
+		float dpr = devicePixelRatioF();
+		auto currentMousePos = glm::ivec2(event->pos().x() * dpr, event->pos().y() * dpr);
 		glm::ivec2 mouseDiff = m_lastFrameMousePos - currentMousePos;
 		m_manager->tryMoveObject(mouseDiff);
 		m_lastFrameMousePos = currentMousePos;

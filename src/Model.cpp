@@ -1,16 +1,14 @@
 #include "Model.hpp"
 
-Model::Model(const std::filesystem::path& path)
-	: m_directory{path.parent_path()}, m_scale{glm::vec3(1.0f)}, m_position{glm::vec3(0)}
+Model::Model(const std::filesystem::path& path) : m_objectFile{path}, m_directory{path.parent_path()}, m_scale{glm::vec3(1.0f)}, m_position{glm::vec3(0)}
 {
 	if (!std::filesystem::exists(path))
 	{
 		throw std::invalid_argument("File [" + path.string() + "] doesn't exist.");
 	}
-	this->loadModel(path);
 }
 
-void Model::Draw(Shader& shader)
+void Model::Draw(const Shader& shader) const
 {
 	for (auto& mesh : m_meshes)
 	{
@@ -18,14 +16,14 @@ void Model::Draw(Shader& shader)
 	}
 }
 
-void Model::loadModel(const std::filesystem::path& path)
+void Model::loadModel(void)
 {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path.string(), aiProcess_Triangulate | aiProcess_FlipUVs);
+	const aiScene* scene = importer.ReadFile(m_objectFile.string(), aiProcess_Triangulate | aiProcess_FlipUVs);
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
 		qCritical() << "Assimp:" << importer.GetErrorString();
-		throw std::runtime_error("File [" + path.string() + "] could not be loaded.");
+		throw std::runtime_error("File [" + m_objectFile.string() + "] could not be loaded.");
 	}
 
 	processNode(scene->mRootNode, scene);

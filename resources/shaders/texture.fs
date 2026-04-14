@@ -47,7 +47,6 @@ vec3 calculateLight(Light light, vec3 normal, vec3 fragPos, vec3 camDir);
 void main()
 {
 	vec3 finalColor = vec3(0.0);
-	vec3 ambient	= vec3(0.0);
 
 	if(nLights <= MAX_LIGHTS)
 	{
@@ -55,7 +54,6 @@ void main()
 		vec3 nCameraDir = normalize(cameraPos - fragPos);
 
 		float baseIntensity = 2;
-		ambient  = 0.2 * vec3(texture(material.diffuse_1, textureCoord));
 
 		for(int i = 0; i < nLights; i++)
 		{
@@ -79,7 +77,7 @@ vec3 calculateLight(Light light, vec3 normal, vec3 fragPos, vec3 camDir)
 
 	// Diffuse
 	float diff			= max(dot(normal, lightDirection), 0.0);
-	vec3 diffuse		= light.diffuse * vec3(texture(material.diffuse_1, textureCoord)) * diff;
+	vec3 diffuse		= (light.diffuse * vec3(texture(material.diffuse_1, textureCoord)) * diff) + light.ambient;
 
 	// Specular
 	vec3 reflectDir		= reflect(-lightDirection, normal);

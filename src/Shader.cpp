@@ -4,8 +4,7 @@ std::map<std::filesystem::path, LoadedTextures> g_loadedTextures;
 
 Shader::Shader() : Shader(ShaderType::Custom) {}
 
-Shader::Shader(ShaderType shaderType, bool isFont) : m_font{isFont}, m_color{}, m_shaderType{shaderType}, m_shdPrgId{}
-{}
+Shader::Shader(ShaderType shaderType, bool isFont) : m_font{isFont}, m_color{}, m_shaderType{shaderType}, m_shdPrgId{} {}
 
 Shader::~Shader()
 {
@@ -27,13 +26,12 @@ void Shader::setCustom(const std::filesystem::path& vtxShdPath, const std::files
 
 	m_vtxShdPath = vtxShdPath;
 	m_frgShdPath = frgShdPath;
-
-	compile(vtxShdPath, frgShdPath);
 }
 
 void Shader::setLight()
 {
-	compile("resources/shaders/unicolor.vs", "resources/shaders/unicolor.fs");
+	m_vtxShdPath = "resources/shaders/unicolor.vs";
+	m_frgShdPath = "resources/shaders/unicolor.fs";
 }
 
 void Shader::setColor(RGBColor color)
@@ -44,7 +42,9 @@ void Shader::setColor(RGBColor color)
 	}
 
 	m_color = color;
-	compile("resources/shaders/unicolor.vs", "resources/shaders/unicolor.fs");
+
+	m_vtxShdPath = "resources/shaders/unicolor.vs";
+	m_frgShdPath = "resources/shaders/unicolor.fs";
 }
 
 void Shader::setColor(std::string color)
@@ -75,7 +75,8 @@ void Shader::setColor(std::string color)
 		throw std::invalid_argument(err_msg);
 	}
 
-	compile("resources/shaders/unicolor.vs", "resources/shaders/unicolor.fs");
+	m_vtxShdPath = "resources/shaders/unicolor.vs";
+	m_frgShdPath = "resources/shaders/unicolor.fs";
 }
 
 void Shader::addTexture(const std::filesystem::path& texturePath)
@@ -91,9 +92,9 @@ void Shader::addTexture(const std::filesystem::path& texturePath)
 	}
 
 	int width, height, nrChannels;
-	if (m_font)
+	if (!m_font)
 	{
-		stbi_set_flip_vertically_on_load(false);
+		stbi_set_flip_vertically_on_load(true);
 	}
 	unsigned char* data = stbi_load(texturePath.string().c_str(), &width, &height, &nrChannels, 0);
 
@@ -106,14 +107,17 @@ void Shader::addTexture(const std::filesystem::path& texturePath)
 
 	if (m_font)
 	{
-		stbi_set_flip_vertically_on_load(true);
-		compile("resources/shaders/font.vs", "resources/shaders/font.fs");
+		m_vtxShdPath = "resources/shaders/font.vs";
+		m_frgShdPath = "resources/shaders/font.fs";
 	}
 	else
-		compile("resources/shaders/texture.vs", "resources/shaders/texture.fs");
+	{
+		m_vtxShdPath = "resources/shaders/texture.vs";
+		m_frgShdPath = "resources/shaders/texture.fs";
+	}
 }
 
-void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath)
+void Shader::_setShaders(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath)
 {
 	int success;
 	unsigned int vtxShd = 0, frgShd = 0;
@@ -121,7 +125,7 @@ void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::file
 
 	// VERTEX SHADER
 
-	const std::string vertexShaderContent = getFileContent(vtxShdPath);
+	const std::string vertexShaderContent = _getFileContent(vtxShdPath);
 	if (vertexShaderContent.empty())
 	{
 		throw std::invalid_argument("Vertex shader [" + vtxShdPath.string() + "]content could not be loaded");
@@ -142,7 +146,7 @@ void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::file
 
 	// FRAGMENT SHADER
 
-	const std::string fragmentShaderContent = getFileContent(frgShdPath);
+	const std::string fragmentShaderContent = _getFileContent(frgShdPath);
 	if (fragmentShaderContent.empty())
 	{
 		deleteShaders(vtxShd, frgShd);
@@ -178,7 +182,7 @@ void Shader::setShaders(const std::filesystem::path& vtxShdPath, const std::file
 	}
 }
 
-void Shader::setTransformation(glm::mat4 model, glm::mat4 view, glm::mat4 projection)
+void Shader::setTransformation(glm::mat4 model, glm::mat4 view, glm::mat4 projection) const
 {
 	unsigned int modelUni = getUniform("t.model");
 	g_opengl.glUniformMatrix4fv(modelUni, 1, GL_FALSE, glm::value_ptr(model));
@@ -244,7 +248,7 @@ void Shader::use() const
 	}
 }
 
-std::string Shader::getFileContent(const std::filesystem::path& path)
+std::string Shader::_getFileContent(const std::filesystem::path& path)
 {
 
 	if (!std::filesystem::exists(path))
@@ -298,9 +302,9 @@ int Shader::getUniform(std::string uniform) const
 	return ret;
 }
 
-void Shader::compile(const std::filesystem::path& vtxShdPath, const std::filesystem::path& frgShdPath)
+void Shader::compile(void)
 {
-	if (vtxShdPath.empty() || frgShdPath.empty())
+	if (m_vtxShdPath.empty() || m_frgShdPath.empty())
 	{
 		throw std::invalid_argument("Vertex and fragment shaders have not been specified before compilation");
 	}
@@ -308,58 +312,53 @@ void Shader::compile(const std::filesystem::path& vtxShdPath, const std::filesys
 	switch (m_shaderType)
 	{
 		case ShaderType::Texture: {
-			// No need to set the shaders if a texture has already been added
-			if (m_texturesInfo.size() > 1)
+			for (auto& textInfo : m_texturesInfo)
 			{
-				return;
+				if (!textInfo.data)
+				{
+					throw std::invalid_argument("Texture data have not been loaded before compilation");
+				}
+
+				GLenum format;
+
+				switch (textInfo.nrChannels)
+				{
+					case 1:
+						format = GL_RED;
+						break;
+					case 3:
+						format = GL_RGB;
+						break;
+					case 4:
+						format = GL_RGBA;
+						break;
+					default:
+						throw std::runtime_error("Unknown texture type");
+						break;
+				}
+
+				if (m_font)
+					g_opengl.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+				g_opengl.glGenTextures(1, &textInfo.buffer);
+				g_opengl.glBindTexture(GL_TEXTURE_2D, textInfo.buffer);
+				g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+				g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+				g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+				g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+				g_opengl.glTexImage2D(GL_TEXTURE_2D, 0, format, textInfo.width, textInfo.height, 0, format, GL_UNSIGNED_BYTE, textInfo.data);
+				g_opengl.glGenerateMipmap(GL_TEXTURE_2D);
+
+				stbi_image_free(textInfo.data);
 			}
-
-			TextureInfo& textInfo = m_texturesInfo.back();
-			if (!textInfo.data)
-			{
-				throw std::invalid_argument("Texture data have not been loaded before compilation");
-			}
-
-			GLenum format;
-
-			switch (textInfo.nrChannels)
-			{
-				case 1:
-					format = GL_RED;
-					break;
-				case 3:
-					format = GL_RGB;
-					break;
-				case 4:
-					format = GL_RGBA;
-					break;
-				default:
-					throw std::runtime_error("Unknown texture type");
-					break;
-			}
-
-			if (m_font)
-				g_opengl.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-			g_opengl.glGenTextures(1, &textInfo.buffer);
-			g_opengl.glBindTexture(GL_TEXTURE_2D, textInfo.buffer);
-			g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			g_opengl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-			g_opengl.glTexImage2D(GL_TEXTURE_2D, 0, format, textInfo.width, textInfo.height, 0, format,
-								  GL_UNSIGNED_BYTE, textInfo.data);
-			g_opengl.glGenerateMipmap(GL_TEXTURE_2D);
-
-			stbi_image_free(textInfo.data);
 		}
 		break;
 		default:
 			break;
 	}
 
-	setShaders(vtxShdPath, frgShdPath);
+	_setShaders(m_vtxShdPath, m_frgShdPath);
 }
 
 int TextureFromFile(const std::filesystem::path& texturePath, TextureType type)

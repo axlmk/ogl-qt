@@ -7,6 +7,7 @@
 #include "Scene.hpp"
 
 class QStandardItemModel;
+class SceneObject;
 
 class App3D : public QObject
 {
@@ -14,14 +15,28 @@ class App3D : public QObject
    public:
 	App3D(int argc, char* argv[]);
 	int run(void);
-	scene* getscene(void) const;
 
    private slots:
 	void newModelAdded(InfoObject info);
 
+	/**
+	 * @brief Load a model at the \p rowIndex index
+	 * @param[in] rowIndex The index of the model to load
+	 */
+	void loadModel(uint rowIndex);
+
    private:
-	std::unique_ptr<App3DViewer> m_app3DViewer;
-	std::unique_ptr<scene> m_scene;
+	/**
+	* @brief Add all the elementary objects to the list of available objects
+    */
+	void _initializeBasicsObjects(void);
+
+	scene m_scene;
+	App3DViewer m_app3DViewer;
+
+	std::vector<Model> m_models;
+	std::vector<Shader> m_shaders;
+	std::vector<std::unique_ptr<SceneObject>> m_availableObjects;
 
 	QStandardItemModel* m_sceneObjectModel;
 };

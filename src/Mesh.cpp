@@ -31,7 +31,7 @@ void Mesh::setupMesh()
 	g_opengl.glBindVertexArray(0);
 }
 
-void Mesh::Draw(Shader& shader)
+void Mesh::Draw(const Shader& shader) const
 {
 
 	if (shader.getType() == ShaderType::Texture)

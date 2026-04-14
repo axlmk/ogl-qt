@@ -8,8 +8,10 @@ add_executable(ogl-qt
     Camera.hpp
     Gizmo.cpp
     HUD.cpp
-    Light.cpp
-    Light.hpp
+    LightObject.cpp
+    LightObject.hpp
+    LightProperties.cpp
+    LightProperties.hpp
     Mesh.cpp
     Mesh.hpp
     Model.cpp

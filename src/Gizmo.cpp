@@ -1,52 +1,71 @@
 #include "gizmo.hpp"
 
-Gizmo::Gizmo(std::unique_ptr<SceneObject> red, std::unique_ptr<SceneObject> green, std::unique_ptr<SceneObject> blue)
-	: m_selectedArrow{-1}, m_arrows{std::move(red), std::move(green), std::move(blue)}
+#include "Camera.hpp"
+
+Gizmo::Gizmo()
+	: m_selectedArrow{ArrowDirection::None},
+	  m_arrows{Arrow(Model("resources/models/gizmo/x.obj"), Shader(ShaderType::Unicolor), {255, 0., 0.}),
+			   Arrow(Model("resources/models/gizmo/y.obj"), Shader(ShaderType::Unicolor), {0., 255, 0.}),
+			   Arrow(Model("resources/models/gizmo/z.obj"), Shader(ShaderType::Unicolor), {0., 0., 255})},
+	  m_position{0.}
 {}
 
-void Gizmo::render(const Camera& camera, const std::vector<std::reference_wrapper<SceneObject>>& lights) const
+void Gizmo::load(void)
 {
+	m_arrows[0].mdl.loadModel();
+	m_arrows[0].shd.setColor("#FF0000");
+	m_arrows[0].shd.compile();
 
-	const static float threshold = 0.25;
+	m_arrows[1].mdl.loadModel();
+	m_arrows[1].shd.setColor("#00FF00");
+	m_arrows[1].shd.compile();
+
+	m_arrows[2].mdl.loadModel();
+	m_arrows[2].shd.setColor("#0000FF");
+	m_arrows[2].shd.compile();
+}
+
+void Gizmo::render(const Camera& camera, [[maybe_unused]] const std::vector<LightProperties*>& lights) const
+{
 	const glm::vec3 A{0., 0., 1.};
 	const glm::vec3 C{1., 0., 0.};
 	const glm::vec3 D{0., 1., 0.};
 	const auto B = camera.getDirection();
+
 	const auto xCos = (glm::dot(A, B)) / (glm::length(A) * glm::length(B));
 	const auto zCos = (glm::dot(C, B)) / (glm::length(C) * glm::length(B));
 	const auto YCos = (glm::dot(D, B)) / (glm::length(D) * glm::length(B));
 
-	const static float scalingFactor = 0.1f;
+	const auto lenCamArrow = glm::length(camera.getPosition() - m_position);
 
-	if (std::abs(xCos) > threshold || std::abs(YCos) > threshold)
+	if (std::abs(xCos) > m_threshold || std::abs(YCos) > m_threshold)
 	{
-		const auto lenCamArrow = glm::length(camera.getPosition() - m_arrows[0]->getPosition());
-		m_arrows[0]->getModel()->scale(lenCamArrow * scalingFactor);
-		m_arrows[0]->render(camera, lights);
+		auto modelX = m_arrows[0].mdl;
+		modelX.scale(m_scalingFactor);
+		SceneObject::_render(camera, lights, modelX, m_arrows[0].shd);
 	}
 
-	const auto lenCamArrow = glm::length(camera.getPosition() - m_arrows[1]->getPosition());
-	m_arrows[1]->getModel()->scale(lenCamArrow * scalingFactor);
-	m_arrows[1]->render(camera, lights);
+	auto modelY = m_arrows[1].mdl;
+	modelY.scale(m_scalingFactor);
+	SceneObject::_render(camera, lights, modelY, m_arrows[1].shd);
 
-	if (std::abs(zCos) > threshold || std::abs(YCos) > threshold)
+	if (std::abs(zCos) > m_threshold || std::abs(YCos) > m_threshold)
 	{
-		const auto lenCamArrow = glm::length(camera.getPosition() - m_arrows[2]->getPosition());
-		m_arrows[2]->getModel()->scale(lenCamArrow * scalingFactor);
-		m_arrows[2]->render(camera, lights);
+		auto modelZ = m_arrows[2].mdl;
+		modelZ.scale(m_scalingFactor);
+		SceneObject::_render(camera, lights, modelZ, m_arrows[2].shd);
 	}
 }
 
 void Gizmo::setPosition(const glm::vec3& position)
 {
-	m_arrows[0]->getModel()->setPosition(position);
-	m_arrows[1]->getModel()->setPosition(position);
-	m_arrows[2]->getModel()->setPosition(position);
+	m_arrows[0].mdl.setPosition(position);
+	m_arrows[1].mdl.setPosition(position);
+	m_arrows[2].mdl.setPosition(position);
 }
 
-void Gizmo::renderPicking(const Camera& camera)
+void Gizmo::renderPicking(const Camera& camera) const
 {
-	const static float threshold = 0.25;
 	const glm::vec3 A{0., 0., 1.};
 	const glm::vec3 C{1., 0., 0.};
 	const glm::vec3 D{0., 1., 0.};
@@ -55,64 +74,78 @@ void Gizmo::renderPicking(const Camera& camera)
 	const auto zCos = (glm::dot(C, B)) / (glm::length(C) * glm::length(B));
 	const auto YCos = (glm::dot(D, B)) / (glm::length(D) * glm::length(B));
 
-	const static float scalingFactor = 0.1f;
+	const auto lenCamArrow = glm::length(camera.getPosition() - m_position);
 
-	if (std::abs(xCos) > threshold || std::abs(YCos) > threshold)
+	if (std::abs(xCos) > m_threshold || std::abs(YCos) > m_threshold)
 	{
-		const auto lenCamArrow = glm::length(camera.getPosition() - m_arrows[0]->getPosition());
-		m_arrows[0]->getModel()->scale(lenCamArrow * scalingFactor);
-		m_arrows[0]->renderPicking(camera);
+		auto modelX = m_arrows[0].mdl;
+		modelX.scale(m_scalingFactor);
+		_renderPicking(camera, modelX, _getColorId(ArrowDirection::X));
 	}
 
-	const auto lenCamArrow = glm::length(camera.getPosition() - m_arrows[1]->getPosition());
-	m_arrows[1]->getModel()->scale(lenCamArrow * scalingFactor);
-	m_arrows[1]->renderPicking(camera);
+	auto modelY = m_arrows[1].mdl;
+	modelY.scale(m_scalingFactor);
+	_renderPicking(camera, modelY, _getColorId(ArrowDirection::Y));
 
-	if (std::abs(zCos) > threshold || std::abs(YCos) > threshold)
+	if (std::abs(zCos) > m_threshold || std::abs(YCos) > m_threshold)
 	{
-		const auto lenCamArrow = glm::length(camera.getPosition() - m_arrows[2]->getPosition());
-		m_arrows[2]->getModel()->scale(lenCamArrow * scalingFactor);
-		m_arrows[2]->renderPicking(camera);
+		auto modelZ = m_arrows[2].mdl;
+		modelZ.scale(m_scalingFactor);
+		_renderPicking(camera, modelZ, _getColorId(ArrowDirection::Z));
 	}
 }
 
-bool Gizmo::isId(const glm::ivec3 id)
+glm::vec3 Gizmo::_getColorId(ArrowDirection arrow) const
 {
-	if (m_arrows[0]->isId(id))
+	switch (arrow)
 	{
-		m_selectedArrow = 0;
+		case ArrowDirection::X:
+			return {1., 0., 0.};
+		case ArrowDirection::Y:
+			return {0., 1., 0.};
+		case ArrowDirection::Z:
+			return {0., 0., 1.};
+		default:
+			return {0., 0., 0.};
 	}
-	else if (m_arrows[1]->isId(id))
-	{
-		m_selectedArrow = 1;
-	}
-	else if (m_arrows[2]->isId(id))
-	{
-		m_selectedArrow = 2;
-	}
-	else
-	{
-		m_selectedArrow = -1;
-		return false;
-	}
-	return true;
 }
 
-SceneObject* Gizmo::getSelectedArrow(void) const
+bool Gizmo::isId(const glm::ivec3& id) const
 {
-	if (m_selectedArrow >= 0 && m_selectedArrow < 3)
-	{
-		return m_arrows[m_selectedArrow].get();
-	}
-	return nullptr;
+	return id == glm::ivec3(255, 0, 0) || id == glm::ivec3(0, 255, 0) || id == glm::ivec3(0, 0, 255);
 }
 
 bool Gizmo::isSelected(void) const
 {
-	return m_selectedArrow != -1;
+	return m_selectedArrow != ArrowDirection::None;
 }
 
 int Gizmo::getSelectedIndex(void) const
 {
 	return m_selectedArrow;
+}
+
+void Gizmo::select(glm::ivec3 id)
+{
+	if ((id.x == 255) && (id.y == 0) && (id.z == 0))
+	{
+		m_selectedArrow = ArrowDirection::X;
+	}
+	else if ((id.x == 0) && (id.y == 255) && (id.z == 0))
+	{
+		m_selectedArrow = ArrowDirection::Y;
+	}
+	else if ((id.x == 0) && (id.y == 0) && (id.z == 255))
+	{
+		m_selectedArrow = ArrowDirection::Z;
+	}
+	else
+	{
+		m_selectedArrow = ArrowDirection::None;
+	}
+}
+
+void Gizmo::unselect(void)
+{
+	select({0, 0, 0});
 }
