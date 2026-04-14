@@ -3,8 +3,8 @@
 ## A project to learn the usage of OpenGL and Qt
 
 ## 1. Build the project 
-### My prefered way to build the project
-Using VSCode, I append the paths of the CMake executable and of the compiler in the `settings.json` file of the user.
+### My preferred way of building the project
+Using VSCode, I append the paths of the CMake executable and of the compiler into the `settings.json` file of the user.
 ```json
 "cmake.cmakePath": "C:\\Qt\\Tools\\CMake_64\\bin\\cmake",
 "cmake.environment": {
