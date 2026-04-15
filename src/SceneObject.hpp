@@ -125,4 +125,5 @@ class SceneObject
 	Shader* m_shd;		   ///< The shader of the object
 	glm::ivec3 m_colorId;  ///< The ID of the object represented as a color
 	std::string m_name;	   ///< The name, used mostly for debugging
+	bool m_loaded;		   ///< Indicates if the sceneobject has already been loaded or not
 };

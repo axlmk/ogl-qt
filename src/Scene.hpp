@@ -62,7 +62,7 @@ class scene
    private:
 	void _picking();
 
-	// std::vector < std::unique_ptrHUD >> m_huds;
+	std::vector<std::unique_ptr<HUD>> m_huds;	  ///< All the HUDs present in the scene
 	std::vector<SceneObject*> m_renderedObjects;  ///< All the objects present in the scene
 	std::vector<LightProperties*> m_lights;		  ///< All the lights that illuminate the scene
 

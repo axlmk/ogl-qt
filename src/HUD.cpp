@@ -25,9 +25,10 @@ HUD::HUD(std::string font)
 
 	generateOGLBuffers();
 
-	Shader* s = new Shader(ShaderType::Texture, true);
-	s->addTexture("resources/textures/arial.png");
-	m_shd = std::unique_ptr<Shader>(s);
+	m_shd = std::make_unique<Shader>(ShaderType::Texture, true);
+	m_shd->addTexture("resources/textures/arial.png");
+
+	m_shd->compile();
 
 	FT_Done_Face(face);
 	FT_Done_FreeType(ft);
@@ -155,13 +156,12 @@ void HUD::RenderText(float x, float y, glm::vec3 color, float scale)
 		float w = ch.size.x * scale;
 		float h = ch.size.y * scale;
 
-		float vertices[6][4] = {
-			{xpos, ypos + h, ch.atlasPos.x / ATLAS_WIDTH, ch.atlasPos.y / ATLAS_HEIGHT},
-			{xpos, ypos, ch.atlasPos.x / ATLAS_WIDTH, (ch.atlasPos.y + ch.size.y) / ATLAS_HEIGHT},
-			{xpos + w, ypos, (ch.atlasPos.x + ch.size.x) / ATLAS_WIDTH, (ch.atlasPos.y + ch.size.y) / ATLAS_HEIGHT},
-			{xpos, ypos + h, ch.atlasPos.x / ATLAS_WIDTH, ch.atlasPos.y / ATLAS_HEIGHT},
-			{xpos + w, ypos, (ch.atlasPos.x + ch.size.x) / ATLAS_WIDTH, (ch.atlasPos.y + ch.size.y) / ATLAS_HEIGHT},
-			{xpos + w, ypos + h, (ch.atlasPos.x + ch.size.x) / ATLAS_WIDTH, ch.atlasPos.y / ATLAS_HEIGHT}};
+		float vertices[6][4] = {{xpos, ypos + h, ch.atlasPos.x / ATLAS_WIDTH, ch.atlasPos.y / ATLAS_HEIGHT},
+								{xpos, ypos, ch.atlasPos.x / ATLAS_WIDTH, (ch.atlasPos.y + ch.size.y) / ATLAS_HEIGHT},
+								{xpos + w, ypos, (ch.atlasPos.x + ch.size.x) / ATLAS_WIDTH, (ch.atlasPos.y + ch.size.y) / ATLAS_HEIGHT},
+								{xpos, ypos + h, ch.atlasPos.x / ATLAS_WIDTH, ch.atlasPos.y / ATLAS_HEIGHT},
+								{xpos + w, ypos, (ch.atlasPos.x + ch.size.x) / ATLAS_WIDTH, (ch.atlasPos.y + ch.size.y) / ATLAS_HEIGHT},
+								{xpos + w, ypos + h, (ch.atlasPos.x + ch.size.x) / ATLAS_WIDTH, ch.atlasPos.y / ATLAS_HEIGHT}};
 
 		g_opengl.glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 		g_opengl.glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);

@@ -10,11 +10,7 @@ Shader SceneObject::pick{ShaderType::Unicolor};
 
 SceneObject::SceneObject() : m_model{nullptr}, m_shd{nullptr} {}
 
-SceneObject::SceneObject(Model* geometry, Shader* shader)
-{
-	m_model = geometry;
-	m_shd = shader;
-}
+SceneObject::SceneObject(Model* geometry, Shader* shader) : m_model{geometry}, m_shd{shader}, m_loaded{false} {}
 
 Model* SceneObject::getModel() const
 {

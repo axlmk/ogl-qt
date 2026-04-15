@@ -16,14 +16,13 @@ void scene::initializeScene(int viewportWidth, int viewportHeight)
 
 	m_pickingTex = PickingTexture(viewportWidth, viewportHeight);
 
-	// Todo implement again the HUD
-	// HUD* hud = new HUD("arial");
-	// m_huds.push_back(std::unique_ptr<HUD>(hud));
-	// hud->setText(std::bind(&Camera::getPositionStr, m_camera));
+	auto hud = std::make_unique<HUD>("arial");
+	hud->setText(std::bind(&Camera::getPositionStr, m_camera));
+	m_huds.push_back(std::move(hud));
 
-	// HUD* hud2 = new HUD("arial");
-	// m_huds.push_back(std::unique_ptr<HUD>(hud2));
-	// hud2->setText(std::bind(&scene::getSelectedObjectCoordinateStr, this));
+	auto hud2 = std::make_unique<HUD>("arial");
+	hud2->setText(std::bind(&scene::getSelectedObjectCoordinateStr, this));
+	m_huds.push_back(std::move(hud2));
 }
 
 void scene::updateViewport(int width, int height)
@@ -33,10 +32,6 @@ void scene::updateViewport(int width, int height)
 
 void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed, qint64 deltaTime)
 {
-	// Todo implement the HUD
-	// static unsigned int i = 0;
-	static std::string smoothDT = "";
-
 	g_opengl.glEnable(GL_DEPTH_TEST);
 	g_opengl.glEnable(GL_LINE_SMOOTH);
 	g_opengl.glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
@@ -64,17 +59,20 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 		g_opengl.glEnable(GL_DEPTH_TEST);
 	}
 
-	// int j = 0;
-	// for (auto& hud : m_huds)
-	// {
-	// 	if (!(i % 4))
-	// 	{
-	// 		smoothDT = std::to_string(int(1000 / deltaTime));
-	// 	}
-	// 	hud->RenderText(1, j * -20, {255, 255, 255}, 0.3);
-	// 	j++;
-	// }
-	// i++;
+	// HUD management
+	static unsigned int i = 0;
+	static std::string smoothDT = "";
+	int j = 0;
+	for (auto& hud : m_huds)
+	{
+		if (!(i % 4))
+		{
+			smoothDT = std::to_string(int(1000 / deltaTime));
+		}
+		hud->RenderText(1, j * -20, {255, 255, 255}, 0.3);
+		j++;
+	}
+	i++;
 }
 
 void scene::addObjectToRenderables(SceneObject* renderable)
