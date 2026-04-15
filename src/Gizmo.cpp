@@ -36,7 +36,8 @@ void Gizmo::render(const Camera& camera, [[maybe_unused]] const std::vector<Ligh
 	const auto zCos = (glm::dot(C, B)) / (glm::length(C) * glm::length(B));
 	const auto YCos = (glm::dot(D, B)) / (glm::length(D) * glm::length(B));
 
-	const auto lenCamArrow = glm::length(camera.getPosition() - m_position);
+	// Todo : need to decide if we scale the gizmo to make it have the same no matter the zoom or not
+	// const auto lenCamArrow = glm::length(camera.getPosition() - m_position);
 
 	if (std::abs(xCos) > m_threshold || std::abs(YCos) > m_threshold)
 	{
@@ -74,7 +75,8 @@ void Gizmo::renderPicking(const Camera& camera) const
 	const auto zCos = (glm::dot(C, B)) / (glm::length(C) * glm::length(B));
 	const auto YCos = (glm::dot(D, B)) / (glm::length(D) * glm::length(B));
 
-	const auto lenCamArrow = glm::length(camera.getPosition() - m_position);
+	// Todo : need to decide if we scale the gizmo to make it have the same no matter the zoom or not
+	// const auto lenCamArrow = glm::length(camera.getPosition() - m_position);
 
 	if (std::abs(xCos) > m_threshold || std::abs(YCos) > m_threshold)
 	{

@@ -16,6 +16,7 @@ void scene::initializeScene(int viewportWidth, int viewportHeight)
 
 	m_pickingTex = PickingTexture(viewportWidth, viewportHeight);
 
+	// Todo implement again the HUD
 	// HUD* hud = new HUD("arial");
 	// m_huds.push_back(std::unique_ptr<HUD>(hud));
 	// hud->setText(std::bind(&Camera::getPositionStr, m_camera));
@@ -32,7 +33,8 @@ void scene::updateViewport(int width, int height)
 
 void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed, qint64 deltaTime)
 {
-	static unsigned int i = 0;
+	// Todo implement the HUD
+	// static unsigned int i = 0;
 	static std::string smoothDT = "";
 
 	g_opengl.glEnable(GL_DEPTH_TEST);
