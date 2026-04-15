@@ -56,6 +56,5 @@ void App3D::_initializeBasicsObjects(void)
 void App3D::loadModel(uint rowIndex)
 {
 	auto objectToLoad = m_availableObjects[rowIndex].get();
-	objectToLoad->load();
 	m_scene.addObjectToRenderables(objectToLoad);
 }

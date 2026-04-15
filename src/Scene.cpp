@@ -80,9 +80,15 @@ void scene::addObjectToRenderables(SceneObject* renderable)
 	auto light = dynamic_cast<LightObject*>(renderable);
 	if (light != nullptr)
 	{
+		if (m_lights.size() >= MAX_LIGHT_NUMBER)
+		{
+			qWarning() << "No more light can be added to the scene. Max number of lights:" << MAX_LIGHT_NUMBER;
+			return;
+		}
 		auto lightPropeties = light->getLightProperties();
 		m_lights.push_back(lightPropeties);
 	}
+	renderable->load();
 	m_renderedObjects.push_back(renderable);
 }
 

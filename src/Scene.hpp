@@ -14,6 +14,8 @@
 #include "Shader.hpp"
 #include "glm/glm.hpp"
 
+#define MAX_LIGHT_NUMBER 10
+
 struct LightProperties;
 
 enum class Mouvement { Forward, Backward, Left, Right };
