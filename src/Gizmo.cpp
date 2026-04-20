@@ -36,33 +36,21 @@ void Gizmo::render(const Camera& camera, [[maybe_unused]] const std::vector<Ligh
 	const auto zCos = (glm::dot(C, B)) / (glm::length(C) * glm::length(B));
 	const auto YCos = (glm::dot(D, B)) / (glm::length(D) * glm::length(B));
 
+	const transformation transfo{m_transformation.position, glm::vec3(m_scalingFactor)};
 	// Todo : need to decide if we scale the gizmo to make it have the same no matter the zoom or not
 	// const auto lenCamArrow = glm::length(camera.getPosition() - m_position);
 
 	if (std::abs(xCos) > m_threshold || std::abs(YCos) > m_threshold)
 	{
-		auto modelX = m_arrows[0].mdl;
-		modelX.scale(m_scalingFactor);
-		SceneObject::_render(camera, lights, modelX, m_arrows[0].shd);
+		SceneObject::_render(camera, lights, m_arrows[0].mdl, m_arrows[0].shd, transfo);
 	}
 
-	auto modelY = m_arrows[1].mdl;
-	modelY.scale(m_scalingFactor);
-	SceneObject::_render(camera, lights, modelY, m_arrows[1].shd);
+	SceneObject::_render(camera, lights, m_arrows[1].mdl, m_arrows[1].shd, transfo);
 
 	if (std::abs(zCos) > m_threshold || std::abs(YCos) > m_threshold)
 	{
-		auto modelZ = m_arrows[2].mdl;
-		modelZ.scale(m_scalingFactor);
-		SceneObject::_render(camera, lights, modelZ, m_arrows[2].shd);
+		SceneObject::_render(camera, lights, m_arrows[2].mdl, m_arrows[2].shd, transfo);
 	}
-}
-
-void Gizmo::setPosition(const glm::vec3& position)
-{
-	m_arrows[0].mdl.setPosition(position);
-	m_arrows[1].mdl.setPosition(position);
-	m_arrows[2].mdl.setPosition(position);
 }
 
 void Gizmo::renderPicking(const Camera& camera) const
@@ -75,25 +63,21 @@ void Gizmo::renderPicking(const Camera& camera) const
 	const auto zCos = (glm::dot(C, B)) / (glm::length(C) * glm::length(B));
 	const auto YCos = (glm::dot(D, B)) / (glm::length(D) * glm::length(B));
 
+	const transformation transfo{m_transformation.position, glm::vec3(m_scalingFactor)};
+
 	// Todo : need to decide if we scale the gizmo to make it have the same no matter the zoom or not
 	// const auto lenCamArrow = glm::length(camera.getPosition() - m_position);
 
 	if (std::abs(xCos) > m_threshold || std::abs(YCos) > m_threshold)
 	{
-		auto modelX = m_arrows[0].mdl;
-		modelX.scale(m_scalingFactor);
-		_renderPicking(camera, modelX, _getColorId(ArrowDirection::X));
+		_renderPicking(camera, m_arrows[0].mdl, _getColorId(ArrowDirection::X), transfo);
 	}
 
-	auto modelY = m_arrows[1].mdl;
-	modelY.scale(m_scalingFactor);
-	_renderPicking(camera, modelY, _getColorId(ArrowDirection::Y));
+	_renderPicking(camera, m_arrows[1].mdl, _getColorId(ArrowDirection::Y), transfo);
 
 	if (std::abs(zCos) > m_threshold || std::abs(YCos) > m_threshold)
 	{
-		auto modelZ = m_arrows[2].mdl;
-		modelZ.scale(m_scalingFactor);
-		_renderPicking(camera, modelZ, _getColorId(ArrowDirection::Z));
+		_renderPicking(camera, m_arrows[2].mdl, _getColorId(ArrowDirection::Z), transfo);
 	}
 }
 

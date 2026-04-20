@@ -17,10 +17,29 @@ struct Selection
 
 class SceneObject
 {
+   protected:
+	/**
+	 * @brief Represents the 3D transformation of the object
+     */
+	struct transformation
+	{
+		glm::vec3 position;	 ///< The location
+		glm::vec3 scale;	 ///< The scale
+	} m_transformation;		 ///< The transformation of the object
+
    public:
 	static Shader pick;	 ///< A static shader to represent the picking version of the objects
 
+	/**
+	 * @brief Default constructor
+	 */
 	SceneObject();
+
+	/**
+	 * @brief Constructor
+	 * @param[in] geometry The model of the object to render
+	 * @param[in] shader The shader of the objet to render
+	 */
 	SceneObject(Model* geometry, Shader* shader);
 
 	/**
@@ -80,6 +99,24 @@ class SceneObject
 	 */
 	virtual void translate(const glm::vec3& translation);
 
+	/**
+	 * @brief Move the object to a specified location in the scene
+	 * @param[in] position The new position
+	 */
+	void setPosition(const glm::vec3& position);
+
+	/**
+	 * @brief Scale the object
+	 * @param[in] scale A float representing the percentage of the scale to apply
+	 */
+	void scale(float scale);
+
+	/**
+	 * @brief Scale the object
+	 * @param[in] scale The vector representation of the scaling to apply
+	 */
+	void scale(glm::vec3 scale);
+
    protected:
 	/**
 	 * @brief Internal rendering function
@@ -87,9 +124,19 @@ class SceneObject
 	 * @param[in] lights All lights used in the scene for the render
 	 * @param[in] model The model to render
 	 * @param[in] shader The shader used on the model
+	 * @param[in] transformation The transformation to apply to the object
      */
-	void _render(const Camera& camera, const std::vector<LightProperties*>& lights, const Model& model, const Shader& shader) const;
+	void _render(const Camera& camera, const std::vector<LightProperties*>& lights, const Model& model, const Shader& shader,
+				 const transformation& transformation) const;
 
+	/**
+	 * @brief Internal rendering function for a selected object
+	 * @param[in] camera The camera from which render the scene
+	 * @param[in] lights All lights used in the scene for the render
+	 * @param[in] model The model to render
+	 * @param[in] shader The shader used on the model
+	 * @param[in] selection The selection effect to apply to the object
+     */
 	void _renderSelected(const Camera& camera, const std::vector<LightProperties*>& lights, const Model& model, const Shader& shader,
 						 const Selection& selection) const;
 
@@ -97,8 +144,10 @@ class SceneObject
 	 * @brief Internal rendering picking function
 	 * @param[in] camera The camera from which render the scene
 	 * @param[in] model The model to render
+	 * @param[in] colorId The ID of the object
+	 * @param[in] transformation The transformation to apply when rendering
      */
-	void _renderPicking(const Camera& camera, const Model& model, const glm::vec3& colorId) const;
+	void _renderPicking(const Camera& camera, const Model& model, const glm::vec3& colorId, const transformation& transformation) const;
 
 	/**
 	 * @brief Set up the lights required to render the scene
@@ -110,10 +159,10 @@ class SceneObject
 	/**
 	 * @brief Set the transformation matrix of the object's shader
 	 * @param[in] camera The camera from which the scene is taken from
-	 * @param[in] model The model to render
 	 * @param[in] shader The shader used on the model
+	 * @param[in] transformation The transformation to apply
 	 */
-	void _setTransformation(const Camera& camera, const Model& model, const Shader& shader) const;
+	void _setTransformation(const Camera& camera, const Shader& shader, const transformation& transformation) const;
 
 	/**
 	 * @brief Get the color id
