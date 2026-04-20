@@ -44,7 +44,7 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 
 	for (const auto& sceneObject : m_renderedObjects)
 	{
-		if (sceneObject != m_selectedObject)
+		if (sceneObject.get() != m_selectedObject)
 		{
 			sceneObject->render(m_camera, m_lights);
 		}
@@ -75,21 +75,38 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 	i++;
 }
 
-void scene::addObjectToRenderables(SceneObject* renderable)
+void scene::addObjectToRenderables(Model* model, Shader* shader)
 {
-	auto light = dynamic_cast<LightObject*>(renderable);
-	if (light != nullptr)
+	m_renderedObjects.push_back(std::make_unique<SceneObject>(model, shader));
+}
+
+void scene::addLightToRenderables(Model* model, Shader* shader, LightProperties::LightType light)
+{
+	if (m_lights.size() >= MAX_LIGHT_NUMBER)
 	{
-		if (m_lights.size() >= MAX_LIGHT_NUMBER)
-		{
-			qWarning() << "No more light can be added to the scene. Max number of lights:" << MAX_LIGHT_NUMBER;
-			return;
-		}
-		auto lightPropeties = light->getLightProperties();
-		m_lights.push_back(lightPropeties);
+		qWarning() << "No more light can be added to the scene. Max number of lights:" << MAX_LIGHT_NUMBER;
+		return;
 	}
-	renderable->load();
-	m_renderedObjects.push_back(renderable);
+
+	auto lightToAdd = std::make_unique<LightObject>(model, shader);
+	switch (light)
+	{
+		case LightProperties::LightType::Point:
+			lightToAdd->setPointLight(0.09f, 0.032f);
+			lightToAdd->setName("Point Light");
+			break;
+		case LightProperties::LightType::Directional:
+			lightToAdd->setDirectionalLight(glm::vec3(0.f, -1.0f, 0.0f));
+			lightToAdd->setName("Directionnal Light");
+			break;
+		default:
+			lightToAdd->setSpotLight(glm::vec3(0.f, -1.0f, 0.0f), 0.91, 0.82);
+			lightToAdd->setName("Spot Light");
+			break;
+	}
+
+	m_lights.push_back(lightToAdd->getLightProperties());
+	m_renderedObjects.push_back(std::move(lightToAdd));
 }
 
 void scene::walkCamera(Mouvement mouvement, bool active)
@@ -161,7 +178,7 @@ void scene::_picking()
 			g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			for (auto it = m_renderedObjects.cbegin(); it != m_renderedObjects.cend(); it++)
 			{
-				auto sceneObject = *it;
+				auto sceneObject = (*it).get();
 				sceneObject->renderPicking(m_camera);
 				glm::ivec3 id = m_pickingTex.readPixel(m_mouseCoords.x, m_mouseCoords.y);
 				if (sceneObject->isId(id))

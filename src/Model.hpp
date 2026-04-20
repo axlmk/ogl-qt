@@ -20,7 +20,7 @@ class Model
 	/**
 	 * @brief Load the model
 	 */
-	void loadModel(void);
+	void load(void);
 
    private:
 	std::vector<Mesh> m_meshes;

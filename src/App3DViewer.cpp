@@ -51,8 +51,11 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
 	QWidget* tips = new QWidget();
 	QLabel* title = new QLabel("Controls");
 	QLabel* controls = new QLabel(
-		"alt + left click : rotate around\nalt + middle click : pan around\nalt + right click : zoom\nClick on object "
-		": select it\nClick on gizmo : translate selected object");
+		"Alt + left click : rotate around\n"
+		"Alt + middle click : pan around\n"
+		"Alt + right click : zoom\n"
+		"Click on object: select it\n"
+		"Click on gizmo : translate selected object");
 	QVBoxLayout* vlayTips = new QVBoxLayout;
 	m_sceneObjectView = new QListView();
 
@@ -80,6 +83,8 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
 	int y = screenGeometry.y() + (screenGeometry.height() - windowSize.height()) / 2;
 	m_mainWindow->move(x, y);
 	m_mainWindow->show();
+
+	connect(m_sceneViewer.get(), &SceneViewer::initialized, this, &App3DViewer::initialized, Qt::UniqueConnection);
 }
 
 int App3DViewer::run(void)

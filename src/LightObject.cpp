@@ -24,7 +24,7 @@ void LightObject::translate(const glm::vec3& translation)
 
 void LightObject::setDirectionalLight(glm::vec3 direction)
 {
-	m_lightProperties.type = LightProperties::LightType::Point;
+	m_lightProperties.type = LightProperties::LightType::Directional;
 	m_lightProperties.direction = direction;
 }
 

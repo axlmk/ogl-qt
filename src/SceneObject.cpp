@@ -20,7 +20,7 @@ Model* SceneObject::getModel() const
 
 void SceneObject::load(void)
 {
-	m_model->loadModel();
+	m_model->load();
 	m_shd->compile();
 }
 

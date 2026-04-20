@@ -10,6 +10,7 @@ class scene;
 
 class SceneViewer : public QOpenGLWindow
 {
+	Q_OBJECT
    public:
 	SceneViewer(scene* scene);
 	~SceneViewer() Q_DECL_OVERRIDE;
@@ -29,6 +30,12 @@ class SceneViewer : public QOpenGLWindow
 	void keyPressEvent(QKeyEvent* event) override;
 	void keyReleaseEvent(QKeyEvent* event) override;
 	void mouseMoveEvent(QMouseEvent* event) override;
+
+   signals:
+	/**
+	 * @brief Indicates the OpenGL is initialized
+	 */
+	void initialized(void);
 
    private:
 	scene* m_manager;

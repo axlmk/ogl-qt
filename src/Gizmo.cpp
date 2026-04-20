@@ -12,15 +12,15 @@ Gizmo::Gizmo()
 
 void Gizmo::load(void)
 {
-	m_arrows[0].mdl.loadModel();
+	m_arrows[0].mdl.load();
 	m_arrows[0].shd.setColor("#FF0000");
 	m_arrows[0].shd.compile();
 
-	m_arrows[1].mdl.loadModel();
+	m_arrows[1].mdl.load();
 	m_arrows[1].shd.setColor("#00FF00");
 	m_arrows[1].shd.compile();
 
-	m_arrows[2].mdl.loadModel();
+	m_arrows[2].mdl.load();
 	m_arrows[2].shd.setColor("#0000FF");
 	m_arrows[2].shd.compile();
 }
