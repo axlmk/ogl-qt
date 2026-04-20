@@ -7,7 +7,6 @@
 #include "Scene.hpp"
 
 class QStandardItemModel;
-class SceneObject;
 
 class App3D : public QObject
 {
@@ -17,26 +16,43 @@ class App3D : public QObject
 	int run(void);
 
    private slots:
-	void newModelAdded(InfoObject info);
+
+	/**
+	 * @brief Import the model to the scene
+	 * @param[in] info Information of the object to import
+	 */
+	void _importModel(InfoObject info);
 
 	/**
 	 * @brief Load a model at the \p rowIndex index
 	 * @param[in] rowIndex The index of the model to load
 	 */
-	void loadModel(uint rowIndex);
+	void _loadModel(uint rowIndex);
 
-   private:
 	/**
 	* @brief Add all the elementary objects to the list of available objects
     */
 	void _initializeBasicsObjects(void);
+
+   private:
+	/**
+	 * @brief Represents an imported object into the project
+	 */
+	struct importedObject
+	{
+		std::string name;				   ///< Name
+		uint modelIdx;					   ///< 3D model
+		uint shaderIdx;					   /// Shader
+		enum Type { Light, Normal } type;  ///< Type
+		LightProperties::LightType light;  ///< Light properties if it's a light
+	};
 
 	scene m_scene;
 	App3DViewer m_app3DViewer;
 
 	std::vector<Model> m_models;
 	std::vector<Shader> m_shaders;
-	std::vector<std::unique_ptr<SceneObject>> m_availableObjects;
+	std::vector<importedObject> m_availableObjects;
 
 	QStandardItemModel* m_sceneObjectModel;
 };

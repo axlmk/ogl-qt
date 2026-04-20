@@ -1,6 +1,6 @@
 #include "Model.hpp"
 
-Model::Model(const std::filesystem::path& path) : m_objectFile{path}, m_directory{path.parent_path()}, m_scale{glm::vec3(1.0f)}, m_position{glm::vec3(0)}
+Model::Model(const std::filesystem::path& path) : m_objectFile{path}, m_directory{path.parent_path()}
 {
 	if (!std::filesystem::exists(path))
 	{
@@ -16,7 +16,7 @@ void Model::Draw(const Shader& shader) const
 	}
 }
 
-void Model::loadModel(void)
+void Model::load(void)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(m_objectFile.string(), aiProcess_Triangulate | aiProcess_FlipUVs);
@@ -41,11 +41,6 @@ void Model::processNode(aiNode* node, const aiScene* scene)
 	{
 		processNode(node->mChildren[i], scene);
 	}
-}
-
-void Model::setPosition(const glm::vec3& position)
-{
-	m_position = position;
 }
 
 Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
@@ -111,30 +106,4 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
 		textures.push_back(texture);
 	}
 	return textures;
-}
-
-void Model::scale(float scale)
-{
-	m_scale = glm::vec3(scale);
-}
-
-void Model::scale(glm::vec3 scale)
-{
-	m_scale = scale;
-}
-
-void Model::translate(const glm::vec3& translation)
-{
-	m_position += translation;
-}
-
-glm::vec3 Model::getPosition() const
-{
-	return m_position;
-}
-
-glm::mat4 Model::getTransforms(void) const
-{
-	auto scl = glm::translate(glm::mat4(1.0f), m_position);
-	return glm::scale(scl, m_scale);
 }

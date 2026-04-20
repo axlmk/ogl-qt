@@ -45,6 +45,8 @@ void SceneViewer::initializeGL()
 	float dpr = devicePixelRatioF();
 	g_opengl.glViewport(0, 0, geometry().width() * dpr, geometry().height() * dpr);
 	m_manager->initializeScene(geometry().width() * dpr, geometry().height() * dpr);
+
+	emit initialized();
 }
 
 void SceneViewer::resizeGL(int w, int h)

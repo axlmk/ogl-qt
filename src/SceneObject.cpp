@@ -10,11 +10,8 @@ Shader SceneObject::pick{ShaderType::Unicolor};
 
 SceneObject::SceneObject() : m_model{nullptr}, m_shd{nullptr} {}
 
-SceneObject::SceneObject(Model* geometry, Shader* shader)
-{
-	m_model = geometry;
-	m_shd = shader;
-}
+SceneObject::SceneObject(Model* geometry, Shader* shader) : m_transformation{glm::vec3(0.f), glm::vec3(1.f)}, m_model{geometry}, m_shd{shader}, m_loaded{false}
+{}
 
 Model* SceneObject::getModel() const
 {
@@ -23,7 +20,7 @@ Model* SceneObject::getModel() const
 
 void SceneObject::load(void)
 {
-	m_model->loadModel();
+	m_model->load();
 	m_shd->compile();
 }
 
@@ -90,14 +87,9 @@ void SceneObject::_setUpLights(const Camera& camera, const std::vector<LightProp
 	g_opengl.glUniform3f(uniform, cameraPos.x, cameraPos.y, cameraPos.z);
 }
 
-glm::vec3 SceneObject::getPosition() const
-{
-	return m_model->getPosition();
-}
-
 void SceneObject::render(const Camera& camera, const std::vector<LightProperties*>& lights) const
 {
-	_render(camera, lights, *m_model, *m_shd);
+	_render(camera, lights, *m_model, *m_shd, m_transformation);
 }
 
 void SceneObject::renderSelected(const Camera& camera, const std::vector<LightProperties*>& lights, const Selection& selection) const
@@ -105,11 +97,12 @@ void SceneObject::renderSelected(const Camera& camera, const std::vector<LightPr
 	_renderSelected(camera, lights, *m_model, *m_shd, selection);
 }
 
-void SceneObject::_render(const Camera& camera, const std::vector<LightProperties*>& lights, const Model& model, const Shader& shader) const
+void SceneObject::_render(const Camera& camera, const std::vector<LightProperties*>& lights, const Model& model, const Shader& shader,
+						  const transformation& transformation) const
 {
 	g_opengl.glStencilMask(0x00);
 
-	_setTransformation(camera, model, shader);
+	_setTransformation(camera, shader, transformation);
 
 	// Lights calculations
 	if (shader.getType() == ShaderType::Texture)
@@ -125,7 +118,7 @@ void SceneObject::_renderSelected(const Camera& camera, const std::vector<LightP
 	g_opengl.glStencilMask(0xFF);
 	g_opengl.glStencilFunc(GL_ALWAYS, 1, 0xFF);
 
-	_setTransformation(camera, model, shader);
+	_setTransformation(camera, shader, m_transformation);
 
 	// Lights calculations
 	if (shader.getType() == ShaderType::Texture)
@@ -139,13 +132,9 @@ void SceneObject::_renderSelected(const Camera& camera, const std::vector<LightP
 	g_opengl.glStencilMask(0x00);
 	g_opengl.glDisable(GL_DEPTH_TEST);
 
-	Model model_selected = model;
-	model_selected.scale(selection.scale);
+	_setTransformation(camera, selection.color, {m_transformation.position, glm::vec3(selection.scale)});
 
-	_setTransformation(camera, model_selected, selection.color);
-
-	model_selected.Draw(selection.color);
-	model_selected.scale(1.0f);
+	model.Draw(selection.color);
 
 	g_opengl.glStencilMask(0xFF);
 	g_opengl.glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -153,12 +142,7 @@ void SceneObject::_renderSelected(const Camera& camera, const std::vector<LightP
 	g_opengl.glClear(GL_STENCIL_BUFFER_BIT);
 }
 
-void SceneObject::translate(const glm::vec3& translation)
-{
-	m_model->translate(translation);
-}
-
-void SceneObject::_setTransformation(const Camera& camera, const Model& model, const Shader& shader) const
+void SceneObject::_setTransformation(const Camera& camera, const Shader& shader, const transformation& transformation) const
 {
 	glm::mat4 model_mat = glm::mat4(1.f);
 	glm::mat4 view_mat = glm::mat4(1.f);
@@ -167,7 +151,7 @@ void SceneObject::_setTransformation(const Camera& camera, const Model& model, c
 	shader.use();
 
 	// World's location
-	model_mat = model.getTransforms();
+	model_mat = glm::scale(glm::translate(glm::mat4(1.0f), transformation.position), transformation.scale);
 
 	// Camera's location
 	view_mat = camera.getSpaceMat();
@@ -181,7 +165,7 @@ void SceneObject::_setTransformation(const Camera& camera, const Model& model, c
 
 void SceneObject::renderPicking(const Camera& camera) const
 {
-	_renderPicking(camera, *m_model, _getColorId());
+	_renderPicking(camera, *m_model, _getColorId(), m_transformation);
 }
 
 void SceneObject::setName(const std::string& name)
@@ -200,10 +184,10 @@ const std::string& SceneObject::getName(void) const
 	return m_name;
 }
 
-void SceneObject::_renderPicking(const Camera& camera, const Model& model, const glm::vec3& colorId) const
+void SceneObject::_renderPicking(const Camera& camera, const Model& model, const glm::vec3& colorId, const transformation& transformation) const
 {
 	pick.setColor(colorId);
-	_setTransformation(camera, model, pick);
+	_setTransformation(camera, pick, transformation);
 
 	// Final render
 	model.Draw(pick);
@@ -217,4 +201,29 @@ glm::vec3 SceneObject::_getColorId(void) const
 bool SceneObject::isId(const glm::ivec3& id) const
 {
 	return id == m_colorId;
+}
+
+void SceneObject::scale(float scale)
+{
+	m_transformation.scale = glm::vec3(scale);
+}
+
+void SceneObject::scale(glm::vec3 scale)
+{
+	m_transformation.scale = scale;
+}
+
+void SceneObject::translate(const glm::vec3& translation)
+{
+	m_transformation.position += translation;
+}
+
+glm::vec3 SceneObject::getPosition() const
+{
+	return m_transformation.position;
+}
+
+void SceneObject::setPosition(const glm::vec3& position)
+{
+	m_transformation.position = position;
 }

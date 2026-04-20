@@ -27,12 +27,22 @@ class App3DViewer : public QObject
 	void setSceneObjectsModel(QStandardItemModel* sceneObjectModel);
 
    signals:
+	/**
+	 * @brief Emits that a new model should be added to the project
+	 * @param[in] info The information about the added object
+	 */
 	void newModelAdded(InfoObject info);
 
 	/**
 	 * @brief Emits that a new model should be loaded
+	 * @param[in] modelIndex The index of the model to load
 	 */
 	void modelLoaded(uint modelIndex);
+
+	/**
+	 * @brief Indicates OpenGL has been initialized
+	 */
+	void initialized(void);
 
    private slots:
 

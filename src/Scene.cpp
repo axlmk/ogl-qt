@@ -16,13 +16,13 @@ void scene::initializeScene(int viewportWidth, int viewportHeight)
 
 	m_pickingTex = PickingTexture(viewportWidth, viewportHeight);
 
-	// HUD* hud = new HUD("arial");
-	// m_huds.push_back(std::unique_ptr<HUD>(hud));
-	// hud->setText(std::bind(&Camera::getPositionStr, m_camera));
+	auto hud = std::make_unique<HUD>("arial");
+	hud->setText(std::bind(&Camera::getPositionStr, m_camera));
+	m_huds.push_back(std::move(hud));
 
-	// HUD* hud2 = new HUD("arial");
-	// m_huds.push_back(std::unique_ptr<HUD>(hud2));
-	// hud2->setText(std::bind(&scene::getSelectedObjectCoordinateStr, this));
+	auto hud2 = std::make_unique<HUD>("arial");
+	hud2->setText(std::bind(&scene::getSelectedObjectCoordinateStr, this));
+	m_huds.push_back(std::move(hud2));
 }
 
 void scene::updateViewport(int width, int height)
@@ -32,9 +32,6 @@ void scene::updateViewport(int width, int height)
 
 void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed, qint64 deltaTime)
 {
-	static unsigned int i = 0;
-	static std::string smoothDT = "";
-
 	g_opengl.glEnable(GL_DEPTH_TEST);
 	g_opengl.glEnable(GL_LINE_SMOOTH);
 	g_opengl.glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
@@ -47,7 +44,7 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 
 	for (const auto& sceneObject : m_renderedObjects)
 	{
-		if (sceneObject != m_selectedObject)
+		if (sceneObject.get() != m_selectedObject)
 		{
 			sceneObject->render(m_camera, m_lights);
 		}
@@ -62,28 +59,54 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 		g_opengl.glEnable(GL_DEPTH_TEST);
 	}
 
-	// int j = 0;
-	// for (auto& hud : m_huds)
-	// {
-	// 	if (!(i % 4))
-	// 	{
-	// 		smoothDT = std::to_string(int(1000 / deltaTime));
-	// 	}
-	// 	hud->RenderText(1, j * -20, {255, 255, 255}, 0.3);
-	// 	j++;
-	// }
-	// i++;
+	// HUD management
+	static unsigned int i = 0;
+	static std::string smoothDT = "";
+	int j = 0;
+	for (auto& hud : m_huds)
+	{
+		if (!(i % 4))
+		{
+			smoothDT = std::to_string(int(1000 / deltaTime));
+		}
+		hud->RenderText(1, j * -20, {255, 255, 255}, 0.3);
+		j++;
+	}
+	i++;
 }
 
-void scene::addObjectToRenderables(SceneObject* renderable)
+void scene::addObjectToRenderables(Model* model, Shader* shader)
 {
-	auto light = dynamic_cast<LightObject*>(renderable);
-	if (light != nullptr)
+	m_renderedObjects.push_back(std::make_unique<SceneObject>(model, shader));
+}
+
+void scene::addLightToRenderables(Model* model, Shader* shader, LightProperties::LightType light)
+{
+	if (m_lights.size() >= MAX_LIGHT_NUMBER)
 	{
-		auto lightPropeties = light->getLightProperties();
-		m_lights.push_back(lightPropeties);
+		qWarning() << "No more light can be added to the scene. Max number of lights:" << MAX_LIGHT_NUMBER;
+		return;
 	}
-	m_renderedObjects.push_back(renderable);
+
+	auto lightToAdd = std::make_unique<LightObject>(model, shader);
+	switch (light)
+	{
+		case LightProperties::LightType::Point:
+			lightToAdd->setPointLight(0.09f, 0.032f);
+			lightToAdd->setName("Point Light");
+			break;
+		case LightProperties::LightType::Directional:
+			lightToAdd->setDirectionalLight(glm::vec3(0.f, -1.0f, 0.0f));
+			lightToAdd->setName("Directionnal Light");
+			break;
+		default:
+			lightToAdd->setSpotLight(glm::vec3(0.f, -1.0f, 0.0f), 0.91, 0.82);
+			lightToAdd->setName("Spot Light");
+			break;
+	}
+
+	m_lights.push_back(lightToAdd->getLightProperties());
+	m_renderedObjects.push_back(std::move(lightToAdd));
 }
 
 void scene::walkCamera(Mouvement mouvement, bool active)
@@ -155,7 +178,7 @@ void scene::_picking()
 			g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			for (auto it = m_renderedObjects.cbegin(); it != m_renderedObjects.cend(); it++)
 			{
-				auto sceneObject = *it;
+				auto sceneObject = (*it).get();
 				sceneObject->renderPicking(m_camera);
 				glm::ivec3 id = m_pickingTex.readPixel(m_mouseCoords.x, m_mouseCoords.y);
 				if (sceneObject->isId(id))

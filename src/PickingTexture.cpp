@@ -31,7 +31,7 @@ void PickingTexture::_updateTexture(int windowWidth, int windowHeight)
 	GLenum status = g_opengl.glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE)
 	{
-		qDebug() << "Erreur chef" << status;
+		qDebug() << "Picking texture could not loaded correctly" << status;
 		exit(1);
 	}
 

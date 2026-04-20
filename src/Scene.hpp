@@ -14,6 +14,8 @@
 #include "Shader.hpp"
 #include "glm/glm.hpp"
 
+#define MAX_LIGHT_NUMBER 10
+
 struct LightProperties;
 
 enum class Mouvement { Forward, Backward, Left, Right };
@@ -53,18 +55,27 @@ class scene
 
 	/**
 	 * @brief Add an object to the list of the scene's renderable
-	 * @param[in] renderable The object to add
+	 * @param[in] model The model of a new object
+	 * @param[in] shader The shader of a new object
 	 */
-	void addObjectToRenderables(SceneObject* renderable);
+	void addObjectToRenderables(Model* model, Shader* shader);
+
+	/**
+	 * @brief Add an object to the list of the scene's renderable
+	 * @param[in] model The model of a new light
+	 * @param[in] shader The shader of a new light
+	 * @param[in] light The type of the light 
+	 */
+	void addLightToRenderables(Model* model, Shader* shader, LightProperties::LightType light);
 
 	std::string getSelectedObjectCoordinateStr(void) const;
 
    private:
 	void _picking();
 
-	// std::vector < std::unique_ptrHUD >> m_huds;
-	std::vector<SceneObject*> m_renderedObjects;  ///< All the objects present in the scene
-	std::vector<LightProperties*> m_lights;		  ///< All the lights that illuminate the scene
+	std::vector<std::unique_ptr<HUD>> m_huds;					  ///< All the HUDs present in the scene
+	std::vector<std::unique_ptr<SceneObject>> m_renderedObjects;  ///< All the objects present in the scene
+	std::vector<LightProperties*> m_lights;						  ///< All the lights that illuminate the scene
 
 	Camera m_camera;
 	PickingTexture m_pickingTex;

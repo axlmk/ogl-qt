@@ -26,8 +26,6 @@ class Gizmo : public SceneObject
 	 */
 	bool isId(const glm::ivec3& id) const override;
 
-	void setPosition(const glm::vec3& position);
-
 	/**
 	 * @brief Select the gizmo
 	 * @param[in] id The id of the arrow to select
