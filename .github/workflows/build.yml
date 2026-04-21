@@ -25,6 +25,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
@@ -33,6 +37,7 @@ jobs:
         target: desktop
         arch: win64_mingw
         tools: 'tools_mingw tools_ninja'
+        setup-python: 'false'
 
     - name: Check tools
       run: |
