@@ -18,9 +18,11 @@ jobs:
           # - os: ubuntu-latest
           #   preset: linux-debug
           - os: windows-latest
-            preset: windows-debug-mingw
+            configure: windows-debug-mingw
+            build: windows-debug
           - os: windows-latest
-            preset: windows-release
+            configure: windows-release
+            build: windows-release
 
     steps:
     - uses: actions/checkout@v4
@@ -47,7 +49,7 @@ jobs:
 
     - name: Configure CMake
       run: >
-        cmake --preset ${{ matrix.preset }}
+        cmake --preset ${{ matrix.configure }}
 
     - name: Build
-      run: cmake --build --preset ${{ matrix.preset }}
+      run: cmake --build --preset ${{ matrix.build }}
