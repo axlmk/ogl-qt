@@ -1,0 +1,48 @@
+name: Build project on multiple platforms
+
+on:
+  push:
+    # branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        include: 
+          - os: ubuntu-latest
+            preset: linux-release-clang
+          - os: ubuntu-latest
+            preset: linux-debug
+          - os: windows-latest
+            preset: windows-debug-mingw
+          - os: windows-latest
+            preset: windows-release
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.8.3'
+        host: windows
+        target: desktop
+        arch: win64_mingw
+        tools: 'tools_mingw tools_ninja'
+
+    - name: Check tools
+      run: |
+        g++ --version
+        ninja --version
+        cmake --version
+
+    - name: Configure CMake
+      run: >
+        cmake --preset ${{ matrix.preset }}
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.preset }}
