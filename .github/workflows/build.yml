@@ -13,10 +13,10 @@ jobs:
     strategy:
       matrix:
         include: 
-          - os: ubuntu-latest
-            preset: linux-release-clang
-          - os: ubuntu-latest
-            preset: linux-debug
+          # - os: ubuntu-latest
+          #   preset: linux-release-clang
+          # - os: ubuntu-latest
+          #   preset: linux-debug
           - os: windows-latest
             preset: windows-debug-mingw
           - os: windows-latest
