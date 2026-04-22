@@ -1,5 +1,5 @@
 # OGL-QT
-[![windows-latest-debug-mingw](https://github.com/axlmk/ogl-qt/actions/workflows/windows-lastest-debug-mingw.yml/badge.svg)](https://github.com/axlmk/ogl-qt/actions/workflows/windows-lastest-debug-mingw.yml) [![windows-latest-release-msvc](https://github.com/axlmk/ogl-qt/actions/workflows/windows-lastest-release.yml/badge.svg)](https://github.com/axlmk/ogl-qt/actions/workflows/windows-lastest-release.yml)
+[![windows-latest-mingw](https://github.com/axlmk/ogl-qt/actions/workflows/windows-lastest-mingw.yml/badge.svg)](https://github.com/axlmk/ogl-qt/actions/workflows/windows-lastest-mingw.yml) [![windows-latest-msvc](https://github.com/axlmk/ogl-qt/actions/workflows/windows-lastest-msvc.yml/badge.svg)](https://github.com/axlmk/ogl-qt/actions/workflows/windows-lastest-msvc.yml)
 
 ## A project to learn the usage of OpenGL and Qt
 

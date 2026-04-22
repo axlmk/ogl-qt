@@ -1,4 +1,4 @@
-name: windows-latest-release-msvc
+name: windows-latest-msvc
 
 on:
   push:
@@ -10,5 +10,6 @@ jobs:
     uses: ./.github/workflows/windows-build.yml
     with:
       os: windows-latest
-      configure: windows-release
-      build: windows-release
+      configure: windows-msvc
+      build: windows-msvc-b
+      arch: win64_msvc2022_64

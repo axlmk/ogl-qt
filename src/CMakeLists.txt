@@ -1,4 +1,4 @@
-find_package(Qt6 REQUIRED COMPONENTS Widgets
+find_package(Qt6 REQUIRED COMPONENTS
     Core
     Gui
     Widgets
@@ -47,7 +47,8 @@ target_link_libraries(ogl-qt
         glm::glm
         freetype
         stb::image
-        assimp)
+        assimp
+        opengl32)
 
 target_include_directories(ogl-qt PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 

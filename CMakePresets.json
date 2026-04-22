@@ -2,7 +2,7 @@
     "version": 6,
     "configurePresets": [
         {
-            "name": "windows-debug-mingw",
+            "name": "windows-mingw-debug",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
@@ -11,7 +11,7 @@
             }
         },
         {
-            "name": "windows-release",
+            "name": "windows-msvc",
             "generator": "Visual Studio 17 2022",
             "toolset": "v143",
             "binaryDir": "${sourceDir}/build/${presetName}",
@@ -20,15 +20,25 @@
             }
         },
         {
-            "name": "linux-debug",
-            "generator": "Unix Makefiles",
+            "name": "windows-mingw",
+            "generator": "Visual Studio 17 2022",
+            "toolset": "v143",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_BUILD_TYPE": "Release"
             }
         },
         {
-            "name": "linux-release-clang",
+            "name": "linux-g++",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "linux-clang",
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
@@ -40,19 +50,23 @@
     "buildPresets": [
         {
             "name": "windows-debug",
-            "configurePreset": "windows-debug-mingw"
+            "configurePreset": "windows-mingw-debug"
         },
         {
-            "name": "windows-release",
-            "configurePreset": "windows-release"
+            "name": "windows-msvc-b",
+            "configurePreset": "windows-msvc"
         },
         {
-            "name": "linux-debug",
-            "configurePreset": "linux-debug"
+            "name": "windows-mingw-b",
+            "configurePreset": "windows-mingw"
         },
         {
-            "name": "linux-release",
-            "configurePreset": "linux-release-clang"
+            "name": "linux-g++-b",
+            "configurePreset": "linux-g++"
+        },
+        {
+            "name": "linux-clang-b",
+            "configurePreset": "linux-clang"
         }
     ]
 }

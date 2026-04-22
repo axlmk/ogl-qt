@@ -1,4 +1,4 @@
-name: windows-latest-debug-mingw
+name: windows-latest-mingw
 
 on:
   push:
@@ -10,5 +10,7 @@ jobs:
     uses: ./.github/workflows/windows-build.yml
     with:
       os: windows-latest
-      configure: windows-debug-mingw
-      build: windows-debug
+      configure: windows-mingw
+      build: windows-mingw-b
+      arch: win64_mingw
+      tooling: tools_mingw1310
