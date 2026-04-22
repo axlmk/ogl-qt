@@ -1,0 +1,14 @@
+name: windows-latest-debug-mingw
+
+on:
+  push:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  windows-latest-build:
+    uses: ./.github/workflows/windows-build.yml
+    with:
+      os: windows-latest
+      configure: windows-debug-mingw
+      preset: windows-debug
