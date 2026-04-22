@@ -1,4 +1,4 @@
-add_executable(ogl-qt
+qt_add_executable(ogl-qt
     main.cpp
     App3D.cpp
     App3D.hpp
@@ -69,12 +69,12 @@ add_custom_command(TARGET ogl-qt POST_BUILD
 target_link_libraries(ogl-qt
     PRIVATE
         Qt6::Core
+        Qt6::Gui
         Qt6::Widgets
         Qt6::OpenGL
         Qt6::OpenGLWidgets
-        Qt6::Gui
+        opengl32
         glm::glm
         freetype
         stb::image
-        opengl32
         assimp)
