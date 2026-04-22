@@ -19,6 +19,14 @@
             }
         },
         {
+            "name": "linux-debug",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
             "name": "linux-release-clang",
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/build/${presetName}",
@@ -26,21 +34,9 @@
                 "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_CXX_COMPILER": "clang"
             }
-        },
-        {
-            "name": "linux-debug",
-            "generator": "Unix Makefiles",
-            "binaryDir": "${sourceDir}/build/${presetName}",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            }
         }
     ],
     "buildPresets": [
-        {
-            "name": "linux-release",
-            "configurePreset": "linux-release-clang"
-        },
         {
             "name": "windows-debug",
             "configurePreset": "windows-debug-mingw"
@@ -52,6 +48,10 @@
         {
             "name": "linux-debug",
             "configurePreset": "linux-debug"
+        },
+        {
+            "name": "linux-release",
+            "configurePreset": "linux-release-clang"
         }
     ]
 }
