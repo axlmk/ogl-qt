@@ -64,7 +64,7 @@ target_compile_features(stb_image
     PUBLIC
         cxx_std_20
 )
-find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGL Gui)
+find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGL Gui OpenGLWidgets)
 
 qt_standard_project_setup()
 
