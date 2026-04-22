@@ -11,4 +11,4 @@ jobs:
     with:
       os: windows-latest
       configure: windows-debug-mingw
-      preset: windows-debug
+      build: windows-debug
