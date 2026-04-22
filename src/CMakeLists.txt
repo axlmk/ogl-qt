@@ -76,4 +76,5 @@ target_link_libraries(ogl-qt
         glm::glm
         freetype
         stb::image
+        opengl32
         assimp)
