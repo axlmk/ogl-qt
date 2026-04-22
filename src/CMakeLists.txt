@@ -29,6 +29,19 @@ qt_add_executable(ogl-qt
     Shader.hpp
 )
 
+target_link_libraries(ogl-qt
+    PRIVATE
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Widgets
+        Qt6::OpenGL
+        Qt6::OpenGLWidgets
+        opengl32
+        glm::glm
+        freetype
+        stb::image
+        assimp)
+
 target_include_directories(ogl-qt PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if (MSVC)
@@ -65,16 +78,3 @@ add_custom_command(TARGET ogl-qt POST_BUILD
     ${CMAKE_SOURCE_DIR}/resources
     $<TARGET_FILE_DIR:ogl-qt>/resources
 )
-
-target_link_libraries(ogl-qt
-    PRIVATE
-        Qt6::Core
-        Qt6::Gui
-        Qt6::Widgets
-        Qt6::OpenGL
-        Qt6::OpenGLWidgets
-        opengl32
-        glm::glm
-        freetype
-        stb::image
-        assimp)
