@@ -68,6 +68,7 @@ add_custom_command(TARGET ogl-qt POST_BUILD
 
 target_link_libraries(ogl-qt
     PRIVATE
+        Qt6::Core
         Qt6::Widgets
         Qt6::OpenGL
         Qt6::Gui

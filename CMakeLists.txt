@@ -70,6 +70,10 @@ qt_standard_project_setup()
 
 add_subdirectory(src)
 
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
 set_target_properties(ogl-qt PROPERTIES
     # WIN32_EXECUTABLE ON
     MACOSX_BUNDLE ON
