@@ -1,5 +1,7 @@
 # OGL-QT
 [![windows-latest-msvc](https://github.com/axlmk/ogl-qt/actions/workflows/windows-latest-msvc.yml/badge.svg)](https://github.com/axlmk/ogl-qt/actions/workflows/windows-latest-msvc.yml) [![windows-latest-mingw](https://github.com/axlmk/ogl-qt/actions/workflows/windows-latest-mingw.yml/badge.svg)](https://github.com/axlmk/ogl-qt/actions/workflows/windows-latest-mingw.yml)
+[![Current milestone completion](https://img.shields.io/github/milestones/progress/axlmk/ogl-qt/2)](https://github.com/axlmk/ogl-qt/milestone/2)
+
 ## A project to learn the usage of OpenGL and Qt
 
 ## Building the project
