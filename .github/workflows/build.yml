@@ -2,7 +2,6 @@ name: Build project on multiple platforms
 
 on:
   push:
-    # branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -20,9 +19,9 @@ jobs:
           - os: windows-latest
             configure: windows-debug-mingw
             build: windows-debug
-          # - os: windows-latest
-          #   configure: windows-release
-          #   build: windows-release
+          - os: windows-latest
+            configure: windows-release
+            build: windows-release
 
     steps:
     - uses: actions/checkout@v4

@@ -13,6 +13,7 @@
         {
             "name": "windows-release",
             "generator": "Visual Studio 17 2022",
+            "toolset": "v143",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
