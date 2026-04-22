@@ -65,8 +65,6 @@ target_compile_features(stb_image
         cxx_std_20
 )
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGL Gui OpenGLWidgets Core)
-
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)

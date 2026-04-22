@@ -1,3 +1,11 @@
+find_package(Qt6 REQUIRED COMPONENTS Widgets
+    Core
+    Gui
+    Widgets
+    OpenGL
+    OpenGLWidgets
+)
+
 qt_add_executable(ogl-qt
     main.cpp
     App3D.cpp
@@ -36,7 +44,6 @@ target_link_libraries(ogl-qt
         Qt6::Widgets
         Qt6::OpenGL
         Qt6::OpenGLWidgets
-        opengl32
         glm::glm
         freetype
         stb::image
