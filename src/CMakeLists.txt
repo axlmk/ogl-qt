@@ -71,6 +71,7 @@ target_link_libraries(ogl-qt
         Qt6::Core
         Qt6::Widgets
         Qt6::OpenGL
+        Qt6::OpenGLWidgets
         Qt6::Gui
         glm::glm
         freetype
