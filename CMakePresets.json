@@ -21,8 +21,7 @@
         },
         {
             "name": "windows-mingw",
-            "generator": "Visual Studio 17 2022",
-            "toolset": "v143",
+            "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
                 "CMAKE_CXX_COMPILER": "g++",
