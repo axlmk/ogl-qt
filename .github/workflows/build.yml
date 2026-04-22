@@ -37,8 +37,8 @@ jobs:
         version: '6.10.0'
         host: windows
         target: desktop
-        arch: win64_mingw13
-        tools: 'tools_mingw tools_ninja'
+        arch: win64_mingw
+        tools: 'tools_mingw1310 tools_ninja'
         setup-python: 'false'
 
     - name: Check tools
