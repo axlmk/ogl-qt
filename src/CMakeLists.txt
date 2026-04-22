@@ -31,9 +31,18 @@ add_executable(ogl-qt
 
 target_include_directories(ogl-qt PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    target_compile_options(ogl-qt PUBLIC -Wall -Wextra -Wpedantic)
+if (MSVC)
+    target_compile_options(ogl-qt PUBLIC
+        /W4
+        /permissive-
+        /Zc:__cplusplus
+    )
+else()
+    target_compile_options(ogl-qt PUBLIC
+        -Wall
+        -Wextra
+        -Wpedantic
+    )
 endif()
 
 if(WIN32)
