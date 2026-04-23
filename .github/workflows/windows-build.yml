@@ -48,12 +48,5 @@ jobs:
     - name: Build
       run: cmake --build --preset ${{ inputs.configure }}
 
-    - name: Debug build output
-      run: |
-        dir build\windows-msvc
-        dir build\windows-msvc\src
-        dir build\windows-msvc\src\Release
-        dir build\windows-msvc\Release
-
     - name: Run tests
-      run: ctest --test-dir build/${{ inputs.configure }} -C Release --output-on-failure
+      run: ctest --test-dir build/${{ inputs.configure }} -C Release --output-on-failure -VV
