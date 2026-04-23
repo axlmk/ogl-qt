@@ -43,11 +43,10 @@ jobs:
         cmake --version
 
     - name: Configure CMake
-      run: >
-        cmake --preset ${{ inputs.configure }}
+      run: cmake --preset ${{ inputs.configure }}
 
     - name: Build
       run: cmake --build --preset ${{ inputs.configure }}
 
     - name: Run tests
-      run: ctest --preset smoke-test
+      run: ctest --test-dir build/${{ inputs.configure }} -C Release --output-on-failure
