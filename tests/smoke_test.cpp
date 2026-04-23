@@ -13,6 +13,7 @@
 
 int smoke_test(int argc, char* argv[])
 {
+	qInstallMessageHandler([](QtMsgType, const QMessageLogContext&, const QString& msg) { fprintf(stderr, "%s\n", msg.toLocal8Bit().constData()); });
 	QApplication app(argc, argv);
 
 	qInfo() << "Working dir:" << QDir::currentPath();
