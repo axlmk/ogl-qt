@@ -6,7 +6,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  windows-latest-build:
+  build-windows-latest-msvc:
     uses: ./.github/workflows/windows-build.yml
     with:
       os: windows-latest
