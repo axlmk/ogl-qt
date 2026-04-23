@@ -46,6 +46,28 @@
             }
         }
     ],
+    "buildPresets": [
+        {
+            "name": "windows-mingw-debug",
+            "configurePreset": "windows-mingw-debug"
+        },
+        {
+            "name": "windows-msvc",
+            "configurePreset": "windows-msvc"
+        },
+        {
+            "name": "windows-mingw",
+            "configurePreset": "windows-mingw"
+        },
+        {
+            "name": "linux-g++",
+            "configurePreset": "linux-g++"
+        },
+        {
+            "name": "linux-clang",
+            "configurePreset": "linux-clang"
+        }
+    ],
     "testPresets": [
         {
             "name": "smoke-test",
