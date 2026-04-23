@@ -1,4 +1,5 @@
 #include <App3D.hpp>
+#include <QCoreApplication>
 #include <QStandardItemModel>
 #include <filesystem>
 
@@ -13,6 +14,8 @@ App3D::App3D(int argc, char* argv[]) : m_app3DViewer{argc, argv, &m_scene}, m_sc
 
 	m_app3DViewer.setSceneObjectsModel(m_sceneObjectModel);
 
+	appDir = QDir(QCoreApplication::applicationDirPath());
+
 	connect(&m_app3DViewer, &App3DViewer::newModelAdded, this, &App3D::_importModel, Qt::UniqueConnection);
 	connect(&m_app3DViewer, &App3DViewer::modelLoaded, this, &App3D::_loadModel, Qt::UniqueConnection);
 	connect(&m_app3DViewer, &App3DViewer::initialized, this, &App3D::_initializeBasicsObjects, Qt::UniqueConnection);
@@ -25,7 +28,8 @@ int App3D::run(void)
 
 void App3D::_initializeBasicsObjects(void)
 {
-	m_models.emplace_back(Model("resources/models/sphere/sphere.obj"));
+
+	m_models.emplace_back(Model(appDir.filePath("resources/models/sphere/sphere.obj").toStdU16String()));
 	m_models.back().load();
 
 	m_shaders.emplace_back(Shader(ShaderType::Light));

@@ -38,26 +38,29 @@ endfunction()
 # ---- Main executable ----
 qt_add_executable(ogl-qt
     main.cpp
-    App3D.cpp App3D.hpp
-    App3DViewer.cpp App3DViewer.hpp
-    Camera.cpp Camera.hpp
-    Gizmo.cpp Gizmo.hpp
-    HUD.cpp HUD.hpp
-    LightObject.cpp LightObject.hpp
-    LightProperties.cpp LightProperties.hpp
-    Mesh.cpp Mesh.hpp
-    Model.cpp Model.hpp
+    App3D.cpp
+    App3DViewer.cpp
+    Camera.cpp
+    Gizmo.cpp
+    HUD.cpp
+    LightObject.cpp
+    LightProperties.cpp
+    Mesh.cpp
+    Model.cpp
     PickingTexture.cpp
     Utils.hpp
-    Scene.cpp Scene.hpp
-    SceneObject.cpp SceneObject.hpp
-    SceneViewer.cpp SceneViewer.hpp
-    Shader.cpp Shader.hpp
+    Scene.cpp
+    SceneObject.cpp
+    SceneViewer.cpp
+    Shader.cpp
 )
 
 setup_qt_target(ogl-qt)
 
-set_target_properties(ogl-qt PROPERTIES MACOSX_BUNDLE ON)
+set_target_properties(ogl-qt PROPERTIES
+    MACOSX_BUNDLE ON
+    VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:ogl-qt>"
+)
 
 # ---- Test executable ----
 qt_add_executable(runtime_test
@@ -68,3 +71,5 @@ qt_add_executable(runtime_test
 setup_qt_target(runtime_test)
 
 add_test(NAME RuntimeSmoke COMMAND $<TARGET_FILE:runtime_test>)
+
+set_tests_properties(RuntimeSmoke PROPERTIES WORKING_DIRECTORY $<TARGET_FILE_DIR:runtime_test>)

@@ -4,9 +4,9 @@
 
 Gizmo::Gizmo()
 	: m_selectedArrow{ArrowDirection::None},
-	  m_arrows{Arrow(Model("resources/models/gizmo/x.obj"), Shader(ShaderType::Unicolor), {255, 0., 0.}),
-			   Arrow(Model("resources/models/gizmo/y.obj"), Shader(ShaderType::Unicolor), {0., 255, 0.}),
-			   Arrow(Model("resources/models/gizmo/z.obj"), Shader(ShaderType::Unicolor), {0., 0., 255})},
+	  m_arrows{Arrow(Model(appDir.filePath("resources/models/gizmo/x.obj").toStdU16String()), Shader(ShaderType::Unicolor), {255, 0., 0.}),
+			   Arrow(Model(appDir.filePath("resources/models/gizmo/y.obj").toStdU16String()), Shader(ShaderType::Unicolor), {0., 255, 0.}),
+			   Arrow(Model(appDir.filePath("resources/models/gizmo/z.obj").toStdU16String()), Shader(ShaderType::Unicolor), {0., 0., 255})},
 	  m_position{0.}
 {}
 

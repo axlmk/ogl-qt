@@ -11,7 +11,7 @@ HUD::HUD(std::string font)
 		throw std::invalid_argument(err_msg);
 	}
 
-	if (FT_New_Face(ft, ("resources/font/" + font + ".ttf").c_str(), 0, &face))
+	if (FT_New_Face(ft, appDir.filePath(QString("resources/font/") + QString(font.c_str()) + QString(".ttf")).toLocal8Bit().data(), 0, &face))
 	{
 		std::string err_msg = "FREETYPE: Failed to load font " + font;
 		qCritical() << err_msg;
@@ -26,7 +26,7 @@ HUD::HUD(std::string font)
 	generateOGLBuffers();
 
 	m_shd = std::make_unique<Shader>(ShaderType::Texture, true);
-	m_shd->addTexture("resources/textures/arial.png");
+	m_shd->addTexture(appDir.filePath("resources/textures/arial.png").toLocal8Bit().data());
 
 	m_shd->compile();
 
@@ -120,7 +120,8 @@ void HUD::generateAtlas(std::string font)
 	}
 
 	// Save the final atlas image
-	int res = stbi_write_png("resources/textures/arial.png", ATLAS_WIDTH, ATLAS_HEIGHT, 1, atlas.data(), ATLAS_WIDTH);
+
+	int res = stbi_write_png(appDir.filePath("resources/textures/arial.png").toLocal8Bit().data(), ATLAS_WIDTH, ATLAS_HEIGHT, 1, atlas.data(), ATLAS_WIDTH);
 	if (!res)
 	{
 		std::string err_msg = "Bitmap texture [" + font + "] could not be saved";

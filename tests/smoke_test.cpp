@@ -19,7 +19,10 @@ int smoke_test(int argc, char* argv[])
 	qInfo() << "Working dir:" << QDir::currentPath();
 	qInfo() << "App dir:" << QCoreApplication::applicationDirPath();
 
-	if (!QFile::exists("resources/models/sphere/sphere.obj"))
+	QString appDir = QCoreApplication::applicationDirPath();
+	QString path = QDir(appDir).filePath("resources/models/sphere/sphere.obj");
+
+	if (!QFile::exists(path))
 	{
 		qCritical() << "Missing resource file!";
 		return 1;
