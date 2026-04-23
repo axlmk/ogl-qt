@@ -1,0 +1,41 @@
+name: Linux-build
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+      configure:
+        required: true
+        type: string
+      arch:
+        required: true
+        type: string
+      tooling:
+        required: false
+        type: string
+
+jobs:
+  build:
+    runs-on: ${{ inputs.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.10.3'
+        host: linux
+        target: desktop
+        arch: ${{ inputs.arch }}
+        tools: 'tools_ninja ${{ inputs.tooling }}'
+
+    - name: Configure CMake
+      run: cmake --preset ${{ inputs.configure }}
+
+    - name: Build
+      run: cmake --build --preset ${{ inputs.configure }}
+
+    - name: Run tests
+      run: ctest --test-dir build/${{ inputs.configure }} -C Release --output-on-failure -VV
