@@ -70,6 +70,16 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+find_package(Qt6 REQUIRED COMPONENTS
+    Core
+    Gui
+    Widgets
+    OpenGL
+    OpenGLWidgets
+)
+
+enable_testing()
+
 add_subdirectory(src)
 
 set_target_properties(ogl-qt PROPERTIES

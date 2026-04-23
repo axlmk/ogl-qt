@@ -11,6 +11,5 @@ jobs:
     with:
       os: windows-latest
       configure: windows-mingw
-      build: windows-mingw-b
       arch: win64_mingw
       tooling: tools_mingw1310

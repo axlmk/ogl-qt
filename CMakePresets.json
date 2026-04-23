@@ -46,26 +46,14 @@
             }
         }
     ],
-    "buildPresets": [
+    "testPresets": [
         {
-            "name": "windows-debug",
-            "configurePreset": "windows-mingw-debug"
-        },
-        {
-            "name": "windows-msvc-b",
-            "configurePreset": "windows-msvc"
-        },
-        {
-            "name": "windows-mingw-b",
-            "configurePreset": "windows-mingw"
-        },
-        {
-            "name": "linux-g++-b",
-            "configurePreset": "linux-g++"
-        },
-        {
-            "name": "linux-clang-b",
-            "configurePreset": "linux-clang"
+            "name": "smoke-test",
+            "description": "Test the environment of the application",
+            "configurePreset": "windows-mingw-debug",
+            "output": {
+                "outputOnFailure": true
+            }
         }
     ]
 }

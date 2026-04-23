@@ -11,5 +11,4 @@ jobs:
     with:
       os: windows-latest
       configure: windows-msvc
-      build: windows-msvc-b
       arch: win64_msvc2022_64
