@@ -14,10 +14,7 @@
             "name": "windows-msvc",
             "generator": "Visual Studio 17 2022",
             "toolset": "v143",
-            "binaryDir": "${sourceDir}/build/${presetName}",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
+            "binaryDir": "${sourceDir}/build/${presetName}"
         },
         {
             "name": "windows-mingw",
@@ -53,7 +50,8 @@
         },
         {
             "name": "windows-msvc",
-            "configurePreset": "windows-msvc"
+            "configurePreset": "windows-msvc",
+            "configuration": "Release"
         },
         {
             "name": "windows-mingw",
@@ -66,16 +64,6 @@
         {
             "name": "linux-clang",
             "configurePreset": "linux-clang"
-        }
-    ],
-    "testPresets": [
-        {
-            "name": "smoke-test",
-            "description": "Test the environment of the application",
-            "configurePreset": "windows-mingw-debug",
-            "output": {
-                "outputOnFailure": true
-            }
         }
     ]
 }
