@@ -36,7 +36,16 @@ int smoke_test(int argc, char* argv[])
 		return 2;
 	}
 
+	QSurfaceFormat fmt;
+	fmt.setVersion(2, 1);  // or even leave version unset
+	fmt.setProfile(QSurfaceFormat::NoProfile);
+	fmt.setRenderableType(QSurfaceFormat::OpenGL);
+	fmt.setDepthBufferSize(24);
+
+	QSurfaceFormat::setDefaultFormat(fmt);
+
 	QOffscreenSurface surface;
+	surface.setFormat(fmt);
 	surface.create();
 
 	if (!ctx.makeCurrent(&surface))

@@ -34,11 +34,12 @@ jobs:
     - name: Configure CMake
       run: cmake --preset ${{ inputs.configure }}
 
-    - name: Build
+    - name: Build 
       run: cmake --build --preset ${{ inputs.configure }}
 
     - name: Run tests
       run: |
         export QT_QPA_PLATFORM=offscreen
         export LIBGL_ALWAYS_SOFTWARE=1
+        export QT_OPENGL=software
         ctest --test-dir build/${{ inputs.configure }} -C Release --output-on-failure -VV
