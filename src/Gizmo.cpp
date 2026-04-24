@@ -1,4 +1,4 @@
-#include "gizmo.hpp"
+#include "Gizmo.hpp"
 
 #include "Camera.hpp"
 
