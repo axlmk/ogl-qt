@@ -9,6 +9,6 @@ jobs:
   build-linux-latest-gcc:
     uses: ./.github/workflows/linux-build.yml
     with:
-      os: linux-latest
+      os: ubuntu-latest
       configure: linux-gcc
       arch: linux_gcc_64
