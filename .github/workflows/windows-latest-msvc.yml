@@ -1,7 +1,6 @@
 name: windows-latest-msvc
 
 on:
-  push:
   pull_request:
     branches: [ "main" ]
 

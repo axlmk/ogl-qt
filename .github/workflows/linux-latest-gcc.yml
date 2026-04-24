@@ -1,7 +1,6 @@
 name: linux-latest-gcc
 
 on:
-  push:
   pull_request:
     branches: [ "main" ]
 
