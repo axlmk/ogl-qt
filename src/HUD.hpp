@@ -3,7 +3,7 @@
 #include <ft2build.h>
 #include <stb_image_write.h>
 
-#include <QTDebug>
+#include <QtDebug>
 #include <algorithm>
 #include <glm/glm.hpp>
 
