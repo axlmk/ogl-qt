@@ -72,7 +72,6 @@ set(COMMON_LIBS
     freetype
     stb::image
     assimp
-    opengl32
 )
 
 enable_testing()

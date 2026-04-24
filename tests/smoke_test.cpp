@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QOffscreenSurface>
 #include <QOpenGLContext>
+#include <QOpenGLExtraFunctions>
 
 #include "assimp/Importer.hpp"
 #include "glm/glm.hpp"
@@ -44,8 +45,11 @@ int smoke_test(int argc, char* argv[])
 		return 3;
 	}
 
+	QOpenGLExtraFunctions g_opengl;
+	g_opengl.initializeOpenGLFunctions();
+
 	qInfo() << "Qt platform:" << QGuiApplication::platformName();
-	qInfo() << "OpenGL version: " << (const char*)glGetString(GL_VERSION);
+	qInfo() << "OpenGL version: " << (const char*)g_opengl.glGetString(GL_VERSION);
 	qInfo() << "= = = Everything's OK! = = =";
 
 	return 0;
