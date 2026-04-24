@@ -38,8 +38,4 @@ jobs:
       run: cmake --build --preset ${{ inputs.configure }}
 
     - name: Run tests
-      run: |
-        export QT_QPA_PLATFORM=offscreen
-        export LIBGL_ALWAYS_SOFTWARE=1
-        export QT_OPENGL=software
-        xvfb-run --auto-servernum ctest --test-dir build/${{ inputs.configure }} -C Release --output-on-failure -VV
+      run: xvfb-run --auto-servernum ctest --test-dir build/${{ inputs.configure }} -C Release --output-on-failure -VV
