@@ -1,7 +1,7 @@
 name: windows-latest-mingw
 
 on:
-  push:
+  # push:
   pull_request:
     branches: [ "main" ]
 
