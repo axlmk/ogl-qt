@@ -30,8 +30,8 @@ void Shader::setCustom(const std::filesystem::path& vtxShdPath, const std::files
 
 void Shader::setLight()
 {
-	m_vtxShdPath = "resources/shaders/unicolor.vs";
-	m_frgShdPath = "resources/shaders/unicolor.fs";
+	m_vtxShdPath = appDir.filePath("resources/shaders/unicolor.vs").toStdU16String();
+	m_frgShdPath = appDir.filePath("resources/shaders/unicolor.fs").toStdU16String();
 }
 
 void Shader::setColor(RGBColor color)
@@ -43,8 +43,8 @@ void Shader::setColor(RGBColor color)
 
 	m_color = color;
 
-	m_vtxShdPath = "resources/shaders/unicolor.vs";
-	m_frgShdPath = "resources/shaders/unicolor.fs";
+	m_vtxShdPath = appDir.filePath("resources/shaders/unicolor.vs").toStdU16String();
+	m_frgShdPath = appDir.filePath("resources/shaders/unicolor.fs").toStdU16String();
 }
 
 void Shader::setColor(std::string color)
@@ -75,8 +75,8 @@ void Shader::setColor(std::string color)
 		throw std::invalid_argument(err_msg);
 	}
 
-	m_vtxShdPath = "resources/shaders/unicolor.vs";
-	m_frgShdPath = "resources/shaders/unicolor.fs";
+	m_vtxShdPath = appDir.filePath("resources/shaders/unicolor.vs").toStdU16String();
+	m_frgShdPath = appDir.filePath("resources/shaders/unicolor.fs").toStdU16String();
 }
 
 void Shader::addTexture(const std::filesystem::path& texturePath)
@@ -107,13 +107,13 @@ void Shader::addTexture(const std::filesystem::path& texturePath)
 
 	if (m_font)
 	{
-		m_vtxShdPath = "resources/shaders/font.vs";
-		m_frgShdPath = "resources/shaders/font.fs";
+		m_vtxShdPath = appDir.filePath("resources/shaders/font.vs").toStdU16String();
+		m_frgShdPath = appDir.filePath("resources/shaders/font.fs").toStdU16String();
 	}
 	else
 	{
-		m_vtxShdPath = "resources/shaders/texture.vs";
-		m_frgShdPath = "resources/shaders/texture.fs";
+		m_vtxShdPath = appDir.filePath("resources/shaders/texture.vs").toStdU16String();
+		m_frgShdPath = appDir.filePath("resources/shaders/texture.fs").toStdU16String();
 	}
 }
 

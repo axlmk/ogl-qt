@@ -1,0 +1,13 @@
+name: linux-latest-gcc
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-linux-latest-gcc:
+    uses: ./.github/workflows/linux-build.yml
+    with:
+      os: ubuntu-latest
+      configure: linux-gcc
+      arch: linux_gcc_64

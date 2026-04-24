@@ -1,0 +1,13 @@
+name: windows-latest-msvc
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-windows-latest-msvc:
+    uses: ./.github/workflows/windows-build.yml
+    with:
+      os: windows-latest
+      configure: windows-msvc
+      arch: win64_msvc2022_64

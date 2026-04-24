@@ -1,0 +1,14 @@
+name: windows-latest-mingw
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-windows-latest-mingw:
+    uses: ./.github/workflows/windows-build.yml
+    with:
+      os: windows-latest
+      configure: windows-mingw
+      arch: win64_mingw
+      tooling: tools_mingw1310

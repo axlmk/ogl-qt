@@ -1,31 +1,9 @@
 # OGL-QT
+[![windows-latest-msvc](https://github.com/axlmk/ogl-qt/actions/workflows/windows-latest-msvc.yml/badge.svg)](https://github.com/axlmk/ogl-qt/actions/workflows/windows-latest-msvc.yml) [![windows-latest-mingw](https://github.com/axlmk/ogl-qt/actions/workflows/windows-latest-mingw.yml/badge.svg)](https://github.com/axlmk/ogl-qt/actions/workflows/windows-latest-mingw.yml) [![linux-latest-gcc](https://github.com/axlmk/ogl-qt/actions/workflows/linux-latest-gcc.yml/badge.svg)](https://github.com/axlmk/ogl-qt/actions/workflows/linux-latest-gcc.yml)
+<br>
+[![Current milestone completion](https://img.shields.io/github/milestones/progress/axlmk/ogl-qt/2)](https://github.com/axlmk/ogl-qt/milestone/2)
 
 ## A project to learn the usage of OpenGL and Qt
 
-## 1. Build the project 
-### My preferred way of building the project
-Using VSCode, I append the paths of the CMake executable and of the compiler into the `settings.json` file of the user.
-```json
-"cmake.cmakePath": "C:\\Qt\\Tools\\CMake_64\\bin\\cmake",
-"cmake.environment": {
-    "PATH": "C:\\Qt\\Tools\\mingw1310_64\\bin;${env:PATH}"
-}
-```
-I then create a custom `CMakeUserPresets.json` file to specify the paths of the compiler, the Qt's dependencies and the build system.
-```json
-{
-    "version" : 6,
-    "configurePresets": [
-        {
-            "name": "win_debug_usr",
-            "displayName": "Windows debug Axel",
-            "inherits": "win_debug",
-            "cacheVariables": {
-                "CMAKE_MAKE_PROGRAM" : "C:\\Qt\\Tools\\Ninja\\ninja.exe",
-                "CMAKE_PREFIX_PATH" : "C:\\Qt\\6.11.0\\mingw_64",
-                "CMAKE_CXX_COMPILER" : "C:\\Qt\\Tools\\mingw1310_64\\bin\\g++.exe"
-            }
-        }
-    ]
-}
-```
+## Building the project
+**OGL-QT** uses CMake for the dependency management as well as for building the entire project. Some presets are available under the `CMakePreset.json`. For more details, see the [documentation](https://github.com/axlmk/ogl-qt/wiki/Building-the-project).

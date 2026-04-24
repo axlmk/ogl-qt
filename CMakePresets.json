@@ -2,13 +2,68 @@
     "version": 6,
     "configurePresets": [
         {
-            "name": "win_debug",
-            "displayName": "Windows debug",
+            "name": "windows-mingw-debug",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "g++",
                 "CMAKE_BUILD_TYPE": "Debug"
             }
+        },
+        {
+            "name": "windows-msvc",
+            "generator": "Visual Studio 17 2022",
+            "toolset": "v143",
+            "binaryDir": "${sourceDir}/build/${presetName}"
+        },
+        {
+            "name": "windows-mingw",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "linux-gcc",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "linux-clang",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_CXX_COMPILER": "clang"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "windows-mingw-debug",
+            "configurePreset": "windows-mingw-debug"
+        },
+        {
+            "name": "windows-msvc",
+            "configurePreset": "windows-msvc",
+            "configuration": "Release"
+        },
+        {
+            "name": "windows-mingw",
+            "configurePreset": "windows-mingw"
+        },
+        {
+            "name": "linux-gcc",
+            "configurePreset": "linux-gcc"
+        },
+        {
+            "name": "linux-clang",
+            "configurePreset": "linux-clang"
         }
     ]
 }
