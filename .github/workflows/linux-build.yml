@@ -42,4 +42,4 @@ jobs:
         export QT_QPA_PLATFORM=offscreen
         export LIBGL_ALWAYS_SOFTWARE=1
         export QT_OPENGL=software
-        ctest --test-dir build/${{ inputs.configure }} -C Release --output-on-failure -VV
+        xvfb-run --auto-servernum ctest --test-dir build/${{ inputs.configure }} -C Release --output-on-failure -VV
