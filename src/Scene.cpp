@@ -17,7 +17,7 @@ void scene::initializeScene(int viewportWidth, int viewportHeight)
 	m_pickingTex = PickingTexture(viewportWidth, viewportHeight);
 
 	auto hud = std::make_unique<HUD>("arial");
-	hud->setText(std::bind(&Camera::getPositionStr, m_camera));
+	hud->setText(std::bind(&Camera::getPositionStr, &m_camera));
 	m_huds.push_back(std::move(hud));
 
 	auto hud2 = std::make_unique<HUD>("arial");
