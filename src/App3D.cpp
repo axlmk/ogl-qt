@@ -52,8 +52,6 @@ void App3D::_importModel(InfoObject info)
 	shader->compile();
 	m_shaders.emplace_back(std::move(shader));
 
-	// todo test everything went ok
-
 	const uint modelIdx = static_cast<uint>(m_models.size() - 1);
 	const uint shaderIdx = static_cast<uint>(m_shaders.size() - 1);
 	const importedObject import{info.name.toStdString(), modelIdx, shaderIdx, importedObject::Type::Normal, LightProperties::LightType::Point};
