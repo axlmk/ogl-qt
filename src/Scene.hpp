@@ -57,8 +57,9 @@ class scene
 	 * @brief Add an object to the list of the scene's renderable
 	 * @param[in] model The model of a new object
 	 * @param[in] shader The shader of a new object
+	 * @param[in] name The name of a new object
 	 */
-	void addObjectToRenderables(Model* model, Shader* shader);
+	void addObjectToRenderables(Model* model, Shader* shader, const std::string& name);
 
 	/**
 	 * @brief Add an object to the list of the scene's renderable
@@ -87,6 +88,8 @@ class scene
 
 	bool m_cameraDirection[4];
 	glm::ivec2 m_mouseCoords;
+
+	uint m_numberOfCreatedObjects;	///< Count the number of objects created throughout the project
 
 	bool m_isPicking = false;  ///< Indicates if the user is trying to pick an object
 };
