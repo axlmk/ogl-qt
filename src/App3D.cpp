@@ -8,10 +8,6 @@
 
 App3D::App3D(int argc, char* argv[]) : m_app3DViewer{argc, argv, &m_scene}, m_sceneObjectModel{new QStandardItemModel()}
 {
-	// todo temporary fix for not having to deal with the pointer change when pushing_back
-	m_shaders.reserve(20);
-	m_models.reserve(20);
-
 	m_app3DViewer.setSceneObjectsModel(m_sceneObjectModel);
 
 	appDir = QDir(QCoreApplication::applicationDirPath());
@@ -28,13 +24,14 @@ int App3D::run(void)
 
 void App3D::_initializeBasicsObjects(void)
 {
+	auto model = std::make_unique<Model>(appDir.filePath("resources/models/sphere/sphere.obj").toStdU16String());
+	model->load();
+	m_models.emplace_back(std::move(model));
 
-	m_models.emplace_back(Model(appDir.filePath("resources/models/sphere/sphere.obj").toStdU16String()));
-	m_models.back().load();
-
-	m_shaders.emplace_back(Shader(ShaderType::Light));
-	m_shaders.back().setLight();
-	m_shaders.back().compile();
+	auto shader = std::make_unique<Shader>(ShaderType::Light);
+	shader->setLight();
+	shader->compile();
+	m_shaders.emplace_back(std::move(shader));
 
 	const uint modelIdx = static_cast<uint>(m_models.size() - 1);
 	const uint shaderIdx = static_cast<uint>(m_shaders.size() - 1);
@@ -45,13 +42,15 @@ void App3D::_initializeBasicsObjects(void)
 
 void App3D::_importModel(InfoObject info)
 {
-	m_models.emplace_back(Model(info.objectPath.toStdString()));
-	m_models.back().load();
+	auto model = std::make_unique<Model>(info.objectPath.toStdString());
+	model->load();
+	m_models.emplace_back(std::move(model));
 
-	m_shaders.emplace_back(Shader(ShaderType::Texture));
-	m_shaders.back().addTexture(info.diffusePath.toStdString());
-	m_shaders.back().addTexture(info.specularPath.toStdString());
-	m_shaders.back().compile();
+	auto shader = std::make_unique<Shader>(ShaderType::Texture);
+	shader->addTexture(info.diffusePath.toStdString());
+	shader->addTexture(info.specularPath.toStdString());
+	shader->compile();
+	m_shaders.emplace_back(std::move(shader));
 
 	// todo test everything went ok
 
@@ -70,10 +69,10 @@ void App3D::_loadModel(uint rowIndex)
 	switch (m_availableObjects[rowIndex].type)
 	{
 		case importedObject::Type::Normal:
-			m_scene.addObjectToRenderables(&selectedModel, &selectedShader);
+			m_scene.addObjectToRenderables(selectedModel.get(), selectedShader.get());
 			break;
 		case importedObject::Light: {
-			m_scene.addLightToRenderables(&selectedModel, &selectedShader, m_availableObjects[rowIndex].light);
+			m_scene.addLightToRenderables(selectedModel.get(), selectedShader.get(), m_availableObjects[rowIndex].light);
 			break;
 		}
 		default:

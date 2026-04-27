@@ -50,8 +50,8 @@ class App3D : public QObject
 	scene m_scene;
 	App3DViewer m_app3DViewer;
 
-	std::vector<Model> m_models;
-	std::vector<Shader> m_shaders;
+	std::vector<std::unique_ptr<Model>> m_models;
+	std::vector<std::unique_ptr<Shader>> m_shaders;
 	std::vector<importedObject> m_availableObjects;
 
 	QStandardItemModel* m_sceneObjectModel;
