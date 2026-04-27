@@ -7,7 +7,6 @@ LightObject::LightObject(Model* geometry, Shader* shader) : SceneObject(geometry
 
 void LightObject::render(const Camera& camera, const std::vector<LightProperties*>& lights) const
 {
-	// todo a modifier pour simplifier la fonction de rendu car pour les lights, tous les calculs ne sont pas a faire
 	SceneObject::render(camera, lights);
 }
 
