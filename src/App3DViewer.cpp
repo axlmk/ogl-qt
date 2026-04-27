@@ -55,7 +55,8 @@ App3DViewer::App3DViewer(int argc, char* argv[], scene* scene)
 		"Alt + middle click : pan around\n"
 		"Alt + right click : zoom\n"
 		"Click on object: select it\n"
-		"Click on gizmo : translate selected object");
+		"Click on object + f: zoom on the object"
+		"Click on gizmo : translate selected object\n");
 	QVBoxLayout* vlayTips = new QVBoxLayout;
 	m_sceneObjectView = new QListView();
 
