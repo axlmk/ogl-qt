@@ -67,7 +67,7 @@ void App3D::_loadModel(uint rowIndex)
 	switch (m_availableObjects[rowIndex].type)
 	{
 		case importedObject::Type::Normal:
-			m_scene.addObjectToRenderables(selectedModel.get(), selectedShader.get());
+			m_scene.addObjectToRenderables(selectedModel.get(), selectedShader.get(), m_availableObjects[rowIndex].name);
 			break;
 		case importedObject::Light: {
 			m_scene.addLightToRenderables(selectedModel.get(), selectedShader.get(), m_availableObjects[rowIndex].light);

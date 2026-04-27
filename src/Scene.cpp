@@ -1,7 +1,7 @@
 #include <Scene.hpp>
 #include <SceneViewer.hpp>
 
-scene::scene() : m_camera{SpaceCoord(0.0, 0.0, 3.0)}, m_selectedObject{nullptr}, m_cameraDirection{false, false, false, false} {}
+scene::scene() : m_camera{SpaceCoord(0.0, 0.0, 3.0)}, m_selectedObject{nullptr}, m_cameraDirection{false, false, false, false}, m_numberOfCreatedObjects{0} {}
 
 void scene::initializeScene(int viewportWidth, int viewportHeight)
 {
@@ -17,7 +17,7 @@ void scene::initializeScene(int viewportWidth, int viewportHeight)
 	m_pickingTex = PickingTexture(viewportWidth, viewportHeight);
 
 	auto hud = std::make_unique<HUD>("arial");
-	hud->setText(std::bind(&Camera::getPositionStr, m_camera));
+	hud->setText(std::bind(&Camera::getPositionStr, &m_camera));
 	m_huds.push_back(std::move(hud));
 
 	auto hud2 = std::make_unique<HUD>("arial");
@@ -75,9 +75,12 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 	i++;
 }
 
-void scene::addObjectToRenderables(Model* model, Shader* shader)
+void scene::addObjectToRenderables(Model* model, Shader* shader, const std::string& name)
 {
-	m_renderedObjects.push_back(std::make_unique<SceneObject>(model, shader));
+	auto objectToAdd = std::make_unique<SceneObject>(model, shader);
+	objectToAdd->setName(name + std::to_string(m_numberOfCreatedObjects));
+	m_renderedObjects.push_back(std::move(objectToAdd));
+	m_numberOfCreatedObjects++;
 }
 
 void scene::addLightToRenderables(Model* model, Shader* shader, LightProperties::LightType light)
@@ -93,20 +96,22 @@ void scene::addLightToRenderables(Model* model, Shader* shader, LightProperties:
 	{
 		case LightProperties::LightType::Point:
 			lightToAdd->setPointLight(0.09f, 0.032f);
-			lightToAdd->setName("Point Light");
+			lightToAdd->setName("Point Light" + m_numberOfCreatedObjects);
 			break;
 		case LightProperties::LightType::Directional:
 			lightToAdd->setDirectionalLight(glm::vec3(0.f, -1.0f, 0.0f));
-			lightToAdd->setName("Directionnal Light");
+			lightToAdd->setName("Directionnal Light" + m_numberOfCreatedObjects);
 			break;
 		default:
 			lightToAdd->setSpotLight(glm::vec3(0.f, -1.0f, 0.0f), 0.91, 0.82);
-			lightToAdd->setName("Spot Light");
+			lightToAdd->setName("Spot Light" + m_numberOfCreatedObjects);
 			break;
 	}
 
 	m_lights.push_back(lightToAdd->getLightProperties());
 	m_renderedObjects.push_back(std::move(lightToAdd));
+
+	m_numberOfCreatedObjects++;
 }
 
 void scene::walkCamera(Mouvement mouvement, bool active)
@@ -185,7 +190,6 @@ void scene::_picking()
 				{
 					m_selectedObject = sceneObject;
 					hasSelected = true;
-					break;
 				}
 			}
 		}
