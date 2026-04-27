@@ -65,8 +65,7 @@ class Gizmo : public SceneObject
 
 	ArrowDirection m_selectedArrow;	 ///< Represents the selected arrow of the gizmo
 	std::array<Arrow, 3> m_arrows;	 ///< The three arrows composing the gizmo
-	glm::vec3 m_position;			 ///< The position of the gizmo
 
-	constexpr static float m_scalingFactor = 0.5f;	///< Scaling factor of the gizmo
+	constexpr static float m_scalingFactor = 0.1f;	///< Scaling factor of the gizmo
 	constexpr static float m_threshold = 0.25;		///< The threshold from which an arrow is seen or not
 };

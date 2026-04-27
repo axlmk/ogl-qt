@@ -6,8 +6,7 @@ Gizmo::Gizmo()
 	: m_selectedArrow{ArrowDirection::None},
 	  m_arrows{Arrow(Model(appDir.filePath("resources/models/gizmo/x.obj").toStdU16String()), Shader(ShaderType::Unicolor), {255, 0., 0.}),
 			   Arrow(Model(appDir.filePath("resources/models/gizmo/y.obj").toStdU16String()), Shader(ShaderType::Unicolor), {0., 255, 0.}),
-			   Arrow(Model(appDir.filePath("resources/models/gizmo/z.obj").toStdU16String()), Shader(ShaderType::Unicolor), {0., 0., 255})},
-	  m_position{0.}
+			   Arrow(Model(appDir.filePath("resources/models/gizmo/z.obj").toStdU16String()), Shader(ShaderType::Unicolor), {0., 0., 255})}
 {}
 
 void Gizmo::load(void)
@@ -36,9 +35,8 @@ void Gizmo::render(const Camera& camera, [[maybe_unused]] const std::vector<Ligh
 	const auto zCos = (glm::dot(C, B)) / (glm::length(C) * glm::length(B));
 	const auto YCos = (glm::dot(D, B)) / (glm::length(D) * glm::length(B));
 
-	const transformation transfo{m_transformation.position, glm::vec3(m_scalingFactor)};
-	// Todo : need to decide if we scale the gizmo to make it have the same no matter the zoom or not
-	// const auto lenCamArrow = glm::length(camera.getPosition() - m_position);
+	const auto lenCamArrow = glm::length(camera.getPosition() - m_transformation.position);
+	const transformation transfo{m_transformation.position, glm::vec3(m_scalingFactor * lenCamArrow)};
 
 	if (std::abs(xCos) > m_threshold || std::abs(YCos) > m_threshold)
 	{
@@ -63,10 +61,8 @@ void Gizmo::renderPicking(const Camera& camera) const
 	const auto zCos = (glm::dot(C, B)) / (glm::length(C) * glm::length(B));
 	const auto YCos = (glm::dot(D, B)) / (glm::length(D) * glm::length(B));
 
-	const transformation transfo{m_transformation.position, glm::vec3(m_scalingFactor)};
-
-	// Todo : need to decide if we scale the gizmo to make it have the same no matter the zoom or not
-	// const auto lenCamArrow = glm::length(camera.getPosition() - m_position);
+	const auto lenCamArrow = glm::length(camera.getPosition() - m_transformation.position);
+	const transformation transfo{m_transformation.position, glm::vec3(m_scalingFactor * lenCamArrow)};
 
 	if (std::abs(xCos) > m_threshold || std::abs(YCos) > m_threshold)
 	{
