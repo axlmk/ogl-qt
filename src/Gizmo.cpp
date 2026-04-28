@@ -97,12 +97,7 @@ bool Gizmo::isId(const glm::ivec3& id) const
 	return id == glm::ivec3(255, 0, 0) || id == glm::ivec3(0, 255, 0) || id == glm::ivec3(0, 0, 255);
 }
 
-bool Gizmo::isSelected(void) const
-{
-	return m_selectedArrow != ArrowDirection::None;
-}
-
-int Gizmo::getSelectedIndex(void) const
+Gizmo::ArrowDirection Gizmo::getSelectedIndex(void) const
 {
 	return m_selectedArrow;
 }

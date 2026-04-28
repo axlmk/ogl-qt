@@ -7,41 +7,119 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
 
-enum class CameraProjection { Perspective, Orthographic };
+/**
+ * @brief Describes the type of projection used by the camera
+ */
+enum class CameraProjection {
+	Perspective,  ///< Persepective camera
+	Orthographic  ///< Orthographic camera
+};
 
-using SpaceCoord = glm::vec3;
-
+/**
+ * @brief Represents a point of view of the scene
+ * @note The camera has a position as well as a target. When rotating around, the camera is always rotation around this target
+ * When panning, the camera is translating its position and its target's
+ * When zooming, it just gets more or less closer to the target
+ */
 class Camera
 {
    public:
-	Camera(const SpaceCoord& position, float fov = 45.f);
+	/**
+	 * @brief Default constructor
+	 * @param[in] position Position of the camera in the scene
+	 * @param[in] fov The FOV of the camera
+	 */
+	Camera(const glm::vec3& position, float fov = 45.f);
 
-	float getFov() const;
-	float getFarPlan() const;
-	float getNearPlan() const;
-	glm::mat4 getSpaceMat() const;
-	SpaceCoord getPosition() const;
+	/**
+	 * @brief Returns the FOV
+	 * @return The FOV representes as a float
+	 */
+	float getFov(void) const;
+
+	/**
+	 * @brief Returns the far plan of the camera
+	 * @return The far plan
+	 */
+	float getFarPlan(void) const;
+
+	/**
+	 * @brief Returns the near plan of the camera
+	 * @return The near plan
+	 */
+	float getNearPlan(void) const;
+
+	/**
+	 * @brief Get the space matrix representing the camera
+	 * @return The space matrix
+	 */
+	glm::mat4 getSpaceMat(void) const;
+
+	/**
+	 * @brief Get the position of the camera
+	 * @return The position
+	 */
+	glm::vec3 getPosition(void) const;
+
+	/**
+	 * @brief Get the position of the camera as a string
+	 * @return The position as a string
+	 */
 	std::string getPositionStr(void) const;
-	SpaceCoord getDirection() const;
-	SpaceCoord getTarget(void) const;
 
-	void setTarget(SpaceCoord targ0et);
-	void setPosition(SpaceCoord pos);
+	/**
+	 * @brief Get the direction the camera is looking to
+	 * @return The direction
+	 */
+	glm::vec3 getDirection(void) const;
 
-	void move(std::unordered_map<std::string, bool> inputsBeingPressed, qint64 deltaTime);
+	/**
+	 * @brief Get the target the camera is following
+	 * @return The target position
+	 */
+	glm::vec3 getTarget(void) const;
 
+	/**
+	 * @brief Set the new position of the camera's target
+	 * @param[in] target The new position of the target
+	 */
+	void setTarget(glm::vec3 target);
+
+	/**
+	 * @brief Set the new position of the camera
+	 * @param[in] pos The new position
+	 */
+	void setPosition(glm::vec3 pos);
+
+	/**
+	 * @brief Rotates the camera around its target
+	 * @param[in] lastPos Position of the mouse cursor during the previous render
+	 * @param[in] currentPos Current position of the mouse cursor 
+	 */
 	void rotate(glm::vec2 lastPos, glm::vec2 currentPos);
+
+	/**
+	 * @brief Pans the camera
+	 * @param[in] lastPos Position of the mouse cursor during the previous render
+	 * @param[in] currentPos Current position of the mouse cursor 
+	 */
 	void pan(glm::vec2 lastPos, glm::vec2 currentPos);
+
+	/**
+	 * @brief Zoom onto the camera's target
+	 * @param[in] lastPos Position of the mouse cursor during the previous render
+	 * @param[in] currentPos Current position of the mouse cursor 
+	 */
 	void zoom(glm::vec2 lastPos, glm::vec2 currentPos);
 
    private:
-	SpaceCoord m_position;
-	SpaceCoord m_target;
-	SpaceCoord m_rightVec;
-	SpaceCoord m_upVec;
+	glm::vec3 m_position;  ///< The position of the camera
+	glm::vec3 m_target;	   ///< The position of the camera's target
+	glm::vec3 m_rightVec;  ///< A vector pointing to the right of the camera's relative direction
+	glm::vec3 m_upVec;	   ///< A vector pointing to the top of the camera's relative direction
 
-	CameraProjection m_projection;
-	float m_fov;
-	float m_nearPlan;
-	float m_farPlan;
+	CameraProjection m_projection;	///< The projection, can be perspective or orthogonal
+	float m_fov;					///< The field of view
+	float m_nearPlan;				///< The distance limit until objects are too close and can't be rendered
+	float m_farPlan;				///< The distance limit until objects are too far and can't be rendered
 };

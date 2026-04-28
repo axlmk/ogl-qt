@@ -18,15 +18,21 @@
 
 struct LightProperties;
 
-enum class Mouvement { Forward, Backward, Left, Right };
-
-class scene
+/**
+ * @brief Handles the logic of the 3D scene
+ */
+class Scene
 {
    public:
-	scene();
+	/**
+	 * @brief Default constructor
+	 */
+	Scene(void);
 
-	//ajouter la selection aux objets et garder trace de quel objet est selectionne
-
+	/**
+	 * @brief Returns the camera used by the scene
+	 * @return The camera
+	 */
 	Camera& getCamera(void);
 
 	/**
@@ -40,16 +46,34 @@ class scene
 	 */
 	void disablePicking(void);
 
+	/**
+	 * @brief Initialize the 3D scene
+	 * @param[in] viewportWidth The width of the 3D scene
+	 * @param[in] viewportHeight The height of the 3D scene
+	 */
 	void initializeScene(int viewportWidth, int viewportHeight);
-	void renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed, qint64 deltaTime);
-	void walkCamera(Mouvement mouvsement, bool active);
+
+	/**
+	 * @brief Main loop of the application. Render the entire scene every time it's called
+	 * @param[in] deltaTime The time difference between two renders
+	 */
+	void renderLoop(long long deltaTime);
+
+	/**
+	 * @brief Make the camera focus on the selected object
+	 */
 	void focusCameraOnSelectedObject(void);
+
+	/**
+	 * @brief Try to translate the selected object
+	 * @param[in] mouseDiff The 2D vector describing the mouse mouvement between two renders
+	 */
 	void tryMoveObject(const glm::ivec2& mouseDiff);
 
 	/**
 	 * @brief Updates the viewport after a resizing of its window
 	 * @param[in] width The new width of the window
-	 * @param[in] heigth The new height of the window
+	 * @param[in] height The new height of the window
 	 */
 	void updateViewport(int width, int height);
 
@@ -69,27 +93,35 @@ class scene
 	 */
 	void addLightToRenderables(Model* model, Shader* shader, LightProperties::LightType light);
 
+	/**
+	 * @brief Returns the select object coordinates through a string
+	 * @return The coordinates of the select object as a string
+	 */
 	std::string getSelectedObjectCoordinateStr(void) const;
 
    private:
-	void _picking();
+	/**
+	 * @brief Do the picking phase, which means a special render of the image is made to determine even an object has been clicked on
+	 */
+	void _picking(void);
 
 	std::vector<std::unique_ptr<HUD>> m_huds;					  ///< All the HUDs present in the scene
 	std::vector<std::unique_ptr<SceneObject>> m_renderedObjects;  ///< All the objects present in the scene
 	std::vector<LightProperties*> m_lights;						  ///< All the lights that illuminate the scene
 
-	Camera m_camera;
-	PickingTexture m_pickingTex;
-	Gizmo m_gizmo;	///< Gizmo places at the selected object's location
+	Camera m_camera;			  ///< The point of view of the user in the screen
+	PickingTexture m_pickingTex;  ///< The texture used to defer the render of the picking phase
+	Gizmo m_gizmo;				  ///< Gizmo places at the selected object's location
 
-	SceneObject* m_selectedObject;
+	SceneObject* m_selectedObject;	/// A reference to the selected object
+	Selection m_selection;			///< The selection applied to selected objects
+	bool m_isPicking = false;		///< Indicates if the user is trying to pick an object
 
-	Selection m_selection;	///< The selection applied to selected objects
-
-	bool m_cameraDirection[4];
-	glm::ivec2 m_mouseCoords;
+	glm::ivec2 m_mouseCoords;  ///< The coordinates of the mouse during the render
 
 	uint m_numberOfCreatedObjects;	///< Count the number of objects created throughout the project
 
-	bool m_isPicking = false;  ///< Indicates if the user is trying to pick an object
+	constexpr static float m_translatingUpFactor = 0.002f;	///< A factor of multiplication to translate the object up and down
+	constexpr static float m_translatingXFactor = -0.002f;	///< A factor of multiplication to translate the object right and left
+	constexpr static float m_translatingZFactor = 0.002f;	///< A factor of multiplication to translate the object front and back
 };

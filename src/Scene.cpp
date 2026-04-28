@@ -1,9 +1,9 @@
 #include <Scene.hpp>
 #include <SceneViewer.hpp>
 
-scene::scene() : m_camera{SpaceCoord(0.0, 0.0, 3.0)}, m_selectedObject{nullptr}, m_cameraDirection{false, false, false, false}, m_numberOfCreatedObjects{0} {}
+Scene::Scene() : m_camera{glm::vec3(0.0, 0.0, 3.0)}, m_selectedObject{nullptr}, m_numberOfCreatedObjects{0} {}
 
-void scene::initializeScene(int viewportWidth, int viewportHeight)
+void Scene::initializeScene(int viewportWidth, int viewportHeight)
 {
 	m_selection = {{ShaderType::Unicolor}, 1.05f};
 	m_selection.color.setColor("#CC0000");
@@ -21,24 +21,22 @@ void scene::initializeScene(int viewportWidth, int viewportHeight)
 	m_huds.push_back(std::move(hud));
 
 	auto hud2 = std::make_unique<HUD>("arial");
-	hud2->setText(std::bind(&scene::getSelectedObjectCoordinateStr, this));
+	hud2->setText(std::bind(&Scene::getSelectedObjectCoordinateStr, this));
 	m_huds.push_back(std::move(hud2));
 }
 
-void scene::updateViewport(int width, int height)
+void Scene::updateViewport(int width, int height)
 {
 	m_pickingTex.updateTexture(width, height);
 }
 
-void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed, qint64 deltaTime)
+void Scene::renderLoop(long long deltaTime)
 {
 	g_opengl.glEnable(GL_DEPTH_TEST);
 	g_opengl.glEnable(GL_LINE_SMOOTH);
 	g_opengl.glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
 	g_opengl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	g_opengl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-	m_camera.move(inputsBeingPressed, deltaTime);
 
 	_picking();	 // Perform the picking rendering to know if an object is selected or not
 
@@ -75,7 +73,7 @@ void scene::renderLoop(std::unordered_map<std::string, bool> inputsBeingPressed,
 	i++;
 }
 
-void scene::addObjectToRenderables(Model* model, Shader* shader, const std::string& name)
+void Scene::addObjectToRenderables(Model* model, Shader* shader, const std::string& name)
 {
 	auto objectToAdd = std::make_unique<SceneObject>(model, shader);
 	objectToAdd->setName(name + std::to_string(m_numberOfCreatedObjects));
@@ -83,7 +81,7 @@ void scene::addObjectToRenderables(Model* model, Shader* shader, const std::stri
 	m_numberOfCreatedObjects++;
 }
 
-void scene::addLightToRenderables(Model* model, Shader* shader, LightProperties::LightType light)
+void Scene::addLightToRenderables(Model* model, Shader* shader, LightProperties::LightType light)
 {
 	if (m_lights.size() >= MAX_LIGHT_NUMBER)
 	{
@@ -114,44 +112,23 @@ void scene::addLightToRenderables(Model* model, Shader* shader, LightProperties:
 	m_numberOfCreatedObjects++;
 }
 
-void scene::walkCamera(Mouvement mouvement, bool active)
-{
-	switch (mouvement)
-	{
-		case Mouvement::Forward:
-			m_cameraDirection[0] = active;
-			break;
-		case Mouvement::Backward:
-			m_cameraDirection[3] = active;
-			break;
-		case Mouvement::Left:
-			m_cameraDirection[1] = active;
-			break;
-		case Mouvement::Right:
-			m_cameraDirection[2] = active;
-			break;
-		default:
-			break;
-	}
-}
-
-Camera& scene::getCamera(void)
+Camera& Scene::getCamera(void)
 {
 	return m_camera;
 }
 
-void scene::enablePicking(glm::ivec2 mouseCoords)
+void Scene::enablePicking(glm::ivec2 mouseCoords)
 {
 	m_isPicking = true;
 	m_mouseCoords = mouseCoords;
 }
 
-void scene::disablePicking(void)
+void Scene::disablePicking(void)
 {
 	m_gizmo.unselect();
 }
 
-void scene::_picking()
+void Scene::_picking()
 {
 	bool hasSelected = false;
 	bool gizmoSelected = false;
@@ -205,38 +182,36 @@ void scene::_picking()
 	m_isPicking = false;
 }
 
-void scene::tryMoveObject(const glm::ivec2& mouseDiff)
+void Scene::tryMoveObject(const glm::ivec2& mouseDiff)
 {
-	if (m_gizmo.isSelected())
+	switch (m_gizmo.getSelectedIndex())
 	{
-		if (m_gizmo.getSelectedIndex() == 1)
-		{
-			static const float translatingUpFactor = 0.002f;
-			auto translation = translatingUpFactor * mouseDiff.y * glm::length(m_selectedObject->getPosition() - m_camera.getPosition());
-			m_selectedObject->translate({0, translation, 0});
-		}
-		else if (m_gizmo.getSelectedIndex() == 0)
-		{
-			static const float translatingXFactor = -0.002f;
+		case Gizmo::ArrowDirection::X: {
 			const glm::vec3 A{0., 0., 1.};
 			const auto B = m_camera.getDirection();
 			const auto cosTheta = (glm::dot(A, B)) / (glm::length(A) * glm::length(B));
-			const auto translation = translatingXFactor * cosTheta * mouseDiff.x * glm::length(m_selectedObject->getPosition() - m_camera.getPosition());
+			const auto translation = m_translatingXFactor * cosTheta * mouseDiff.x * glm::length(m_selectedObject->getPosition() - m_camera.getPosition());
 			m_selectedObject->translate({translation, 0, 0});
+			break;
 		}
-		else
-		{
-			static const float translatingYFactor = 0.002f;
+		case Gizmo::ArrowDirection::Y: {
+			auto translation = m_translatingUpFactor * mouseDiff.y * glm::length(m_selectedObject->getPosition() - m_camera.getPosition());
+			m_selectedObject->translate({0, translation, 0});
+			break;
+		}
+		case Gizmo::ArrowDirection::Z: {
 			const glm::vec3 A{1., 0., 0.};
 			const auto B = m_camera.getDirection();
 			const auto cosTheta = (glm::dot(A, B)) / (glm::length(A) * glm::length(B));
-			const auto translation = translatingYFactor * cosTheta * mouseDiff.x * glm::length(m_selectedObject->getPosition() - m_camera.getPosition());
+			const auto translation = m_translatingZFactor * cosTheta * mouseDiff.x * glm::length(m_selectedObject->getPosition() - m_camera.getPosition());
 			m_selectedObject->translate({0, 0, translation});
 		}
+		default:
+			break;
 	}
 }
 
-void scene::focusCameraOnSelectedObject(void)
+void Scene::focusCameraOnSelectedObject(void)
 {
 	if (m_selectedObject != nullptr)
 	{
@@ -248,7 +223,7 @@ void scene::focusCameraOnSelectedObject(void)
 	}
 }
 
-std::string scene::getSelectedObjectCoordinateStr(void) const
+std::string Scene::getSelectedObjectCoordinateStr(void) const
 {
 	if (m_selectedObject == nullptr)
 	{

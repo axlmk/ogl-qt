@@ -1,0 +1,28 @@
+PROJECT_NAME           = "ogl-qt"
+OUTPUT_DIRECTORY       = docs
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+
+RECURSIVE              = YES
+EXTRACT_ALL            = YES
+
+INPUT                  = src tests
+
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = YES
+
+HAVE_DOT = YES
+CALL_GRAPH = YES
+CALLER_GRAPH = YES
+CLASS_DIAGRAMS = YES
+
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = NO
+
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = YES
+
+WARN_LOGFILE           = doxygen_warnings.log

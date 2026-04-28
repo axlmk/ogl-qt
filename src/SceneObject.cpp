@@ -82,7 +82,7 @@ void SceneObject::_setUpLights(const Camera& camera, const std::vector<LightProp
 		g_opengl.glUniform3f(uniform, 1.0f, 1.0f, 1.0f);
 	}
 
-	SpaceCoord cameraPos = camera.getPosition();
+	glm::vec3 cameraPos = camera.getPosition();
 	uniform = m_shd->getUniform("cameraPos");
 	g_opengl.glUniform3f(uniform, cameraPos.x, cameraPos.y, cameraPos.z);
 }
