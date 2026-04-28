@@ -1,4 +1,3 @@
-name: Windows-build
 on:
   workflow_call:
     inputs:
