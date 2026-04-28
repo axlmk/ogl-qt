@@ -1,0 +1,29 @@
+name: Build Doxygen Docs
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install Doxygen + Graphviz
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+
+      - name: Build documentation
+        run: doxygen Doxyfile
+
+      - name: Verify documentation
+        run: |
+          if [ -s doxygen_warnings.log ]; then
+            cat doxygen_warnings.log
+            exit 1
+          fi
