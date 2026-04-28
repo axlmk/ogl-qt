@@ -1,0 +1,17 @@
+PROJECT_NAME           = "ogl-qt"
+OUTPUT_DIRECTORY       = docs
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+
+RECURSIVE              = YES
+EXTRACT_ALL            = YES
+
+INPUT                  = src tests
+
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = YES
+
+HAVE_DOT = YES
+CALL_GRAPH = YES
+CALLER_GRAPH = YES
+CLASS_DIAGRAMS = YES
