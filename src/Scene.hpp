@@ -49,7 +49,7 @@ class Scene
 	/**
 	 * @brief Initialize the 3D scene
 	 * @param[in] viewportWidth The width of the 3D scene
-	 * @param[in] viewportHeigth The height of the 3D scene
+	 * @param[in] viewportHeight The height of the 3D scene
 	 */
 	void initializeScene(int viewportWidth, int viewportHeight);
 
@@ -73,7 +73,7 @@ class Scene
 	/**
 	 * @brief Updates the viewport after a resizing of its window
 	 * @param[in] width The new width of the window
-	 * @param[in] heigth The new height of the window
+	 * @param[in] height The new height of the window
 	 */
 	void updateViewport(int width, int height);
 

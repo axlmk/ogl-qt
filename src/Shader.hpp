@@ -108,7 +108,7 @@ class Shader
 	 * @brief Apply the given transformation to the shader
 	 * @param[in] model The model matrix, corresponds to the world displacement
 	 * @param[in] view The view matrix, corresponds to the camera's point of view
-	 * @param[in] proejction The projection matrix, corresponds to the screen displacement
+	 * @param[in] projection The projection matrix, corresponds to the screen displacement
 	 */
 	void setTransformation(glm::mat4 model, glm::mat4 view, glm::mat4 projection) const;
 
