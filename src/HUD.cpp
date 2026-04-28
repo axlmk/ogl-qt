@@ -19,11 +19,11 @@ HUD::HUD(std::string font)
 	}
 	FT_Set_Pixel_Sizes(face, 0, 48);
 
-	generateCharacters(face);
+	_generateCharacters(face);
 
-	generateAtlas(font);
+	_generateAtlas(font);
 
-	generateOGLBuffers();
+	_generateOGLBuffers();
 
 	m_shd = std::make_unique<Shader>(ShaderType::Texture, true);
 	m_shd->addTexture(appDir.filePath("resources/textures/arial.png").toLocal8Bit().data());
@@ -40,7 +40,7 @@ HUD::~HUD()
 	g_opengl.glDeleteVertexArrays(1, &m_vao);
 }
 
-void HUD::generateOGLBuffers()
+void HUD::_generateOGLBuffers()
 {
 	g_opengl.glGenVertexArrays(1, &m_vao);
 	g_opengl.glGenBuffers(1, &m_vbo);
@@ -56,7 +56,7 @@ void HUD::generateOGLBuffers()
 	g_opengl.glBindVertexArray(0);
 }
 
-void HUD::generateCharacters(FT_Face face)
+void HUD::_generateCharacters(FT_Face face)
 {
 	for (unsigned char c = 32; c < 128; c++)
 	{
@@ -86,7 +86,7 @@ void HUD::generateCharacters(FT_Face face)
 	}
 }
 
-void HUD::generateAtlas(std::string font)
+void HUD::_generateAtlas(std::string font)
 {
 	std::vector<unsigned char> atlas(ATLAS_WIDTH * ATLAS_HEIGHT, 0);
 
@@ -175,7 +175,7 @@ void HUD::RenderText(float x, float y, glm::vec3 color, float scale)
 	g_opengl.glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void HUD::setText(std::string text)
+void HUD::setText(const std::string& text)
 {
 	m_text = text;
 	m_isMutable = false;

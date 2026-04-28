@@ -3,20 +3,40 @@
 #include "SceneObject.hpp"
 #include "glm/glm.hpp"
 
+/**
+ * @class Represents a gizmo in the scene.
+ * A gizmo is a set of arrow allowing the modification of an object in the scene
+ * This gizmo is always in world's coordinates
+ */
 class Gizmo : public SceneObject
 {
    public:
+	/**
+	 * @brief The direction of the selected arrow
+	 */
 	enum ArrowDirection { X, Y, Z, None };
 
-	explicit Gizmo();
+	/**
+	 * @brief Default constructor
+	 */
+	explicit Gizmo(void);
 
 	/**
 	 * @brief Load the gizmo's model and compile it's shader
 	 */
 	void load(void);
 
+	/**
+	 * @brief Render the gizmo into the scene
+	 * @param[in] camera The point of view from which the scene is rendered
+	 * @param[in] lights Not used
+	 */
 	void render(const Camera& camera, const std::vector<LightProperties*>& lights) const override;
 
+	/**
+	 * @brief Render the gizmo for the picking phase
+	 * @param[in] camera The point of view from which the scene is rendered
+	 */
 	void renderPicking(const Camera& camera) const override;
 
 	/**
@@ -38,12 +58,11 @@ class Gizmo : public SceneObject
 	void unselect(void);
 
 	/**
-	 * @brief Indicates if the gizmo is selected or not
-	 * @return The selection state
+	 * @brief Returns the selected arrow
+	 * Corresponds to the arrows clicked by the user
+	 * @return The selected arrow direction
 	 */
-	bool isSelected(void) const;
-
-	int getSelectedIndex(void) const;
+	ArrowDirection getSelectedIndex(void) const;
 
 	/**
 	 * @brief Get the color id of the given arrow

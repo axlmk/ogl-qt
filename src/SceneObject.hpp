@@ -9,12 +9,18 @@ class Camera;
 class Model;
 struct LightProperties;
 
+/**
+ * @brief Selection effect to apply to a selected object
+ */
 struct Selection
 {
 	Shader color;
 	float scale;
 };
 
+/**
+ * @class Corresponds to an object render into the scene
+ */
 class SceneObject
 {
    protected:
@@ -33,7 +39,7 @@ class SceneObject
 	/**
 	 * @brief Default constructor
 	 */
-	SceneObject();
+	SceneObject(void);
 
 	/**
 	 * @brief Constructor
@@ -78,6 +84,12 @@ class SceneObject
 	 */
 	virtual void render(const Camera& camera, const std::vector<LightProperties*>& lights) const;
 
+	/**
+	 * @brief Render the selected version of the object
+	 * @param[in] camera The camera from which to make the render
+	 * @param[in] lights All the lights illuminating the scene
+	 * @param[in] selection The selection effect to apply to the object
+	 */
 	void renderSelected(const Camera& camera, const std::vector<LightProperties*>& lights, const Selection& selection) const;
 
 	/**

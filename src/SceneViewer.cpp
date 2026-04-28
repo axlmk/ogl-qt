@@ -14,10 +14,10 @@ void SceneViewer::paintGL()
 	m_deltaTime = QDateTime::currentMSecsSinceEpoch() - m_currentTime;
 	m_currentTime = QDateTime::currentMSecsSinceEpoch();
 
-	m_manager->renderLoop(m_inputsBeingPressed, m_deltaTime);
+	m_manager->renderLoop(m_deltaTime);
 }
 
-SceneViewer::SceneViewer(scene* scene)
+SceneViewer::SceneViewer(Scene* scene)
 	: m_manager{scene},
 	  m_inputsBeingPressed{},
 	  m_lastMousePos{0.0, 0.0},
@@ -58,18 +58,6 @@ void SceneViewer::resizeGL(int w, int h)
 
 void SceneViewer::keyPressEvent(QKeyEvent* event)
 {
-	if (event->text() == "z")
-		m_inputsBeingPressed["z"] = true;
-
-	if (event->text() == "q")
-		m_inputsBeingPressed["q"] = true;
-
-	if (event->text() == "d")
-		m_inputsBeingPressed["d"] = true;
-
-	if (event->text() == "s")
-		m_inputsBeingPressed["s"] = true;
-
 	if (event->key() == Qt::Key_Alt)
 	{
 		m_inputsBeingPressed["alt"] = true;
@@ -85,18 +73,6 @@ void SceneViewer::keyPressEvent(QKeyEvent* event)
 
 void SceneViewer::keyReleaseEvent(QKeyEvent* event)
 {
-	if (event->text() == "z")
-		m_inputsBeingPressed["z"] = false;
-
-	if (event->text() == "q")
-		m_inputsBeingPressed["q"] = false;
-
-	if (event->text() == "d")
-		m_inputsBeingPressed["d"] = false;
-
-	if (event->text() == "s")
-		m_inputsBeingPressed["s"] = false;
-
 	if (event->text() == "f")
 		m_manager->focusCameraOnSelectedObject();
 

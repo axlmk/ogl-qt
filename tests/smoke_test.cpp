@@ -12,6 +12,9 @@
 #include "assimp/Importer.hpp"
 #include "glm/glm.hpp"
 
+/**
+ * @brief Tests that dynamic librairies load up properly and that relative paths are corrects
+ */
 int smoke_test(int argc, char* argv[])
 {
 	qInstallMessageHandler([](QtMsgType, const QMessageLogContext&, const QString& msg) { fprintf(stderr, "%s\n", msg.toLocal8Bit().constData()); });

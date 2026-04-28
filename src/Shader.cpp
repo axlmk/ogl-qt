@@ -34,7 +34,7 @@ void Shader::setLight()
 	m_frgShdPath = appDir.filePath("resources/shaders/unicolor.fs").toStdU16String();
 }
 
-void Shader::setColor(RGBColor color)
+void Shader::setColor(glm::vec3 color)
 {
 	if (m_shaderType != ShaderType::Unicolor)
 	{
@@ -77,6 +77,14 @@ void Shader::setColor(std::string color)
 
 	m_vtxShdPath = appDir.filePath("resources/shaders/unicolor.vs").toStdU16String();
 	m_frgShdPath = appDir.filePath("resources/shaders/unicolor.fs").toStdU16String();
+}
+
+std::string to_string(TextureType t)
+{
+	if (t == TextureType::Specular)
+		return "specular";
+	else
+		return "diffuse";
 }
 
 void Shader::addTexture(const std::filesystem::path& texturePath)
@@ -140,7 +148,7 @@ void Shader::_setShaders(const std::filesystem::path& vtxShdPath, const std::fil
 	if (success == GL_FALSE)
 	{
 		g_opengl.glGetShaderInfoLog(vtxShd, INFO_LOG_SIZE, NULL, g_infoLog);
-		deleteShaders(vtxShd, frgShd);
+		_deleteShaders(vtxShd, frgShd);
 		throw std::invalid_argument("Error compiling vertex shader: " + std::string(g_infoLog));
 	}
 
@@ -149,7 +157,7 @@ void Shader::_setShaders(const std::filesystem::path& vtxShdPath, const std::fil
 	const std::string fragmentShaderContent = _getFileContent(frgShdPath);
 	if (fragmentShaderContent.empty())
 	{
-		deleteShaders(vtxShd, frgShd);
+		_deleteShaders(vtxShd, frgShd);
 		throw std::invalid_argument("Fragment shader [" + frgShdPath.string() + "] content could not be loaded");
 	}
 	const char* fragmentShaderContentChar = fragmentShaderContent.c_str();
@@ -162,7 +170,7 @@ void Shader::_setShaders(const std::filesystem::path& vtxShdPath, const std::fil
 	if (success == GL_FALSE)
 	{
 		g_opengl.glGetShaderInfoLog(frgShd, INFO_LOG_SIZE, NULL, g_infoLog);
-		deleteShaders(vtxShd, frgShd);
+		_deleteShaders(vtxShd, frgShd);
 		throw std::invalid_argument("Error compiling fragment shader: " + std::string(g_infoLog));
 	}
 
@@ -174,7 +182,7 @@ void Shader::_setShaders(const std::filesystem::path& vtxShdPath, const std::fil
 	g_opengl.glLinkProgram(m_shdPrgId);
 	g_opengl.glGetProgramiv(m_shdPrgId, GL_LINK_STATUS, &success);
 
-	deleteShaders(vtxShd, frgShd);
+	_deleteShaders(vtxShd, frgShd);
 	if (success == GL_FALSE)
 	{
 		g_opengl.glGetProgramInfoLog(m_shdPrgId, INFO_LOG_SIZE, NULL, g_infoLog);
@@ -270,7 +278,7 @@ std::string Shader::_getFileContent(const std::filesystem::path& path)
 	return buffer.str();
 }
 
-void Shader::deleteShaders(unsigned int vtx, unsigned frg)
+void Shader::_deleteShaders(unsigned int vtx, unsigned frg)
 {
 	if (vtx)
 		g_opengl.glDeleteShader(vtx);
@@ -278,21 +286,7 @@ void Shader::deleteShaders(unsigned int vtx, unsigned frg)
 		g_opengl.glDeleteShader(frg);
 }
 
-void Shader::deleteTexture()
-{
-	g_opengl.glBindTexture(GL_TEXTURE_2D, 0);
-	g_opengl.glDeleteTextures(1, &m_texturesInfo.back().buffer);
-	m_texturesInfo.back().buffer = 0;
-}
-
-void Shader::deleteProgram()
-{
-	g_opengl.glUseProgram(0);
-	g_opengl.glDeleteProgram(m_shdPrgId);
-	m_shdPrgId = 0;
-}
-
-int Shader::getUniform(std::string uniform) const
+int Shader::getUniform(const std::string& uniform) const
 {
 	int ret = g_opengl.glGetUniformLocation(m_shdPrgId, uniform.c_str());
 	if (ret == -1)
