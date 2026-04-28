@@ -1,7 +1,6 @@
 name: Build and Deploy Doxygen Docs
 
 on:
-  push:
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
