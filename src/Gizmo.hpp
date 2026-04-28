@@ -4,7 +4,7 @@
 #include "glm/glm.hpp"
 
 /**
- * @class Represents a gizmo in the scene.
+ * @brief Represents a gizmo in the scene.
  * A gizmo is a set of arrow allowing the modification of an object in the scene
  * This gizmo is always in world's coordinates
  */

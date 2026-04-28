@@ -21,7 +21,7 @@ struct InfoObject
 };
 
 /**
- * @class The view of the 3DApp, displaying the project's information
+ * @brief The view of the 3DApp, displaying the project's information
  */
 class App3DViewer : public QObject
 {

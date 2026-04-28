@@ -9,7 +9,7 @@
 class QStandardItemModel;
 
 /**
- * @class Handle the interaction between the interface and the OpenGL scene
+ * @brief Handle the interaction between the interface and the OpenGL scene
  */
 class App3D : public QObject
 {

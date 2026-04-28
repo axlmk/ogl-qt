@@ -28,7 +28,7 @@ struct Character
 };
 
 /**
- * @class Represents a HUD, 2D that can be added as an overlay on top of the scene
+ * @brief Represents a HUD, 2D that can be added as an overlay on top of the scene
  */
 class HUD
 {

@@ -51,7 +51,7 @@ int TextureFromFile(const std::filesystem::path& texturePath, TextureType type);
 std::string to_string(TextureType t);
 
 /**
- * @class The shader, ie. the visual that will be applied onto a mesh
+ * @brief The shader, ie. the visual that will be applied onto a mesh
  */
 class Shader
 {

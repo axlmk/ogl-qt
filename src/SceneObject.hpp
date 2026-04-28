@@ -19,7 +19,7 @@ struct Selection
 };
 
 /**
- * @class Corresponds to an object render into the scene
+ * @brief Corresponds to an object render into the scene
  */
 class SceneObject
 {
