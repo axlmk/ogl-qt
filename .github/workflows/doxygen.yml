@@ -35,7 +35,7 @@ jobs:
       - name: Upload generated site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs_build/html
+          path: docs/html
 
   deploy:
     environment:
