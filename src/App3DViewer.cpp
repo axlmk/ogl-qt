@@ -65,7 +65,7 @@ void App3DViewer::setSceneObjectsModel(QStandardItemModel* sceneObjectModel)
 
 void App3DViewer::_openExplorer([[maybe_unused]] bool checked)
 {
-	auto filePath = QFileDialog::getOpenFileName(nullptr, "Select 3D file", {}, "3D Files (*.obj);;Images (*.jpg)", {},
+	auto filePath = QFileDialog::getOpenFileName(nullptr, "Select 3D file", "resources/models", "3D Files (*.obj);;Images (*.jpg)", {},
 												 QFileDialog::ReadOnly | QFileDialog::DontResolveSymlinks);
 	if (filePath.isNull())
 	{
