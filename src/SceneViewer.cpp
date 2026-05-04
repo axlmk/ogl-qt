@@ -33,6 +33,13 @@ SceneViewer::SceneViewer(Scene* scene)
 
 SceneViewer::~SceneViewer() {}
 
+void SceneViewer::update(void)
+{
+	QOpenGLWidget::update();
+	auto selectedObject = m_manager->getSelectedObject();
+	emit objectSelectedChanged(selectedObject);
+}
+
 void SceneViewer::initializeGL()
 {
 	g_opengl.initializeOpenGLFunctions();

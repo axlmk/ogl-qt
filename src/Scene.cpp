@@ -112,6 +112,11 @@ void Scene::addLightToRenderables(Model* model, Shader* shader, LightProperties:
 	m_numberOfCreatedObjects++;
 }
 
+SceneObject* Scene::getSelectedObject(void) const
+{
+	return m_selectedObject;
+}
+
 Camera& Scene::getCamera(void)
 {
 	return m_camera;

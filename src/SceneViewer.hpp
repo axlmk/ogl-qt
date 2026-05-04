@@ -7,6 +7,7 @@
 #include "glm/glm.hpp"
 
 class Scene;
+class SceneObject;
 
 /**
  * @brief The view of the 3D scene as Qt Window
@@ -43,6 +44,8 @@ class SceneViewer : public QOpenGLWidget
 	 */
 	void paintGL() Q_DECL_OVERRIDE;
 
+	void update(void);
+
 	/**
 	 * @brief Get the mouse pressed event
 	 * @param[in] event The event captured
@@ -78,6 +81,8 @@ class SceneViewer : public QOpenGLWidget
 	 * @brief Indicates the OpenGL is initialized
 	 */
 	void initialized(void);
+
+	void objectSelectedChanged(SceneObject* selectedObject);
 
    private:
 	Scene* m_manager;  ///< The scene that is represented by this SceneViewer

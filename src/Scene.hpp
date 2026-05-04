@@ -99,6 +99,11 @@ class Scene
 	 */
 	std::string getSelectedObjectCoordinateStr(void) const;
 
+	/**
+	 * @brief Returns the selected object of the scene
+	 */
+	SceneObject* getSelectedObject(void) const;
+
    private:
 	/**
 	 * @brief Do the picking phase, which means a special render of the image is made to determine even an object has been clicked on
