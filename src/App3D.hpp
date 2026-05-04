@@ -60,8 +60,9 @@ class App3D : public QObject
 		LightProperties::LightType light;  ///< Light properties if it's a light
 	};
 
-	Scene m_scene;				///< The scene containing the logic of the elements to render
-	App3DViewer m_app3DViewer;	///< The window responsible for rendering the scene
+	QApplication* m_app;		 ///< Main Qt application
+	Scene m_scene;				 ///< The scene containing the logic of the elements to render
+	App3DViewer* m_app3DViewer;	 ///< The window responsible for rendering the scene
 
 	std::vector<std::unique_ptr<Model>> m_models;	 ///< Contains all the models of the project
 	std::vector<std::unique_ptr<Shader>> m_shaders;	 ///< Contains all the shaders of the project

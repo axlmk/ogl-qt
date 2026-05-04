@@ -6,20 +6,24 @@
 #include "LightObject.hpp"
 #include "SceneObject.hpp"
 
-App3D::App3D(int argc, char* argv[]) : m_app3DViewer{argc, argv, &m_scene}, m_sceneObjectModel{new QStandardItemModel()}
+App3D::App3D(int argc, char* argv[])
 {
-	m_app3DViewer.setSceneObjectsModel(m_sceneObjectModel);
-
+	m_app = new QApplication(argc, argv);
+	m_app3DViewer = new App3DViewer(&m_scene);
+	m_sceneObjectModel = new QStandardItemModel();
 	appDir = QDir(QCoreApplication::applicationDirPath());
 
-	connect(&m_app3DViewer, &App3DViewer::newModelAdded, this, &App3D::_importModel, Qt::UniqueConnection);
-	connect(&m_app3DViewer, &App3DViewer::modelLoaded, this, &App3D::_loadModel, Qt::UniqueConnection);
-	connect(&m_app3DViewer, &App3DViewer::initialized, this, &App3D::_initializeBasicsObjects, Qt::UniqueConnection);
+	connect(m_app3DViewer, &App3DViewer::newModelAdded, this, &App3D::_importModel, Qt::UniqueConnection);
+	connect(m_app3DViewer, &App3DViewer::modelLoaded, this, &App3D::_loadModel, Qt::UniqueConnection);
+	connect(m_app3DViewer, &App3DViewer::initialized, this, &App3D::_initializeBasicsObjects);
+
+	m_app3DViewer->show();
+	m_app3DViewer->setSceneObjectsModel(m_sceneObjectModel);
 }
 
 int App3D::run(void)
 {
-	return m_app3DViewer.run();
+	return m_app->exec();
 }
 
 void App3D::_initializeBasicsObjects(void)
@@ -38,10 +42,13 @@ void App3D::_initializeBasicsObjects(void)
 	const importedObject import{"Point light", modelIdx, shaderIdx, importedObject::Type::Light, LightProperties::LightType::Point};
 	m_availableObjects.emplace_back(import);
 	m_sceneObjectModel->appendRow(new QStandardItem("Point light"));
+
+	m_app3DViewer->centerScreen();
 }
 
 void App3D::_importModel(InfoObject info)
 {
+	m_app3DViewer->initOGLContext();
 	auto model = std::make_unique<Model>(info.objectPath.toStdString());
 	model->load();
 	m_models.emplace_back(std::move(model));

@@ -13,90 +13,53 @@
 #include <QWidget>
 #include <Scene.hpp>
 
-App3DViewer::App3DViewer(int argc, char* argv[], Scene* scene) : m_app{argc, argv}
+#include "ui_App3DViewer.h"
+
+App3DViewer::App3DViewer(Scene* scene) : ui(new Ui::App3DViewer)
 {
-	// Minimal required components
+	ui->setupUi(this);
 
-	m_mainWindow = std::make_unique<QDialog>(nullptr, Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
-	m_sceneViewer = std::make_unique<SceneViewer>(scene);
-
-	// Format management
-
+	// OGL format & configuration
 	QSurfaceFormat format;
 	format.setDepthBufferSize(24);
 	format.setStencilBufferSize(8);
 	format.setRenderableType(QSurfaceFormat::OpenGL);
 	format.setProfile(QSurfaceFormat::CoreProfile);
 	format.setVersion(3, 3);
+
+	m_sceneViewer = new SceneViewer(scene);
 	m_sceneViewer->setFormat(format);
+	m_sceneViewer->setMinimumSize(QSize(900, 600));
 
-	// Container widget
+	// Replace widget properly in layout
+	QLayout* layout = ui->openGLWidget->parentWidget()->layout();
+	layout->replaceWidget(ui->openGLWidget, m_sceneViewer);
+	ui->openGLWidget->deleteLater();
+	ui->openGLWidget = m_sceneViewer;
 
-	QWidget* container = QWidget::createWindowContainer(&(*m_sceneViewer));
-	container->setMinimumSize(QSize(900, 600));
-
-	// Layout and widget container
-
-	std::unique_ptr<QHBoxLayout> globalLayout = std::make_unique<QHBoxLayout>();
-	std::unique_ptr<QVBoxLayout> catalogLayout = std::make_unique<QVBoxLayout>();
-	QLabel* titreCatalogue = new QLabel("List of imported models");
-	QPushButton* importModels = new QPushButton("Import model");
-	connect(importModels, &QPushButton::clicked, this, &App3DViewer::_openExplorer, Qt::UniqueConnection);
-
-	QPushButton* loadModels = new QPushButton("Load model in Scene");
-	connect(loadModels, &QPushButton::clicked, this, &App3DViewer::_modelSelectedToLoad, Qt::UniqueConnection);
-
-	QVBoxLayout* mainLayout = new QVBoxLayout;
-	QWidget* tips = new QWidget();
-	QLabel* title = new QLabel("Controls");
-	QLabel* controls = new QLabel(
-		"Alt + left click : rotate around\n"
-		"Alt + middle click : pan around\n"
-		"Alt + right click : zoom\n"
-		"Click on object: select it\n"
-		"Click on object + f: zoom on the object"
-		"Click on gizmo : translate selected object\n");
-	QVBoxLayout* vlayTips = new QVBoxLayout;
-	m_sceneObjectView = new QListView();
-
-	catalogLayout->addWidget(titreCatalogue);
-	catalogLayout->addWidget(importModels);
-	catalogLayout->addWidget(loadModels);
-	tips->setLayout(vlayTips);
-	vlayTips->setSpacing(5);
-	vlayTips->addWidget(title);
-	vlayTips->addWidget(controls);
-	catalogLayout->addWidget(m_sceneObjectView);
-	mainLayout->setSpacing(0);
-	mainLayout->addWidget(container);
-	mainLayout->addWidget(tips);
-	globalLayout->addLayout(mainLayout);
-	globalLayout->addLayout(catalogLayout.get());
-	m_mainWindow->setLayout(globalLayout.get());
-
-	QScreen* screen = QGuiApplication::primaryScreen();
-	QRect screenGeometry = screen->availableGeometry();
-
-	// Set up the application right at the center of the main screen
-	QSize windowSize = m_mainWindow->sizeHint();
-	int x = screenGeometry.x() + (screenGeometry.width() - windowSize.width()) / 2;
-	int y = screenGeometry.y() + (screenGeometry.height() - windowSize.height()) / 2;
-	m_mainWindow->move(x, y);
-	m_mainWindow->show();
-
-	connect(m_sceneViewer.get(), &SceneViewer::initialized, this, &App3DViewer::initialized, Qt::UniqueConnection);
+	// Connections
+	connect(ui->pushButton, &QPushButton::clicked, this, &App3DViewer::_openExplorer, Qt::UniqueConnection);
+	connect(ui->pushButton_2, &QPushButton::clicked, this, &App3DViewer::_modelSelectedToLoad, Qt::UniqueConnection);
+	connect(m_sceneViewer, &SceneViewer::initialized, this, &App3DViewer::initialized, Qt::UniqueConnection);
 }
 
-int App3DViewer::run(void)
+App3DViewer::~App3DViewer()
 {
-	return m_mainWindow->exec();
+	delete ui;
+}
+
+void App3DViewer::centerScreen(void)
+{
+	QScreen* screen = QGuiApplication::primaryScreen();
+	QRect screenGeometry = screen->geometry();
+	move((screenGeometry.width() - width()) / 2, 5);
 }
 
 void App3DViewer::setSceneObjectsModel(QStandardItemModel* sceneObjectModel)
 {
 	if (sceneObjectModel != nullptr)
 	{
-		m_sceneObjectView->setModel(sceneObjectModel);
+		ui->listView->setModel(sceneObjectModel);
 	}
 }
 
@@ -150,10 +113,15 @@ void App3DViewer::_openExplorer([[maybe_unused]] bool checked)
 
 void App3DViewer::_modelSelectedToLoad([[maybe_unused]] bool checked)
 {
-	auto currentIndex = m_sceneObjectView->selectionModel()->currentIndex();
+	auto currentIndex = ui->listView->selectionModel()->currentIndex();
 	if (!currentIndex.isValid())
 	{
 		return;
 	}
 	emit modelLoaded(currentIndex.row());
+}
+
+void App3DViewer::initOGLContext(void)
+{
+	m_sceneViewer->makeCurrent();
 }

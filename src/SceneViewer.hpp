@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QOpenGLWindow>
+#include <QOpenGLWidget>
 #include <QTimer>
 #include <unordered_map>
 
@@ -11,7 +11,7 @@ class Scene;
 /**
  * @brief The view of the 3D scene as Qt Window
  */
-class SceneViewer : public QOpenGLWindow
+class SceneViewer : public QOpenGLWidget
 {
 	Q_OBJECT
    public:

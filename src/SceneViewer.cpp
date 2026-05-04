@@ -27,6 +27,7 @@ SceneViewer::SceneViewer(Scene* scene)
 	  m_timer{std::make_unique<QTimer>(this)}
 {
 	connect(&(*m_timer), &QTimer::timeout, this, QOverload<>::of(&SceneViewer::update));
+	setFocusPolicy(Qt::StrongFocus);
 	m_timer->start(16);
 }
 
@@ -34,9 +35,7 @@ SceneViewer::~SceneViewer() {}
 
 void SceneViewer::initializeGL()
 {
-	this->requestActivate();
 	g_opengl.initializeOpenGLFunctions();
-
 	g_opengl.glEnable(GL_DEPTH_TEST);
 	g_opengl.glEnable(GL_STENCIL_TEST);
 	g_opengl.glEnable(GL_BLEND);
