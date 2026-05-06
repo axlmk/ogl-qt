@@ -1,6 +1,7 @@
 #include <App3D.hpp>
 #include <QCoreApplication>
 #include <QStandardItemModel>
+#include <QWindow>
 #include <filesystem>
 
 #include "LightObject.hpp"
@@ -19,6 +20,9 @@ App3D::App3D(int argc, char* argv[])
 
 	m_app3DViewer->show();
 	m_app3DViewer->setSceneObjectsModel(m_sceneObjectModel);
+
+	// Icon
+	m_app->setWindowIcon(QIcon(appDir.filePath("resources/icons/app_icon.png")));
 }
 
 int App3D::run(void)
