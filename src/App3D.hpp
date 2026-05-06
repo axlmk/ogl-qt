@@ -47,6 +47,14 @@ class App3D : public QObject
     */
 	void _initializeBasicsObjects(void);
 
+	/**
+	 * @brief Import a light into the scene
+	 * @param[in] name The name
+	 * @param[in] lightType The type
+	 * @param[in] objectName The name of the object to use as a model for the light
+	 */
+	void _importLight(std::string name, LightProperties::LightType lightType, std::string objectName);
+
    private:
 	/**
 	 * @brief Represents an imported object into the project

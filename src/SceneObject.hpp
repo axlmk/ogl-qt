@@ -31,10 +31,13 @@ class SceneObject
 	{
 		glm::vec3 position;	 ///< The location
 		glm::vec3 scale;	 ///< The scale
+		glm::vec3 rotation;	 ///< The rotation
 	} m_transformation;		 ///< The transformation of the object
 
    public:
 	static Shader pick;	 ///< A static shader to represent the picking version of the objects
+
+	enum RotationAxis { X, Y, Z };	///< The axis to rotate around
 
 	/**
 	 * @brief Default constructor
@@ -128,6 +131,19 @@ class SceneObject
 	 * @param[in] scale The vector representation of the scaling to apply
 	 */
 	void scale(glm::vec3 scale);
+
+	/**
+	 * @brief Rotate the object around a specified axis
+	 * @param[in] angle The angle of the rotation in degrees
+	 * @param[in] axis The axis to rotate around
+	 */
+	void rotate(float angle, RotationAxis axis);
+
+	/**
+	 * @brief Get the rotation of the object
+	 * @return The differents angles of rotation around the 3 axis
+	 */
+	glm::vec3 getRotation(void) const;
 
    protected:
 	/**

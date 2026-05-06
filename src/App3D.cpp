@@ -28,7 +28,16 @@ int App3D::run(void)
 
 void App3D::_initializeBasicsObjects(void)
 {
-	auto model = std::make_unique<Model>(appDir.filePath("resources/models/sphere/sphere.obj").toStdU16String());
+	_importLight("Point light", LightProperties::LightType::Point, "sphere");
+	_importLight("Directional light", LightProperties::LightType::Directional, "directional");
+	_importLight("Spot light", LightProperties::LightType::Spot, "spot");
+
+	m_app3DViewer->centerScreen();
+}
+
+void App3D::_importLight(std::string name, LightProperties::LightType lightType, std::string objectName)
+{
+	auto model = std::make_unique<Model>(appDir.filePath(QString("resources/models/%1/%1.obj").arg(QString::fromStdString(objectName))).toStdU16String());
 	model->load();
 	m_models.emplace_back(std::move(model));
 
@@ -39,11 +48,9 @@ void App3D::_initializeBasicsObjects(void)
 
 	const uint modelIdx = static_cast<uint>(m_models.size() - 1);
 	const uint shaderIdx = static_cast<uint>(m_shaders.size() - 1);
-	const importedObject import{"Point light", modelIdx, shaderIdx, importedObject::Type::Light, LightProperties::LightType::Point};
+	const importedObject import{name, modelIdx, shaderIdx, importedObject::Type::Light, lightType};
 	m_availableObjects.emplace_back(import);
-	m_sceneObjectModel->appendRow(new QStandardItem("Point light"));
-
-	m_app3DViewer->centerScreen();
+	m_sceneObjectModel->appendRow(new QStandardItem(QString::fromStdString(name)));
 }
 
 void App3D::_importModel(InfoObject info)

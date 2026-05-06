@@ -75,6 +75,10 @@ void SceneViewer::keyPressEvent(QKeyEvent* event)
 		auto globalCenter = mapToGlobal(geometry().center());
 		cursor().setPos(globalCenter.x(), globalCenter.y());
 	}
+	else if (event->key() == Qt::Key_D)
+	{
+		qDebug() << "Debug actived";
+	}
 }
 
 void SceneViewer::keyReleaseEvent(QKeyEvent* event)

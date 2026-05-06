@@ -33,4 +33,5 @@ struct LightProperties
 	glm::vec3 direction;  /// Directionnal or spot, the direction the light is pointing to
 	float cutoff;		  ///< Spotlight only, the inner radius of the spotlight
 	float outerCutoff;	  ///< Spotlight only, the ouder radius of the spotlight (creates a a smooth transition between light and shadow)
+	float intensity;	  ///< The overall intensity of the light, used to easily modify the brightness
 };

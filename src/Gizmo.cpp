@@ -36,7 +36,7 @@ void Gizmo::render(const Camera& camera, [[maybe_unused]] const std::vector<Ligh
 	const auto YCos = (glm::dot(D, B)) / (glm::length(D) * glm::length(B));
 
 	const auto lenCamArrow = glm::length(camera.getPosition() - m_transformation.position);
-	const transformation transfo{m_transformation.position, glm::vec3(m_scalingFactor * lenCamArrow)};
+	const transformation transfo{m_transformation.position, glm::vec3(m_scalingFactor * lenCamArrow), glm::vec3(0.)};
 
 	if (std::abs(xCos) > m_threshold || std::abs(YCos) > m_threshold)
 	{
@@ -62,7 +62,7 @@ void Gizmo::renderPicking(const Camera& camera) const
 	const auto YCos = (glm::dot(D, B)) / (glm::length(D) * glm::length(B));
 
 	const auto lenCamArrow = glm::length(camera.getPosition() - m_transformation.position);
-	const transformation transfo{m_transformation.position, glm::vec3(m_scalingFactor * lenCamArrow)};
+	const transformation transfo{m_transformation.position, glm::vec3(m_scalingFactor * lenCamArrow), glm::vec3(0.)};
 
 	if (std::abs(xCos) > m_threshold || std::abs(YCos) > m_threshold)
 	{

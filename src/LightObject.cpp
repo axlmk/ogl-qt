@@ -41,3 +41,16 @@ void LightObject::setSpotLight(glm::vec3 direction, float cutoff, float outerCut
 	m_lightProperties.direction = direction;
 	m_lightProperties.outerCutoff = outerCutoff;
 }
+
+void LightObject::setLightDirection(glm::vec3 direction)
+{
+	auto rotationMatrix = glm::rotate(glm::mat4(1.f), glm::radians(direction.x), glm::vec3(1.f, 0.f, 0.f));
+	rotationMatrix = glm::rotate(rotationMatrix, glm::radians(direction.y), glm::vec3(0.f, 1.f, 0.f));
+	rotationMatrix = glm::rotate(rotationMatrix, glm::radians(direction.z), glm::vec3(0.f, 0.f, 1.f));
+
+	m_lightProperties.direction = glm::vec3(rotationMatrix * glm::vec4(0.f, 1.f, 0.f, 0.f));
+
+	rotate(direction.x, RotationAxis::X);
+	rotate(direction.y, RotationAxis::Y);
+	rotate(direction.z, RotationAxis::Z);
+}
