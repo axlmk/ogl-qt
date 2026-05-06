@@ -19,7 +19,6 @@ struct Light
 {
 	vec3	diffuse;
 	vec3	specular;
-	vec3	ambient;
 
 	int		type;
 	vec3	position;
@@ -29,6 +28,8 @@ struct Light
 	float	quadratic;
 	float	cutoff;
 	float	outerCutoff;
+
+	float 	intensity;
 };
 
 uniform vec3		cameraPos;
@@ -77,35 +78,34 @@ vec3 calculateLight(Light light, vec3 normal, vec3 fragPos, vec3 camDir)
 
 	// Diffuse
 	float diff			= max(dot(normal, lightDirection), 0.0);
-	vec3 diffuse		= (light.diffuse * vec3(texture(material.diffuse_1, textureCoord)) * diff) + light.ambient;
+	vec3 diffuse		= light.diffuse * diff * vec3(texture(material.diffuse_1, textureCoord));
 
 	// Specular
 	vec3 reflectDir		= reflect(-lightDirection, normal);
 	float spec			= pow(max(dot(camDir, reflectDir), 0.0), material.shininess);
 	vec3 specular		= light.specular * spec * vec3(texture(material.specular_1, textureCoord));
 
+	vec3 textureIllumination = diffuse + specular;
+
 	// Light specifities
 	if(light.type == LIGHT_POINT)
 	{
 		float distance	= length(light.position - fragPos);
 		float attenuation = 1.0 / ( 1.0 + light.linear * distance + light.quadratic * distance * distance );
-		return (diffuse + specular) * attenuation;
+		return textureIllumination * attenuation * light.intensity;
 	}
 	else if(light.type == LIGHT_SPOT)
 	{
 		// Cutoff
-		float theta			= dot(lightDirection, normalize(-light.direction));
+		float theta			= dot(-lightDirection, normalize(-light.direction));
 		float epsilon		= light.cutoff - light.outerCutoff;
 		float intensity		= clamp((theta - light.outerCutoff) / epsilon, 0.0, 1.0);
 
-		return (diffuse + specular * 0) * intensity;
+		return textureIllumination * intensity * light.intensity;
 	}
 	else if(light.type == LIGHT_DIRECTIONAL)
 	{
-		return (diffuse + specular * 0);
+		return textureIllumination * light.intensity * 0.8;
 	}
-	else 
-	{
-		return vec3(0.0);
-	}
+	return vec3(0.0);
 }

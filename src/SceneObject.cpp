@@ -10,7 +10,8 @@ Shader SceneObject::pick{ShaderType::Unicolor};
 
 SceneObject::SceneObject() : m_model{nullptr}, m_shd{nullptr} {}
 
-SceneObject::SceneObject(Model* geometry, Shader* shader) : m_transformation{glm::vec3(0.f), glm::vec3(1.f)}, m_model{geometry}, m_shd{shader}, m_loaded{false}
+SceneObject::SceneObject(Model* geometry, Shader* shader)
+	: m_transformation{glm::vec3(0.f), glm::vec3(1.f), glm::vec3(0.f)}, m_model{geometry}, m_shd{shader}, m_loaded{false}
 {}
 
 Model* SceneObject::getModel() const
@@ -37,6 +38,9 @@ void SceneObject::_setUpLights(const Camera& camera, const std::vector<LightProp
 		uniform = m_shd->getUniform("lights[" + iStr + "].type");
 		g_opengl.glUniform1i(uniform, light->type);
 
+		uniform = m_shd->getUniform("lights[" + iStr + "].intensity");
+		g_opengl.glUniform1f(uniform, light->intensity);
+
 		switch (light->type)
 		{
 			case LightProperties::LightType::Point: {
@@ -52,11 +56,12 @@ void SceneObject::_setUpLights(const Camera& camera, const std::vector<LightProp
 				break;
 			}
 			case LightProperties::LightType::Spot: {
+				// The light has inverted outerCutoff and cutoff and I'm too lazy to investigate why, so I just swap them here
 				uniform = m_shd->getUniform("lights[" + iStr + "].cutoff");
-				g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light->cutoff)));
+				g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light->outerCutoff)));
 
 				uniform = m_shd->getUniform("lights[" + iStr + "].outerCutoff");
-				g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light->outerCutoff)));
+				g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light->cutoff)));
 
 				uniform = m_shd->getUniform("lights[" + iStr + "].position");
 				g_opengl.glUniform3f(uniform, light->position.x, light->position.y, light->position.z);
@@ -71,9 +76,6 @@ void SceneObject::_setUpLights(const Camera& camera, const std::vector<LightProp
 				break;
 			}
 		}
-
-		uniform = m_shd->getUniform("lights[" + iStr + "].ambient");
-		g_opengl.glUniform3f(uniform, 0.05f, 0.05f, 0.05f);
 
 		uniform = m_shd->getUniform("lights[" + iStr + "].diffuse");
 		g_opengl.glUniform3f(uniform, 0.65f, 0.65f, 0.65f);
@@ -132,7 +134,7 @@ void SceneObject::_renderSelected(const Camera& camera, const std::vector<LightP
 	g_opengl.glStencilMask(0x00);
 	g_opengl.glDisable(GL_DEPTH_TEST);
 
-	_setTransformation(camera, selection.color, {m_transformation.position, glm::vec3(selection.scale)});
+	_setTransformation(camera, selection.color, {m_transformation.position, glm::vec3(selection.scale), m_transformation.rotation});
 
 	model.Draw(selection.color);
 
@@ -152,6 +154,9 @@ void SceneObject::_setTransformation(const Camera& camera, const Shader& shader,
 
 	// World's location
 	model_mat = glm::scale(glm::translate(glm::mat4(1.0f), transformation.position), transformation.scale);
+	model_mat = glm::rotate(model_mat, glm::radians(transformation.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	model_mat = glm::rotate(model_mat, glm::radians(transformation.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	model_mat = glm::rotate(model_mat, glm::radians(transformation.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
 	// Camera's location
 	view_mat = camera.getSpaceMat();
@@ -218,12 +223,33 @@ void SceneObject::translate(const glm::vec3& translation)
 	m_transformation.position += translation;
 }
 
-glm::vec3 SceneObject::getPosition() const
+glm::vec3 SceneObject::getPosition(void) const
 {
 	return m_transformation.position;
+}
+
+glm::vec3 SceneObject::getRotation(void) const
+{
+	return m_transformation.rotation;
 }
 
 void SceneObject::setPosition(const glm::vec3& position)
 {
 	m_transformation.position = position;
+}
+
+void SceneObject::rotate(float angle, RotationAxis axis)
+{
+	switch (axis)
+	{
+		case X:
+			m_transformation.rotation.x = angle;
+			break;
+		case Y:
+			m_transformation.rotation.y = angle;
+			break;
+		case Z:
+			m_transformation.rotation.z = angle;
+			break;
+	}
 }

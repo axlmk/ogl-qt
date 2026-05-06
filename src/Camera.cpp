@@ -8,7 +8,7 @@ Camera::Camera(const glm::vec3& position, float fov)
 	  m_projection{CameraProjection::Perspective},
 	  m_fov{fov},
 	  m_nearPlan{0.1f},
-	  m_farPlan{100.f}
+	  m_farPlan{500.f}
 {
 	m_upVec = glm::cross(glm::normalize(position), m_rightVec);
 }

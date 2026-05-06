@@ -1,17 +1,18 @@
 #pragma once
 
-#include <QOpenGLWindow>
+#include <QOpenGLWidget>
 #include <QTimer>
 #include <unordered_map>
 
 #include "glm/glm.hpp"
 
 class Scene;
+class SceneObject;
 
 /**
  * @brief The view of the 3D scene as Qt Window
  */
-class SceneViewer : public QOpenGLWindow
+class SceneViewer : public QOpenGLWidget
 {
 	Q_OBJECT
    public:
@@ -42,6 +43,8 @@ class SceneViewer : public QOpenGLWindow
 	 * @brief Render an OpenGL frame
 	 */
 	void paintGL() Q_DECL_OVERRIDE;
+
+	void update(void);
 
 	/**
 	 * @brief Get the mouse pressed event
@@ -78,6 +81,8 @@ class SceneViewer : public QOpenGLWindow
 	 * @brief Indicates the OpenGL is initialized
 	 */
 	void initialized(void);
+
+	void objectSelectedChanged(SceneObject* selectedObject);
 
    private:
 	Scene* m_manager;  ///< The scene that is represented by this SceneViewer

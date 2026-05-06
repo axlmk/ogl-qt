@@ -27,16 +27,22 @@ SceneViewer::SceneViewer(Scene* scene)
 	  m_timer{std::make_unique<QTimer>(this)}
 {
 	connect(&(*m_timer), &QTimer::timeout, this, QOverload<>::of(&SceneViewer::update));
+	setFocusPolicy(Qt::StrongFocus);
 	m_timer->start(16);
 }
 
 SceneViewer::~SceneViewer() {}
 
+void SceneViewer::update(void)
+{
+	QOpenGLWidget::update();
+	auto selectedObject = m_manager->getSelectedObject();
+	emit objectSelectedChanged(selectedObject);
+}
+
 void SceneViewer::initializeGL()
 {
-	this->requestActivate();
 	g_opengl.initializeOpenGLFunctions();
-
 	g_opengl.glEnable(GL_DEPTH_TEST);
 	g_opengl.glEnable(GL_STENCIL_TEST);
 	g_opengl.glEnable(GL_BLEND);
@@ -68,6 +74,10 @@ void SceneViewer::keyPressEvent(QKeyEvent* event)
 		m_lastMousePos.y = cursor().pos().y();
 		auto globalCenter = mapToGlobal(geometry().center());
 		cursor().setPos(globalCenter.x(), globalCenter.y());
+	}
+	else if (event->key() == Qt::Key_D)
+	{
+		qDebug() << "Debug actived";
 	}
 }
 

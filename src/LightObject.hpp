@@ -65,6 +65,12 @@ class LightObject : public SceneObject
 	 */
 	void setSpotLight(glm::vec3 direction, float cutoff, float outerCutoff = 0.0);
 
+	/**
+	 * @brief Set the direction of the light, only for directional and spot light
+	 * @param[in] direction The new direction of the light
+	 */
+	void setLightDirection(glm::vec3 direction);
+
    private:
 	LightProperties m_lightProperties;	///< The rendering properties of the light represent by this lightobject
 };

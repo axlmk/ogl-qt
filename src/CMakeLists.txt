@@ -40,6 +40,7 @@ qt_add_executable(ogl-qt
     main.cpp
     App3D.cpp
     App3DViewer.cpp
+    App3DViewer.ui
     Camera.cpp
     Gizmo.cpp
     HUD.cpp

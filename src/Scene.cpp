@@ -97,11 +97,11 @@ void Scene::addLightToRenderables(Model* model, Shader* shader, LightProperties:
 			lightToAdd->setName("Point Light" + m_numberOfCreatedObjects);
 			break;
 		case LightProperties::LightType::Directional:
-			lightToAdd->setDirectionalLight(glm::vec3(0.f, -1.0f, 0.0f));
+			lightToAdd->setDirectionalLight(glm::vec3(0.f, 1.0f, 0.0f));
 			lightToAdd->setName("Directionnal Light" + m_numberOfCreatedObjects);
 			break;
 		default:
-			lightToAdd->setSpotLight(glm::vec3(0.f, -1.0f, 0.0f), 0.91, 0.82);
+			lightToAdd->setSpotLight(glm::vec3(0.f, 1.0f, 0.0f), 10, 9);
 			lightToAdd->setName("Spot Light" + m_numberOfCreatedObjects);
 			break;
 	}
@@ -110,6 +110,11 @@ void Scene::addLightToRenderables(Model* model, Shader* shader, LightProperties:
 	m_renderedObjects.push_back(std::move(lightToAdd));
 
 	m_numberOfCreatedObjects++;
+}
+
+SceneObject* Scene::getSelectedObject(void) const
+{
+	return m_selectedObject;
 }
 
 Camera& Scene::getCamera(void)
