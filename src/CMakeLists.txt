@@ -58,6 +58,10 @@ qt_add_executable(ogl-qt
 
 setup_qt_target(ogl-qt)
 
+set(APP_ICON_RESOURCE_WINDOWS ../resources/icons/appicon.rc)
+
+target_sources(ogl-qt PRIVATE ${APP_ICON_RESOURCE_WINDOWS})
+
 set_target_properties(ogl-qt PROPERTIES
     MACOSX_BUNDLE ON
     VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:ogl-qt>"
