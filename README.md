@@ -1,5 +1,5 @@
 <h1>
-  <img width="90" align="center" alt="app_icon" src="https://github.com/axlmk/ogl-qt/raw/release_1.0/resources/icons/app_icon.png" />
+  <img width="90" align="center" alt="app_icon" src="https://github.com/axlmk/ogl-qt/raw/main/resources/icons/app_icon.png" />
   OGL-QT
 </h1>
 
