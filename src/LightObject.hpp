@@ -32,6 +32,12 @@ class LightObject : public SceneObject
 	void render(const Camera& camera, const std::vector<LightProperties*>& lights) const override;
 
 	/**
+	 * @brief Move the object to a specified location in the scene
+	 * @param[in] position The new position
+	 */
+	void setPosition(const glm::vec3& position) override;
+
+	/**
 	 * @brief Translate the model and the light properties at the same time
 	 * @param[in] translation The direction for the object to be translated to
 	 */

@@ -118,7 +118,7 @@ class SceneObject
 	 * @brief Move the object to a specified location in the scene
 	 * @param[in] position The new position
 	 */
-	void setPosition(const glm::vec3& position);
+	virtual void setPosition(const glm::vec3& position);
 
 	/**
 	 * @brief Scale the object
