@@ -15,6 +15,12 @@ LightProperties* LightObject::getLightProperties(void)
 	return &m_lightProperties;
 }
 
+void LightObject::setPosition(const glm::vec3& position)
+{
+	m_lightProperties.position = position;
+	SceneObject::setPosition(position);
+}
+
 void LightObject::translate(const glm::vec3& translation)
 {
 	m_lightProperties.position += translation;
