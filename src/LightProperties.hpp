@@ -27,11 +27,37 @@ struct LightProperties
 	 */
 	LightProperties(LightType typeLight);
 
+	/**
+	 * @brief Set the inner cutoff angle for the light
+	 * @param[in] cutoff The inner cutoff angle
+	 */
+	void setCutoff(float cutoff);
+
+	/**
+	 * @brief Set the outer cutoff angle for the light
+	 * @param[in] outerCutoff The outer cutoff angle
+	 */
+	void setOuterCutoff(float outerCutoff);
+
+	/**
+	 * @brief Get the inner cutoff angle for the light
+	 * @return The inner cutoff angle
+	 */
+	float getCutoff(void) const;
+
+	/**
+	 * @brief Get the outer cutoff angle for the light
+	 * @return The outer cutoff angle
+	 */
+	float getOuterCutoff(void) const;
+
 	glm::vec3 position;	  ///< The position
 	float linear;		  ///< Point only, the linear decrease
 	float quadratic;	  ///< Point only, the quadratic decrease
 	glm::vec3 direction;  /// Directionnal or spot, the direction the light is pointing to
-	float cutoff;		  ///< Spotlight only, the inner radius of the spotlight
-	float outerCutoff;	  ///< Spotlight only, the ouder radius of the spotlight (creates a a smooth transition between light and shadow)
 	float intensity;	  ///< The overall intensity of the light, used to easily modify the brightness
+
+   private:
+	float cutoff;		///< Spotlight only, the inner radius of the spotlight
+	float outerCutoff;	///< Spotlight only, the ouder radius of the spotlight (creates a a smooth transition between light and shadow)
 };

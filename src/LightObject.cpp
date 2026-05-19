@@ -37,9 +37,9 @@ void LightObject::setPointLight(float linear, float quadratic)
 void LightObject::setSpotLight(glm::vec3 direction, float cutoff, float outerCutoff)
 {
 	m_lightProperties.type = LightProperties::LightType::Spot;
-	m_lightProperties.cutoff = cutoff;
+	m_lightProperties.setOuterCutoff(outerCutoff);
+	m_lightProperties.setCutoff(cutoff);
 	m_lightProperties.direction = direction;
-	m_lightProperties.outerCutoff = outerCutoff;
 }
 
 void LightObject::setLightDirection(glm::vec3 direction)
