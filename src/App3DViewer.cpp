@@ -228,23 +228,34 @@ void App3DViewer::_selectedObjectChanged(SceneObject* selectedObject)
 					break;
 				}
 				case LightProperties::LightType::Spot: {
-					QLabel* cutoffLabel = new QLabel("Cutoff:");
-					ui->gridLayout->addWidget(cutoffLabel, 6, 0);
-					QDoubleSpinBox* cutoffEdit = new QDoubleSpinBox();
-					cutoffEdit->setRange(0.0, 180.0);
-					cutoffEdit->setSingleStep(1);
-					cutoffEdit->setValue(light->cutoff);
-					ui->gridLayout->addWidget(cutoffEdit, 6, 1);
-					connect(cutoffEdit, &QDoubleSpinBox::valueChanged, this, [light, cutoffEdit](double value) { light->cutoff = value; });
-
-					QLabel* outerCutoffLabel = new QLabel("Outer cutoff:");
-					ui->gridLayout->addWidget(outerCutoffLabel, 7, 0);
+					QLabel* outerCutoffLabel = new QLabel("Outer Cutoff:");
 					QDoubleSpinBox* outerCutoffEdit = new QDoubleSpinBox();
-					outerCutoffEdit->setRange(0.0, 180.0);
+					ui->gridLayout->addWidget(outerCutoffLabel, 6, 0);
+
+					QLabel* cutoffLabel = new QLabel("Cutoff:");
+					ui->gridLayout->addWidget(cutoffLabel, 7, 0);
+					QDoubleSpinBox* cutoffEdit = new QDoubleSpinBox();
+
+					cutoffEdit->setMinimum(0.0);
+					cutoffEdit->setMaximum(light->getOuterCutoff());
+					cutoffEdit->setSingleStep(1);
+					cutoffEdit->setValue(light->getCutoff());
+					ui->gridLayout->addWidget(cutoffEdit, 7, 1);
+
+					outerCutoffEdit->setMinimum(light->getCutoff());
+					outerCutoffEdit->setMaximum(180.0);
 					outerCutoffEdit->setSingleStep(1);
-					outerCutoffEdit->setValue(light->outerCutoff);
-					ui->gridLayout->addWidget(outerCutoffEdit, 7, 1);
-					connect(outerCutoffEdit, &QDoubleSpinBox::valueChanged, this, [light, outerCutoffEdit](double value) { light->outerCutoff = value; });
+					outerCutoffEdit->setValue(light->getOuterCutoff());
+					ui->gridLayout->addWidget(outerCutoffEdit, 6, 1);
+
+					connect(outerCutoffEdit, &QDoubleSpinBox::valueChanged, this, [light, outerCutoffEdit, cutoffEdit](double value) {
+						light->setOuterCutoff(value);
+						cutoffEdit->setMaximum(value);
+					});
+					connect(cutoffEdit, &QDoubleSpinBox::valueChanged, this, [light, outerCutoffEdit, cutoffEdit](double value) {
+						light->setCutoff(value);
+						outerCutoffEdit->setMinimum(value);
+					});
 					additionalRow = 2;
 					[[fallthrough]];
 				}

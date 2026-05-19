@@ -58,10 +58,10 @@ void SceneObject::_setUpLights(const Camera& camera, const std::vector<LightProp
 			case LightProperties::LightType::Spot: {
 				// The light has inverted outerCutoff and cutoff and I'm too lazy to investigate why, so I just swap them here
 				uniform = m_shd->getUniform("lights[" + iStr + "].cutoff");
-				g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light->outerCutoff)));
+				g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light->getCutoff())));
 
 				uniform = m_shd->getUniform("lights[" + iStr + "].outerCutoff");
-				g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light->cutoff)));
+				g_opengl.glUniform1f(uniform, glm::cos(glm::radians(light->getOuterCutoff())));
 
 				uniform = m_shd->getUniform("lights[" + iStr + "].position");
 				g_opengl.glUniform3f(uniform, light->position.x, light->position.y, light->position.z);

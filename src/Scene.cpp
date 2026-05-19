@@ -101,7 +101,7 @@ void Scene::addLightToRenderables(Model* model, Shader* shader, LightProperties:
 			lightToAdd->setName("Directionnal Light" + m_numberOfCreatedObjects);
 			break;
 		default:
-			lightToAdd->setSpotLight(glm::vec3(0.f, 1.0f, 0.0f), 10, 9);
+			lightToAdd->setSpotLight(glm::vec3(0.f, 1.0f, 0.0f), 9, 10);
 			lightToAdd->setName("Spot Light" + m_numberOfCreatedObjects);
 			break;
 	}
