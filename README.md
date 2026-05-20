@@ -3,7 +3,7 @@
   OGL-QT
 </h1>
 
-[![Current milestone completion](https://img.shields.io/github/milestones/progress/axlmk/ogl-qt/2)](https://github.com/axlmk/ogl-qt/milestone/2)
+[![Last milestone implemented](https://img.shields.io/github/milestones/progress-percent/axlmk/ogl-qt/2)](https://github.com/axlmk/ogl-qt/milestone/2) [![Current milestone completion](https://img.shields.io/github/milestones/progress/axlmk/ogl-qt/3)](https://github.com/axlmk/ogl-qt/milestone/3)
 
 [![windows-latest-msvc](https://github.com/axlmk/ogl-qt/actions/workflows/windows-latest-msvc.yml/badge.svg)](https://github.com/axlmk/ogl-qt/actions/workflows/windows-latest-msvc.yml) [![windows-latest-mingw](https://github.com/axlmk/ogl-qt/actions/workflows/windows-latest-mingw.yml/badge.svg)](https://github.com/axlmk/ogl-qt/actions/workflows/windows-latest-mingw.yml) [![linux-latest-gcc](https://github.com/axlmk/ogl-qt/actions/workflows/linux-latest-gcc.yml/badge.svg)](https://github.com/axlmk/ogl-qt/actions/workflows/linux-latest-gcc.yml)
 
