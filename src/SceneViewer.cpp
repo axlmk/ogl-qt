@@ -75,17 +75,22 @@ void SceneViewer::keyPressEvent(QKeyEvent* event)
 		auto globalCenter = mapToGlobal(geometry().center());
 		cursor().setPos(globalCenter.x(), globalCenter.y());
 	}
-	else if (event->key() == Qt::Key_D)
+	if (event->key() == Qt::Key_D)
 	{
 		qDebug() << "Debug actived";
+	}
+	if (event->key() == Qt::Key_F)
+	{
+		m_manager->focusCameraOnSelectedObject();
+	}
+	if (event->key() == Qt::Key_Escape)
+	{
+		m_manager->unselectObject();
 	}
 }
 
 void SceneViewer::keyReleaseEvent(QKeyEvent* event)
 {
-	if (event->text() == "f")
-		m_manager->focusCameraOnSelectedObject();
-
 	if (event->key() == Qt::Key_Alt)
 	{
 		if (m_inputsBeingPressed["alt"])

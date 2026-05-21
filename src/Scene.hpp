@@ -104,6 +104,11 @@ class Scene
 	 */
 	SceneObject* getSelectedObject(void) const;
 
+	/**
+	 * @brief Unselect the selected object
+	 */
+	void unselectObject(void);
+
    private:
 	/**
 	 * @brief Do the picking phase, which means a special render of the image is made to determine even an object has been clicked on
