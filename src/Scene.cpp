@@ -187,6 +187,12 @@ void Scene::_picking()
 	m_isPicking = false;
 }
 
+void Scene::unselectObject(void)
+{
+	m_selectedObject = nullptr;
+	m_gizmo.unselect();
+}
+
 void Scene::tryMoveObject(const glm::ivec2& mouseDiff)
 {
 	switch (m_gizmo.getSelectedIndex())
