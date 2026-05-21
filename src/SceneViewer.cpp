@@ -83,6 +83,10 @@ void SceneViewer::keyPressEvent(QKeyEvent* event)
 	{
 		m_manager->focusCameraOnSelectedObject();
 	}
+	if (event->key() == Qt::Key_Delete)
+	{
+		m_manager->deleteSelectedObject();
+	}
 	if (event->key() == Qt::Key_Escape)
 	{
 		m_manager->unselectObject();

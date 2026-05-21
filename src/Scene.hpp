@@ -109,6 +109,8 @@ class Scene
 	 */
 	void unselectObject(void);
 
+	void deleteSelectedObject(void);
+
    private:
 	/**
 	 * @brief Do the picking phase, which means a special render of the image is made to determine even an object has been clicked on

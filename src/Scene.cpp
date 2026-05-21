@@ -193,6 +193,36 @@ void Scene::unselectObject(void)
 	m_gizmo.unselect();
 }
 
+void Scene::deleteSelectedObject(void)
+{
+	if (m_selectedObject == nullptr)
+	{
+		return;
+	}
+
+	auto it = std::find_if(m_renderedObjects.begin(), m_renderedObjects.end(),
+						   [this](const std::unique_ptr<SceneObject>& object) { return object.get() == m_selectedObject; });
+	if (it == m_renderedObjects.end())
+	{
+		return;
+	}
+
+	m_selectedObject = nullptr;
+	m_gizmo.unselect();
+
+	auto light = dynamic_cast<LightObject*>((*it).get());
+	if (light != nullptr)
+	{
+		auto lightProperties = light->getLightProperties();
+		auto itLight = std::find(m_lights.begin(), m_lights.end(), lightProperties);
+		if (itLight != m_lights.end())
+		{
+			m_lights.erase(itLight);
+		}
+	}
+	m_renderedObjects.erase(it);
+}
+
 void Scene::tryMoveObject(const glm::ivec2& mouseDiff)
 {
 	switch (m_gizmo.getSelectedIndex())
